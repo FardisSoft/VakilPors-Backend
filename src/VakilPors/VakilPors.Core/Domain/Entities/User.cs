@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using VakilPors.Shared.Entities;
 
 namespace VakilPors.Core.Domain.Entities;
 
 [Table(nameof(User))]
-public class User 
+public class User : IEntity
 {
     [Key]
     public int UserId { get; set; }
