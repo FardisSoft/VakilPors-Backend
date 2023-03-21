@@ -2,7 +2,7 @@
 using VakilPors.Shared.Settings;
 using System.Security.Cryptography;
 using System.Text;
-using Beshno.Shared.Settings;
+using VakilPors.Shared.Settings;
 
 namespace VakilPors.Utilities;
 
