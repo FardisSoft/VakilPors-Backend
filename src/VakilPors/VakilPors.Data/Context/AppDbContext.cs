@@ -13,9 +13,11 @@ public class AppDbContext : IdentityDbContext<User, Role, int>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<User>().HasIndex(user => user.UserName).IsUnique();
 
         modelBuilder.RegisterEntities(typeof(User).Assembly);
+        modelBuilder.ApplyUtcDateTimeConverter();
         DatabaseSeeder seeder=new DatabaseSeeder(modelBuilder);
         seeder.Seed();
     }
