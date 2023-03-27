@@ -15,7 +15,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddDbContext<AppDbContext>((IServiceProvider serviceProvider, DbContextOptionsBuilder options) =>
         {
-            options.UseSqlServer(configuration.GetConnectionString("AppDbContext"));
+            options.UseNpgsql(configuration.GetConnectionString("AppDbContext"));
         });
         services.AddScoped(typeof(IGenericRepo<>), typeof(GenericRepo<>));
         services.AddScoped<IAppUnitOfWork, AppUnitOfWork>();
