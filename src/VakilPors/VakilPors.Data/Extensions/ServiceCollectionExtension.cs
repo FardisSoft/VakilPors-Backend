@@ -11,11 +11,11 @@ namespace VakilPors.Data.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static void RegisterAppDbContext(this IServiceCollection services, IConfiguration configuration)
+    public static void RegisterAppDbContext(this IServiceCollection services, string connectionString)
     {
         services.AddDbContext<AppDbContext>((IServiceProvider serviceProvider, DbContextOptionsBuilder options) =>
         {
-            options.UseNpgsql(configuration.GetConnectionString("AppDbContext"));
+            options.UseNpgsql(connectionString);
         });
         services.AddScoped(typeof(IGenericRepo<>), typeof(GenericRepo<>));
         services.AddScoped<IAppUnitOfWork, AppUnitOfWork>();

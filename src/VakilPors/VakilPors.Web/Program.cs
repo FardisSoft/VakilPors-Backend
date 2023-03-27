@@ -11,10 +11,11 @@ using VakilPors.Web.Configuration.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
-
+var connectionString=Environment.GetEnvironmentVariable("ConnectionString") ?? configuration.GetConnectionString("AppDbContext");
+System.Console.WriteLine($"connection string:{connectionString}");
 // Add services to the container.
 builder.Services.RegisterServices();
-builder.Services.RegisterAppDbContext(configuration);
+builder.Services.RegisterAppDbContext(connectionString);
 builder.Services.RegisterIdentity<AppDbContext>();
 builder.Services.RegisterAuthentication(configuration);
 builder.Services.AddAutoMapper(typeof(MapperProfile));
