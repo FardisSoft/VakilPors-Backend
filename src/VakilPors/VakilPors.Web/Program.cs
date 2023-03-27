@@ -1,4 +1,5 @@
 
+using Serilog;
 using VakilPors.Business.Extensions;
 using VakilPors.Core.Authentication.Extensions;
 using VakilPors.Core.Mapper;
@@ -16,6 +17,7 @@ builder.Services.RegisterAppDbContext(configuration);
 builder.Services.RegisterIdentity<AppDbContext>();
 builder.Services.RegisterAuthentication(configuration);
 builder.Services.AddAutoMapper(typeof(MapperProfile));
+builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console().ReadFrom.Configuration(ctx.Configuration));
 
 builder.Services.AddControllers();
 
