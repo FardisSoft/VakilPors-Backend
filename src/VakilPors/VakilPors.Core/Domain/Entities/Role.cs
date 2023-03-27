@@ -15,5 +15,9 @@ namespace VakilPors.Core.Domain.Entities
         public const string Admin = "Admin";
         public const string Vakil = "Vakil";
         public const string User = "User";
+        public static string[] GetAll()
+        {
+            return new string[] { Admin, Vakil, User };
+        }
     }
 }
