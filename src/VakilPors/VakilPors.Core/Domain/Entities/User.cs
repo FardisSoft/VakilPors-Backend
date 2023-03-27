@@ -1,34 +1,23 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
 using VakilPors.Shared.Entities;
 
 namespace VakilPors.Core.Domain.Entities;
 
-[Table(nameof(User))]
-public class User : IEntity
+
+public class User : IdentityUser<int>
 {
-    [Key]
-    public int UserId { get; set; }
-
     [Required]
-    public string Username { get; set; }
+    [MaxLength(50)]
+    public string Name { get; set; }
+    public string? RefreshToken { get; set; }
+    public DateTime RefreshTokenExpiryTime { get; set; }
+    public bool IsActive
+    {
+        get { return PhoneNumberConfirmed; }
+        set { PhoneNumberConfirmed = value; }
+    }
 
-    [Required]
-    [EmailAddress]
-    public string Email { get; set; }
-
-    [Required]
-    [MaxLength(256)]
-    public string Password { get; set; }
-
-    [Required]
-    [MaxLength(256)]
-    public string PasswordSalt { get; set; }
-
-    [Required]
-    public bool IsActive { get; set; }
-
-    [Required]
-    public bool IsLocked { get; set; }
 }
 
