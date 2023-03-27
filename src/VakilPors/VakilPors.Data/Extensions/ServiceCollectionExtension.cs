@@ -15,7 +15,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddDbContext<AppDbContext>((IServiceProvider serviceProvider, DbContextOptionsBuilder options) =>
         {
-            options.UseSqlite(configuration.GetConnectionString("AppDbContext"));
+            options.UseSqlServer(configuration.GetConnectionString("AppDbContext"));
         });
         services.AddScoped(typeof(IGenericRepo<>), typeof(GenericRepo<>));
         services.AddScoped<IAppUnitOfWork, AppUnitOfWork>();
