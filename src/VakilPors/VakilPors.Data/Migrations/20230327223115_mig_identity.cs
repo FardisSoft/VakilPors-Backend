@@ -166,9 +166,9 @@ namespace VakilPors.Data.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { 1, "379ec985-8b06-494b-849b-dfa3aebc9a38", "User", "USER" },
-                    { 2, "f666b8a3-a5f8-4040-8a47-85505948fd78", "Vakil", "VAKIL" },
-                    { 3, "8ded7b01-3804-4a88-bc07-9feadd8613a4", "Admin", "ADMIN" }
+                    { 1, "8bdeb514-9677-4ab5-bcca-b7e097575597", "User", "USER" },
+                    { 2, "c7b51225-e9aa-4d81-8d75-b72266a01fde", "Vakil", "VAKIL" },
+                    { 3, "4e0f7985-9dbd-4d0f-9ff0-4420ee8fee75", "Admin", "ADMIN" }
                 });
 
             migrationBuilder.CreateIndex(

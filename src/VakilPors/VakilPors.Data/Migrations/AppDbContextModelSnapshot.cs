@@ -157,21 +157,21 @@ namespace VakilPors.Data.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "379ec985-8b06-494b-849b-dfa3aebc9a38",
+                            ConcurrencyStamp = "8bdeb514-9677-4ab5-bcca-b7e097575597",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "f666b8a3-a5f8-4040-8a47-85505948fd78",
+                            ConcurrencyStamp = "c7b51225-e9aa-4d81-8d75-b72266a01fde",
                             Name = "Vakil",
                             NormalizedName = "VAKIL"
                         },
                         new
                         {
                             Id = 3,
-                            ConcurrencyStamp = "8ded7b01-3804-4a88-bc07-9feadd8613a4",
+                            ConcurrencyStamp = "4e0f7985-9dbd-4d0f-9ff0-4420ee8fee75",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
