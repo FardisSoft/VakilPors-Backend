@@ -3,6 +3,7 @@ using VakilPors.Business.Extensions;
 using VakilPors.Core.Authentication.Extensions;
 using VakilPors.Data.Context;
 using VakilPors.Data.Extensions;
+using VakilPors.Web.Configuration.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -18,7 +19,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerWithJWTSupport();
 
 var app = builder.Build();
 
