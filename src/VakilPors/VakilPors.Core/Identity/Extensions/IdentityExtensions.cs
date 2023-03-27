@@ -1,8 +1,3 @@
-using System.Reflection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +8,7 @@ namespace VakilPors.Core.Identity.Extensions
     public static class IdentityExtensions
     {
         public static IdentityBuilder RegisterIdentity<TContext>(this IServiceCollection services) where TContext:DbContext{
-            return services.AddIdentity<User, Role>(options=>{
+            return services.AddIdentity<User,Role>(options=>{
                 options.SignIn.RequireConfirmedPhoneNumber=true;
                 options.User.RequireUniqueEmail=true;
                 options.Password.RequireDigit=true;
