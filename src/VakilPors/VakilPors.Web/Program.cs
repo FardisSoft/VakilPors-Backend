@@ -1,4 +1,5 @@
 
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using VakilPors.Business.Extensions;
 using VakilPors.Core.Authentication.Extensions;
@@ -27,11 +28,20 @@ builder.Services.AddSwaggerWithJWTSupport();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+using (var scope = app.Services.CreateScope())
 {
+    var services = scope.ServiceProvider;
+
+    var context = services.GetRequiredService<AppDbContext>();    
+    context.Database.Migrate();
+}
+
+
+// if (app.Environment.IsDevelopment())
+// {
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+// }
 
 app.UseHttpsRedirection();
 
