@@ -25,22 +25,28 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerWithJWTSupport();
-
 var app = builder.Build();
-
-using (var scope = app.Services.CreateScope())
+try
 {
-    var services = scope.ServiceProvider;
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
 
-    var context = services.GetRequiredService<AppDbContext>();    
-    context.Database.Migrate();
+        var context = services.GetRequiredService<AppDbContext>();
+        context.Database.Migrate();
+    }
+}
+catch (System.Exception)
+{
+    System.Console.WriteLine("An error occurred while migrating or seeding the database.");
+
 }
 
 
 // if (app.Environment.IsDevelopment())
 // {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+app.UseSwagger();
+app.UseSwaggerUI();
 // }
 
 app.UseHttpsRedirection();
