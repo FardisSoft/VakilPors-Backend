@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using VakilPors.Core.Domain.Entities;
 
-namespace VakilPors.Core.Identity.Extensions
+namespace VakilPors.Core.Authentication.Extensions
 {
     public static class IdentityExtensions
     {
