@@ -9,7 +9,7 @@ namespace VakilPors.Core.Authentication.Extensions
     {
         public static IdentityBuilder RegisterIdentity<TContext>(this IServiceCollection services) where TContext:DbContext{
             return services.AddIdentity<User,Role>(options=>{
-                options.SignIn.RequireConfirmedPhoneNumber=true;
+                options.SignIn.RequireConfirmedPhoneNumber=false;
                 options.User.RequireUniqueEmail=true;
                 options.Password.RequireDigit=true;
                 options.Password.RequiredUniqueChars=1;

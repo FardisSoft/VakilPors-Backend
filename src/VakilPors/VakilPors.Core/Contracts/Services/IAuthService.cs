@@ -1,8 +1,15 @@
-﻿using VakilPors.Shared.Services;
+﻿using Microsoft.AspNetCore.Identity;
+using VakilPors.Core.Domain.Dtos;
+using VakilPors.Shared.Services;
 
 namespace VakilPors.Core.Contracts.Services;
 
-public interface IAuthService : IScopedDependency
+public interface IAuthServices : IScopedDependency
 {
+    
+        Task<IEnumerable<IdentityError>> Register(SignUpDto userDto);
+        Task<LoginResponseDto> Login(LoginDto loginDto);
+        Task<string> CreateRefreshToken();
+        Task<LoginResponseDto> VerifyRefreshToken(LoginResponseDto request);
 }
 
