@@ -1,0 +1,9 @@
+{
+    "platform": "netcore",
+    "app": "vakilpors-api",
+    "netcore": {
+        "finalDllName": "VakilPors.Api",
+        "csprojectFile": "./src/VakilPors/VakilPors.Web/VakilPors.Api.csproj",
+        "version": "6.0"
+    }
+}
