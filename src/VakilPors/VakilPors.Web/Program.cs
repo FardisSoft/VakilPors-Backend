@@ -12,6 +12,8 @@ var configuration = builder.Configuration;
 builder.Services.RegisterServices();
 builder.Services.RegisterAppDbContext(configuration);
 builder.Services.RegisterIdentity<AppDbContext>();
+builder.Services.RegisterAuthentication(configuration);
+
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -27,6 +29,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
