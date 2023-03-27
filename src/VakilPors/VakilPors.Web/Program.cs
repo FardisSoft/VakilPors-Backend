@@ -12,7 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
 var connectionString=Environment.GetEnvironmentVariable("ConnectionString") ?? configuration.GetConnectionString("AppDbContext");
-System.Console.WriteLine($"connection string:{connectionString}");
 // Add services to the container.
 builder.Services.RegisterServices();
 builder.Services.RegisterAppDbContext(connectionString);
@@ -29,18 +28,13 @@ builder.Services.AddSwaggerWithJWTSupport();
 var app = builder.Build();
 try
 {
-    using (var scope = app.Services.CreateScope())
-    {
-        var services = scope.ServiceProvider;
-
-        var context = services.GetRequiredService<AppDbContext>();
-        context.Database.Migrate();
-    }
+    await using var scope = app.Services.CreateAsyncScope();
+    using var db = scope.ServiceProvider.GetService<AppDbContext>();
+    await db.Database.MigrateAsync();
 }
 catch (System.Exception)
 {
     System.Console.WriteLine("An error occurred while migrating or seeding the database.");
-
 }
 
 
