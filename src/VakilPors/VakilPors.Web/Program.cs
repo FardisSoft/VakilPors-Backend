@@ -1,6 +1,7 @@
 
 using VakilPors.Business.Extensions;
 using VakilPors.Core.Authentication.Extensions;
+using VakilPors.Core.Mapper;
 using VakilPors.Data.Context;
 using VakilPors.Data.Extensions;
 using VakilPors.Web.Configuration.Extensions;
@@ -14,6 +15,7 @@ builder.Services.RegisterServices();
 builder.Services.RegisterAppDbContext(configuration);
 builder.Services.RegisterIdentity<AppDbContext>();
 builder.Services.RegisterAuthentication(configuration);
+builder.Services.AddAutoMapper(typeof(MapperProfile));
 
 builder.Services.AddControllers();
 
