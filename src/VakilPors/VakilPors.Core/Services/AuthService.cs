@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -9,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos;
 using VakilPors.Core.Domain.Entities;
+using VakilPors.Core.Exceptions;
 
 namespace VakilPors.Core.Services;
 
@@ -41,14 +43,17 @@ public class AuthServices : IAuthServices
     {
         _logger.LogInformation($"Looking for user with phone number {loginDto.PhoneNumber}");
         _user = await _userManager.FindByNameAsync(loginDto.PhoneNumber);
-        bool isValidUser = await _userManager.CheckPasswordAsync(_user, loginDto.Password);
-
-        if (_user == null || isValidUser == false)
+        if (_user==null)
         {
-            _logger.LogWarning($"User with phone number {loginDto.PhoneNumber} was not found or password was wrong");
-            return null;
+            _logger.LogWarning($"User with phone number {loginDto.PhoneNumber} was not found");
+            throw new BadArgumentException("incorrect credtials");            
         }
-
+        bool isValidUser = await _userManager.CheckPasswordAsync(_user, loginDto.Password);
+        if (isValidUser == false)
+        {
+            _logger.LogWarning($"User with phone number {loginDto.PhoneNumber} entered wrong password");
+            throw new BadArgumentException("incorrect credtials");            
+        }
         var token = await GenerateToken();
         _logger.LogInformation($"Token generated for user with phone number {loginDto.PhoneNumber} | Token: {token}");
 
@@ -63,13 +68,20 @@ public class AuthServices : IAuthServices
     {
         _user = _mapper.Map<User>(userDto);
         _user.UserName = userDto.PhoneNumber;
-        _user.Email="null@null.com";
+        _user.Email= _user.Email==string.Empty ? "null@null.com":_user.Email;
+        
+        //validate email using regex
+        Match match = Regex.Match(_user.Email,@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+        if (!match.Success)
+        {
+            throw new BadArgumentException("Invalid Email");
+        }
 
         var result = await _userManager.CreateAsync(_user, userDto.Password);
 
         if (result.Succeeded)
         {
-            await _userManager.AddToRoleAsync(_user, RoleNames.User);
+            await _userManager.AddToRoleAsync(_user, userDto.IsVakil?RoleNames.Vakil: RoleNames.User);
         }
 
         return result.Errors;
@@ -85,14 +97,14 @@ public class AuthServices : IAuthServices
         }
         catch (System.ArgumentException)
         {
-            return null;
+            throw new BadArgumentException("Invalid Token");
         } 
         var username = tokenContent.Claims.ToList().FirstOrDefault(q => q.Type == JwtRegisteredClaimNames.Email)?.Value;
         _user = await _userManager.FindByNameAsync(username);
 
         if (_user == null)
         {
-            return null;
+            throw new BadArgumentException("User not found");
         }
 
         var isValidRefreshToken = _user.RefreshTokenExpiryTime >= DateTime.Now &&
@@ -109,7 +121,7 @@ public class AuthServices : IAuthServices
         }
 
         await _userManager.UpdateSecurityStampAsync(_user);
-        return null;
+        throw new BadArgumentException("Invalid Refresh Token");
     }
 
     private async Task<string> GenerateToken()
