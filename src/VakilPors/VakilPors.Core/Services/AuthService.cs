@@ -104,11 +104,10 @@ public class AuthServices : IAuthServices
 
         if (_user == null)
         {
-            throw new BadArgumentException("User not found");
+            throw new NotFoundException("User not found");
         }
 
-        var isValidRefreshToken = _user.RefreshTokenExpiryTime >= DateTime.Now &&
-        _user.RefreshToken.Equals(request.RefreshToken);
+        var isValidRefreshToken = _user.RefreshTokenExpiryTime >= DateTime.Now && _user.RefreshToken.Equals(request.RefreshToken);
 
         if (isValidRefreshToken)
         {
