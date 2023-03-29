@@ -13,7 +13,8 @@ namespace VakilPors.Web.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthServices _authManager;
-    private readonly ILogger<AuthController> _logger;
+        private readonly ILogger<AuthController> _logger;
+        ForgetPasswordDto _passwordDto;
 
     public AuthController(IAuthServices authManager, ILogger<AuthController> logger)
     {
@@ -81,5 +82,29 @@ namespace VakilPors.Web.Controllers
 
         return Ok(authResponse);
     }
+    [HttpGet]
+    [Route("forgetpassword")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult> ForgetPassword([FromBody] ForgetPasswordDto forgetPasswordDto)
+    {
+         this._passwordDto = forgetPasswordDto;
+         var token = await _authManager.CreateToken(forgetPasswordDto);
+        /// TODO:implement  Sending SMS   
+        return Ok();
+    }
+    [HttpPost]
+    [Route("resetpassword")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
+    {
+        
+
+        return Ok();
+    }
+    
     }
 }
