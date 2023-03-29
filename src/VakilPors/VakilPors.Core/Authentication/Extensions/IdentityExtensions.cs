@@ -10,12 +10,13 @@ namespace VakilPors.Core.Authentication.Extensions
         public static IdentityBuilder RegisterIdentity<TContext>(this IServiceCollection services) where TContext:DbContext{
             return services.AddIdentity<User,Role>(options=>{
                 options.SignIn.RequireConfirmedPhoneNumber=false;
-                options.User.RequireUniqueEmail=true;
+                options.User.RequireUniqueEmail=false;
                 options.Password.RequireDigit=true;
-                options.Password.RequiredUniqueChars=1;
+                options.Password.RequiredUniqueChars=0;
                 options.Password.RequireLowercase=true;
                 options.Password.RequireNonAlphanumeric=false;
                 options.Password.RequireUppercase=true;
+                options.Password.RequiredLength=6;
                 })
                 .AddEntityFrameworkStores<TContext>()
                 .AddDefaultTokenProviders();
