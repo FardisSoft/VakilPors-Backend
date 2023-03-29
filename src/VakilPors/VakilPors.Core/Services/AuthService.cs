@@ -26,6 +26,7 @@ public class AuthServices : IAuthServices
         this._userManager = userManager;
         this._configuration = configuration;
         this._logger = logger;
+
     }
 
     public async Task<string> CreateRefreshToken()
@@ -142,4 +143,22 @@ public class AuthServices : IAuthServices
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+    public async Task<string> CreateToken(ForgetPasswordDto forgetPasswordDto)
+    {
+        string phone = forgetPasswordDto.PhoneNumber;
+        _user = _mapper.Map<User>(forgetPasswordDto);
+        var token = this._userManager.CreateSecurityTokenAsync(_user).ToString();
+        return token;
+    }
+
+    public Task ResetPassword(ResetPasswordDto resetPasswordDto)
+    {
+        string phone = resetPasswordDto.PhoneNumber;
+        // getting the user by phone number
+        _user = _userManager.FindByNameAsync(phone).Result;
+        // reseting the password
+        var result = _userManager.ResetPasswordAsync(_user, resetPasswordDto.Code, resetPasswordDto.New_Password).Result;
+        throw new NotImplementedException();
+    }
+
 }

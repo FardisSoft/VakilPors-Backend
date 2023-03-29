@@ -15,8 +15,9 @@ namespace VakilPors.Web.Controllers
         private readonly IAuthServices _authManager;
         private readonly ILogger<AuthController> _logger;
         ForgetPasswordDto _passwordDto;
+        private string _token;
 
-    public AuthController(IAuthServices authManager, ILogger<AuthController> logger)
+        public AuthController(IAuthServices authManager, ILogger<AuthController> logger)
     {
         this._authManager = authManager;
         this._logger = logger;
@@ -91,6 +92,7 @@ namespace VakilPors.Web.Controllers
     {
          this._passwordDto = forgetPasswordDto;
          var token = await _authManager.CreateToken(forgetPasswordDto);
+         this._token = token;
         /// TODO:implement  Sending SMS   
         return Ok();
     }
@@ -101,9 +103,12 @@ namespace VakilPors.Web.Controllers
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
     {
+        if ((resetPasswordDto.PhoneNumber == _passwordDto.PhoneNumber) && resetPasswordDto.Code == _token)
+        {
+            await _authManager.ResetPassword(resetPasswordDto);
+        }
+            return Ok();
         
-
-        return Ok();
     }
     
     }
