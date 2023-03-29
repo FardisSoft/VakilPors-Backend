@@ -20,7 +20,9 @@ namespace VakilPors.Data.Extensions
                 await using var scope = app.Services.CreateAsyncScope();
                 using var db = scope.ServiceProvider.GetService<AppDbContext>();
                 await db.Database.MigrateAsync();
-                bool hasAdmin=await db.Roles.AnyAsync(r=>r.Name==RoleNames.Admin);
+                Console.WriteLine("Migrating database...");
+                int adminRoleId=await db.Roles.Where(r=>r.Name==RoleNames.Admin).Select(r=>r.Id).FirstOrDefaultAsync();
+                bool hasAdmin=await db.UserRoles.AnyAsync(r=>r.RoleId==adminRoleId);
                 if (!hasAdmin){
                     //add default admin
                     using var userManager = scope.ServiceProvider.GetService<UserManager<User>>();
@@ -32,6 +34,7 @@ namespace VakilPors.Data.Extensions
                     };
                     await userManager.CreateAsync(admin,"admin");
                     await userManager.AddToRoleAsync(admin,RoleNames.Admin);
+                    Console.WriteLine("Creating default admin user...");
                 }
             }
             catch (System.Exception)
