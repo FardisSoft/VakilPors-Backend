@@ -3,6 +3,8 @@ using System.Security.Claims;
 using System.Text;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -145,20 +147,46 @@ public class AuthServices : IAuthServices
     }
     public async Task<string> CreateToken(ForgetPasswordDto forgetPasswordDto)
     {
-        string phone = forgetPasswordDto.PhoneNumber;
-        _user = _mapper.Map<User>(forgetPasswordDto);
-        var token = this._userManager.CreateSecurityTokenAsync(_user).ToString();
-        return token;
+        //string phone = forgetPasswordDto.PhoneNumber;
+        //_user = _mapper.Map<User>(forgetPasswordDto);
+        //var token = this._userManager.CreateSecurityTokenAsync(_user).ToString();
+        //return token;
+        var _user = await _userManager.FindByNameAsync(forgetPasswordDto.PhoneNumber);
+        if (_user == null)
+        {
+            return "no user found with this phone number";
+        }
+        //generating token 
+        var token = await _userManager.GeneratePasswordResetTokenAsync(_user);
+        var encoded_token = Encoding.UTF8.GetBytes(token);
+        var valid_token = WebEncoders.Base64UrlEncode(encoded_token);
+        return valid_token;
+
     }
 
-    public Task ResetPassword(ResetPasswordDto resetPasswordDto)
+    public async Task<string> ResetPassword(ResetPasswordDto resetPasswordDto)
     {
-        string phone = resetPasswordDto.PhoneNumber;
-        // getting the user by phone number
-        _user = _userManager.FindByNameAsync(phone).Result;
-        // reseting the password
-        var result = _userManager.ResetPasswordAsync(_user, resetPasswordDto.Code, resetPasswordDto.New_Password).Result;
-        throw new NotImplementedException();
+        //string phone = resetPasswordDto.PhoneNumber;
+        //// getting the user by phone number
+        //_user = _userManager.FindByNameAsync(phone).Result;
+        //// reseting the password
+        //var result = _userManager.ResetPasswordAsync(_user, resetPasswordDto.Code, resetPasswordDto.New_Password).Result;
+        //throw new NotImplementedException();
+        var _user = await _userManager.FindByNameAsync(resetPasswordDto.PhoneNumber);
+        if (_user == null)
+        {
+            return "no user found with this phone number";
+        }
+        if (resetPasswordDto.Confirm_Password != resetPasswordDto.New_Password)
+        {
+            return "new and confirmed passwords don't match";
+        }
+        var result = await _userManager.ResetPasswordAsync(_user,resetPasswordDto.Code,resetPasswordDto.New_Password);
+        if (result.Succeeded)
+        {
+            return "password has been reset succesfully";
+        }
+        return " something went wrong";
     }
 
 }

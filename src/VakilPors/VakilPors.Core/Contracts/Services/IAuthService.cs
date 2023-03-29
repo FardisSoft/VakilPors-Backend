@@ -12,6 +12,6 @@ public interface IAuthServices : IScopedDependency
         Task<string> CreateRefreshToken();
         Task<LoginResponseDto> VerifyRefreshToken(LoginResponseDto request);
         Task<string> CreateToken(ForgetPasswordDto forgetPasswordDto);
-        Task ResetPassword(ResetPasswordDto resetPasswordDto);
+        Task <string>ResetPassword(ResetPasswordDto resetPasswordDto);
 }
 

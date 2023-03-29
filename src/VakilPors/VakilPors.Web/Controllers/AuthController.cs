@@ -14,8 +14,7 @@ namespace VakilPors.Web.Controllers
     {
         private readonly IAuthServices _authManager;
         private readonly ILogger<AuthController> _logger;
-        ForgetPasswordDto _passwordDto;
-        private string _token;
+
 
         public AuthController(IAuthServices authManager, ILogger<AuthController> logger)
     {
@@ -90,12 +89,17 @@ namespace VakilPors.Web.Controllers
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult> ForgetPassword([FromBody] ForgetPasswordDto forgetPasswordDto)
     {
-         this._passwordDto = forgetPasswordDto;
-         var token = await _authManager.CreateToken(forgetPasswordDto);
-         this._token = token;
-        /// TODO:implement  Sending SMS   
-        return Ok();
+        var token = await _authManager.CreateToken(forgetPasswordDto);
+        if (token == "no user found with this phone number")
+        {
+            return BadRequest(token); // 400
+        }
+
+        /// TODO:implement Sending SMS   
+        
+        return Ok(); //200
     }
+
     [HttpPost]
     [Route("resetpassword")]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -103,11 +107,23 @@ namespace VakilPors.Web.Controllers
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
     {
-        if ((resetPasswordDto.PhoneNumber == _passwordDto.PhoneNumber) && resetPasswordDto.Code == _token)
+        if (ModelState.IsValid)
         {
-            await _authManager.ResetPassword(resetPasswordDto);
+
+
+            var result = await _authManager.ResetPassword(resetPasswordDto);
+            if (result == "no user found with this phone number" ||
+                result == "new and confirmed passwords don't match"
+                || result == " something went wrong")
+            {
+                return BadRequest(result); // 400
+            }
+            else
+                return Ok();
         }
-            return Ok();
+        return BadRequest("some properties are not valid");
+            
+
         
     }
     
