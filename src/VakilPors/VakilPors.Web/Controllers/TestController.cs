@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace VakilPors.Web.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class TestController : ControllerBase
     {
         //fake api

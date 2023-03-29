@@ -9,7 +9,7 @@ using VakilPors.Core.Domain.Dtos;
 namespace VakilPors.Web.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthServices _authManager;
