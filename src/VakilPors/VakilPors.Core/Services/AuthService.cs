@@ -160,6 +160,7 @@ public class AuthServices : IAuthServices
         var token = await _userManager.GeneratePasswordResetTokenAsync(_user);
         var encoded_token = Encoding.UTF8.GetBytes(token);
         var valid_token = WebEncoders.Base64UrlEncode(encoded_token);
+        valid_token = valid_token.Substring(0,6);
         return valid_token;
 
     }
