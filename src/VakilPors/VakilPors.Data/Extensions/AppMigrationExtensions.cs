@@ -27,12 +27,12 @@ namespace VakilPors.Data.Extensions
                     //add default admin
                     using var userManager = scope.ServiceProvider.GetService<UserManager<User>>();
                     var admin=new User(){
-                        Email="admin@fardissoft.ir",
+                        Email="info@mail.fardissoft.ir",
                         Name="Admin",
                         PhoneNumber="09116863556",
                         UserName="09116863556"
                     };
-                    await userManager.CreateAsync(admin,"admin");
+                    await userManager.CreateAsync(admin,"Admin1");
                     await userManager.AddToRoleAsync(admin,RoleNames.Admin);
                     Console.WriteLine("Creating default admin user...");
                 }
