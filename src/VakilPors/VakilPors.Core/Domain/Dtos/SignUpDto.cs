@@ -10,5 +10,7 @@ namespace VakilPors.Core.Domain.Dtos
     {
         [Required]
         public string Name { get; set; }
+        public string Email { get; set; }
+        public bool IsVakil { get; set; }=false;
     }
 }

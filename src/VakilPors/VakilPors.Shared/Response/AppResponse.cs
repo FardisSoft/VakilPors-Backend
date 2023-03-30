@@ -23,7 +23,7 @@ public class AppResponse<TData> : AppResponse
 {
     public TData Data { get; set; }
 
-    public AppResponse(TData data, HttpStatusCode statusCode, string message)
+    public AppResponse(TData data, string message, HttpStatusCode statusCode=HttpStatusCode.OK)
         : base(statusCode, message)
         => Data = data;
 
