@@ -87,9 +87,9 @@ namespace VakilPors.Web.Controllers
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult> ForgetPassword([FromBody] ForgetPasswordDto forgetPasswordDto)
+    public async Task<ActionResult> ForgetPassword([FromQuery] ForgetPasswordDto forgetPasswordDto)
     {
-        var token = await _authManager.CreateToken(forgetPasswordDto);
+        var token = await _authManager.CreateForgetPasswordToken(forgetPasswordDto);
         if (token == "no user found with this phone number")
         {
             return BadRequest(token); // 400
@@ -97,7 +97,7 @@ namespace VakilPors.Web.Controllers
 
         /// TODO:implement Sending SMS   
         
-        return Ok(); //200
+        return Ok(token); //200
     }
 
     [HttpPost]
@@ -119,7 +119,7 @@ namespace VakilPors.Web.Controllers
                 return BadRequest(result); // 400
             }
             else
-                return Ok();
+                return Ok("done!");
         }
         return BadRequest("some properties are not valid");
             

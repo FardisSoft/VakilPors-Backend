@@ -13,6 +13,8 @@ public class User : IdentityUser<int>
     public string Name { get; set; }
     public string? RefreshToken { get; set; }
     public DateTime RefreshTokenExpiryTime { get; set; }
+    public string? ForgetPasswordCode { get; set; }
+    public string? ActivationCode { get; set; }
     public bool IsActive
     {
         get { return PhoneNumberConfirmed; }

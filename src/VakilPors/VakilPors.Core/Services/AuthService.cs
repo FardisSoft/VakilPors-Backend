@@ -145,44 +145,44 @@ public class AuthServices : IAuthServices
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
-    public async Task<string> CreateToken(ForgetPasswordDto forgetPasswordDto)
+    public async Task<string> CreateForgetPasswordToken(ForgetPasswordDto forgetPasswordDto)
     {
-        //string phone = forgetPasswordDto.PhoneNumber;
-        //_user = _mapper.Map<User>(forgetPasswordDto);
-        //var token = this._userManager.CreateSecurityTokenAsync(_user).ToString();
-        //return token;
         var _user = await _userManager.FindByNameAsync(forgetPasswordDto.PhoneNumber);
         if (_user == null)
         {
             return "no user found with this phone number";
         }
         //generating token 
-        var token = await _userManager.GeneratePasswordResetTokenAsync(_user);
-        var encoded_token = Encoding.UTF8.GetBytes(token);
-        var valid_token = WebEncoders.Base64UrlEncode(encoded_token);
-        valid_token = valid_token.Substring(0,6);
-        return valid_token;
+        var code = VakilPors.Shared.Utilities.RandomEngine.GenerateString(6);
+        _user.ForgetPasswordCode = code;
+        await _userManager.UpdateAsync(_user);
+        // var encoded_token = Encoding.UTF8.GetBytes(code);
+        // var valid_token = WebEncoders.Base64UrlEncode(encoded_token);
+        // valid_token = valid_token.Substring(0,6);
+        return code;
 
     }
 
     public async Task<string> ResetPassword(ResetPasswordDto resetPasswordDto)
     {
-        //string phone = resetPasswordDto.PhoneNumber;
-        //// getting the user by phone number
-        //_user = _userManager.FindByNameAsync(phone).Result;
-        //// reseting the password
-        //var result = _userManager.ResetPasswordAsync(_user, resetPasswordDto.Code, resetPasswordDto.New_Password).Result;
-        //throw new NotImplementedException();
         var _user = await _userManager.FindByNameAsync(resetPasswordDto.PhoneNumber);
         if (_user == null)
         {
             return "no user found with this phone number";
         }
-        if (resetPasswordDto.Confirm_Password != resetPasswordDto.New_Password)
+        if (resetPasswordDto.ConfirmPassword != resetPasswordDto.NewPassword)
         {
             return "new and confirmed passwords don't match";
         }
-        var result = await _userManager.ResetPasswordAsync(_user,resetPasswordDto.Code,resetPasswordDto.New_Password);
+        if (_user.ForgetPasswordCode!=resetPasswordDto.Code)
+        {
+            return "invalid code";
+        }
+        _user.PasswordHash=_userManager.PasswordHasher.HashPassword(_user,resetPasswordDto.NewPassword);
+        _user.ForgetPasswordCode = null;
+        //update user
+        var result = await _userManager.UpdateAsync(_user);
+        // var result = await _userManager.ResetPasswordAsync(_user,resetPasswordDto.Code,resetPasswordDto.NewPassword);
         if (result.Succeeded)
         {
             return "password has been reset succesfully";

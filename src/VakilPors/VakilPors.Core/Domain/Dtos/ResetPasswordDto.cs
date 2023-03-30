@@ -14,6 +14,10 @@ namespace VakilPors.Core.Domain.Dtos
         [Required]
         public string Code { get; set; }
         [Required]
-        public string New_Password { get; set; }
+        [StringLength(20, ErrorMessage = "Your Password is limited to {2} to {1} characters", MinimumLength = 6)]
+        public string NewPassword { get; set; }
+        [Required]
+        [Compare(nameof(NewPassword))]
+        public string ConfirmPassword { get; set; }
     }
 }
