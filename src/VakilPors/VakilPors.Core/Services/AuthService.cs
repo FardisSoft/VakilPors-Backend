@@ -24,9 +24,11 @@ public class AuthServices : IAuthServices
     private readonly IConfiguration _configuration;
     private readonly ILogger<AuthServices> _logger;
     private User _user;
+    private readonly ISMSSender smsSender;
 
-    public AuthServices(IMapper mapper, UserManager<User> userManager, IConfiguration configuration, ILogger<AuthServices> logger)
+    public AuthServices(IMapper mapper, UserManager<User> userManager, IConfiguration configuration, ILogger<AuthServices> logger,ISMSSender smsSender)
     {
+            this.smsSender = smsSender;
         this._mapper = mapper;
         this._userManager = userManager;
         this._configuration = configuration;
@@ -157,46 +159,52 @@ public class AuthServices : IAuthServices
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
-    public async Task<string> CreateForgetPasswordToken(ForgetPasswordDto forgetPasswordDto)
+    public async Task CreateForgetPasswordToken(ForgetPasswordDto forgetPasswordDto)
     {
         var _user = await _userManager.FindByNameAsync(forgetPasswordDto.PhoneNumber);
         if (_user == null)
         {
-            return "no user found with this phone number";
+            throw new NotFoundException("no user found with this phone number");
         }
         //generating token 
         var code = RandomEngine.Next(100000,1000000 ).ToString();
         _user.ForgetPasswordCode = code;
         await _userManager.UpdateAsync(_user);
-        return code;
-
+        
+        try
+        {
+            await smsSender.SendSmsAsync(forgetPasswordDto.PhoneNumber, $"کد بازیابی رمز عبور شما: {code} است");
+        }
+        catch (System.Exception)
+        {
+            throw new InternalServerException("sms sending failed");
+        }
     }
 
-    public async Task<string> ResetPassword(ResetPasswordDto resetPasswordDto)
+    public async Task ResetPassword(ResetPasswordDto resetPasswordDto)
     {
         var _user = await _userManager.FindByNameAsync(resetPasswordDto.PhoneNumber);
         if (_user == null)
         {
-            return "no user found with this phone number";
+            throw new NotFoundException("no user found with this phone number");
         }
         if (resetPasswordDto.ConfirmPassword != resetPasswordDto.NewPassword)
         {
-            return "new and confirmed passwords don't match";
+            throw new BadArgumentException("passwords don't match");
         }
         if (_user.ForgetPasswordCode!=resetPasswordDto.Code)
         {
-            return "invalid code";
+            throw new BadArgumentException("invalid code");
         }
         _user.PasswordHash=_userManager.PasswordHasher.HashPassword(_user,resetPasswordDto.NewPassword);
         _user.ForgetPasswordCode = null;
         //update user
         var result = await _userManager.UpdateAsync(_user);
         // var result = await _userManager.ResetPasswordAsync(_user,resetPasswordDto.Code,resetPasswordDto.NewPassword);
-        if (result.Succeeded)
+        if (!result.Succeeded)
         {
-            return "password has been reset succesfully";
+            throw new InternalServerException("password reset failed");
         }
-        return " something went wrong";
     }
 
 }

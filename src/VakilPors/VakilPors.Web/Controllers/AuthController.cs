@@ -81,15 +81,11 @@ namespace VakilPors.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> ForgetPassword([FromQuery] ForgetPasswordDto forgetPasswordDto)
         {
-            var token = await _authManager.CreateForgetPasswordToken(forgetPasswordDto);
-            if (token == "no user found with this phone number")
-            {
-                return BadRequest(token); // 400
-            }
+            await _authManager.CreateForgetPasswordToken(forgetPasswordDto);
+            // TODO:implement Sending SMS   
 
-            /// TODO:implement Sending SMS   
 
-            return Ok(token); //200
+            return Ok(new AppResponse(HttpStatusCode.OK,"Forget Password Code sent to your phone number!")); //200
         }
 
         [HttpPost]
@@ -99,24 +95,12 @@ namespace VakilPors.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-
-
-                var result = await _authManager.ResetPassword(resetPasswordDto);
-                if (result == "no user found with this phone number" ||
-                    result == "new and confirmed passwords don't match"
-                    || result == " something went wrong")
-                {
-                    return BadRequest(result); // 400
-                }
-                else
-                    return Ok("done!");
+                return BadRequest(new AppResponse<ModelStateDictionary>(ModelState, $"Fields validations resulted in errors!", HttpStatusCode.BadRequest));
             }
-            return BadRequest("some properties are not valid");
-
-
-
+            await _authManager.ResetPassword(resetPasswordDto);
+            return Ok(new AppResponse(HttpStatusCode.OK, $"Password has been reset!"));    
         }
 
 
