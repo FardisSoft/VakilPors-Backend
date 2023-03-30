@@ -13,5 +13,8 @@ public interface IAuthServices : IScopedDependency
         Task<LoginResponseDto> VerifyRefreshToken(LoginResponseDto request);
         Task CreateAndSendForgetPasswordToken(ForgetPasswordDto forgetPasswordDto);
         Task ResetPassword(ResetPasswordDto resetPasswordDto);
+        Task ActivateAccount(ActivateAccountDto activateAccountDto);
+        Task SendActivationCode(string phoneNumber);
+
 }
 

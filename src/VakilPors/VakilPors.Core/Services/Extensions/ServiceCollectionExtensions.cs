@@ -11,8 +11,6 @@ public static class ServiceCollectionExtensions
         services.RegisterScopedDependencies(assembly);
         services.RegisterSingletonDependencies(assembly);
         services.RegisterTransientDependencies(assembly);
-
-        //services.AddScoped<IUserService, UserService>();
     }
 
 }

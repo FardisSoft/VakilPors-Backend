@@ -211,4 +211,61 @@ public class AuthServices : IAuthServices
         }
     }
 
+    public async Task SendActivationCode(string phoneNumber)
+    {
+        string code = GenerateActivationCode();
+        await SetActivationCode(phoneNumber, code);
+        await SendActivationCodeSms(phoneNumber, code);
+    }
+
+    private string GenerateActivationCode()
+        => RandomEngine.Next(100000, 1000000).ToString();
+
+    private async Task SendActivationCodeSms(string phoneNumber, string code)
+    {
+        var message = $"کد فعال سازی اکانت شما: {code} است";
+        try
+        {
+            await smsSender.SendSmsAsync(phoneNumber, message);
+        }
+        catch (System.Exception)
+        {
+            throw new InternalServerException("sms sending failed");
+        }
+    }
+
+    private async Task SetActivationCode(string phoneNumber, string code)
+    {
+        var user = await _userManager.FindByNameAsync(phoneNumber);
+        if (user == null)
+            throw new NotFoundException("no user found with this phone number");
+
+        user.ActivationCode = code;
+
+        var result = await _userManager.UpdateAsync(user);
+        
+        if (!result.Succeeded)
+            throw new InternalServerException("set activation code failed");
+    }
+
+
+    public async Task ActivateAccount(ActivateAccountDto activateAccountDto)
+    {
+        var user = await _userManager.FindByNameAsync(activateAccountDto.PhoneNumber);
+        if (user == null)
+            throw new NotFoundException("no user found with this phone number");
+
+        if (user.ActivationCode != activateAccountDto.Code)
+            throw new BadArgumentException("activation code is wrong");
+
+        user.IsActive = true;
+
+        var result = await _userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+        {
+            throw new InternalServerException("activate account failed");
+        }
+    }
+
 }
