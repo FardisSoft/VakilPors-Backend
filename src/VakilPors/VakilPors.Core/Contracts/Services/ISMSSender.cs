@@ -6,7 +6,7 @@ using VakilPors.Shared.Services;
 
 namespace VakilPors.Core.Contracts.Services
 {
-    public interface ISMSSender : IScopedDependency
+    public interface ISMSSender : ISingletonDependency
     {
         Task SendSmsAsync(string number, string message);
     }
