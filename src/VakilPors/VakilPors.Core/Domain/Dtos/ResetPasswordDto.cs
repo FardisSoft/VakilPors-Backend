@@ -15,6 +15,8 @@ namespace VakilPors.Core.Domain.Dtos
         public string Code { get; set; }
         [Required]
         [StringLength(20, ErrorMessage = "Your Password is limited to {2} to {1} characters", MinimumLength = 6)]
+        [RegularExpression(@"^((?=.*[a-z])(?=.*[A-Z])(?=.*\d)).+$")]
+        [DataType(DataType.Password)]
         public string NewPassword { get; set; }
         [Required]
         [Compare(nameof(NewPassword))]
