@@ -13,6 +13,7 @@ using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
+using VakilPors.Shared.Utilities;
 
 namespace VakilPors.Core.Services;
 
@@ -164,12 +165,9 @@ public class AuthServices : IAuthServices
             return "no user found with this phone number";
         }
         //generating token 
-        var code = VakilPors.Shared.Utilities.RandomEngine.GenerateString(6);
+        var code = RandomEngine.Next(100000,1000000 ).ToString();
         _user.ForgetPasswordCode = code;
         await _userManager.UpdateAsync(_user);
-        // var encoded_token = Encoding.UTF8.GetBytes(code);
-        // var valid_token = WebEncoders.Base64UrlEncode(encoded_token);
-        // valid_token = valid_token.Substring(0,6);
         return code;
 
     }
