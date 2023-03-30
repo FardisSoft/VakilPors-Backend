@@ -81,9 +81,9 @@ namespace VakilPors.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> ForgetPassword([FromQuery] ForgetPasswordDto forgetPasswordDto)
         {
-            await _authManager.CreateForgetPasswordToken(forgetPasswordDto);
-            // TODO:implement Sending SMS   
-
+            await _authManager.CreateAndSendForgetPasswordToken(forgetPasswordDto);   
+            _logger.LogInformation($"Forget password Token generated for {forgetPasswordDto.PhoneNumber} and sent!");
+            
 
             return Ok(new AppResponse(HttpStatusCode.OK,"Forget Password Code sent to your phone number!")); //200
         }
@@ -100,6 +100,7 @@ namespace VakilPors.Web.Controllers
                 return BadRequest(new AppResponse<ModelStateDictionary>(ModelState, $"Fields validations resulted in errors!", HttpStatusCode.BadRequest));
             }
             await _authManager.ResetPassword(resetPasswordDto);
+            _logger.LogInformation($"Password has been Reset {resetPasswordDto.PhoneNumber}");
             return Ok(new AppResponse(HttpStatusCode.OK, $"Password has been reset!"));    
         }
 

@@ -65,7 +65,7 @@ namespace VakilPors.Core.Exceptions
                         break;
                 }
 
-                Log.Error($"{errorResult.Exception} Request failed with Status Code {context.Response.StatusCode} and Error Id {errorId}.");
+                Log.Error($"{appResponse.Message} Request failed with Status Code {appResponse.StatusCode} and Error Id {errorId}.");
                 var response = context.Response;
                 if (!response.HasStarted)
                 {

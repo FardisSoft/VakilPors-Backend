@@ -106,18 +106,21 @@ public class AuthServices : IAuthServices
             throw new BadArgumentException("Invalid Token");
         } 
         var username = tokenContent.Claims.ToList().FirstOrDefault(q => q.Type == JwtRegisteredClaimNames.Email)?.Value;
+
         _user = await _userManager.FindByNameAsync(username);
 
         if (_user == null)
         {
             throw new NotFoundException("User not found");
         }
+        _logger.LogInformation($"Refresh Token Attempt for {username} ");
 
         var isValidRefreshToken = _user.RefreshTokenExpiryTime >= DateTime.Now && _user.RefreshToken.Equals(request.RefreshToken);
 
         if (isValidRefreshToken)
         {
             var token = await GenerateToken();
+            _logger.LogInformation($"token refreshed for {username}");
             return new LoginResponseDto
             {
                 Token = token,
@@ -125,6 +128,7 @@ public class AuthServices : IAuthServices
             };
         }
 
+        _logger.LogInformation($"Invalid Token for {username} ");
         await _userManager.UpdateSecurityStampAsync(_user);
         throw new BadArgumentException("Invalid Refresh Token");
     }
@@ -159,7 +163,7 @@ public class AuthServices : IAuthServices
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
-    public async Task CreateForgetPasswordToken(ForgetPasswordDto forgetPasswordDto)
+    public async Task CreateAndSendForgetPasswordToken(ForgetPasswordDto forgetPasswordDto)
     {
         var _user = await _userManager.FindByNameAsync(forgetPasswordDto.PhoneNumber);
         if (_user == null)
