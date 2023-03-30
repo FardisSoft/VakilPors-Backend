@@ -5,5 +5,6 @@
         "finalDllName": "VakilPors.Api",
         "csprojectFile": "./src/VakilPors/VakilPors.Web/VakilPors.Api.csproj",
         "version": "6.0"
-    }
+    },
+    "port":"5000"
 }
