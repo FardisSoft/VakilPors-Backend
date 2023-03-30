@@ -122,7 +122,7 @@ namespace VakilPors.Web.Controllers
         }
 
         [HttpPost]
-        [Route("SendActivationCode")]
+        [Route("sendactivationcode")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]

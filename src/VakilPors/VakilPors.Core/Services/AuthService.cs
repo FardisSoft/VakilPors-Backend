@@ -90,6 +90,8 @@ public class AuthServices : IAuthServices
             await _userManager.AddToRoleAsync(_user, userDto.IsVakil?RoleNames.Vakil: RoleNames.User);
         }
 
+        await SendActivationCode(_user.PhoneNumber);
+
         return result.Errors;
     }
 
