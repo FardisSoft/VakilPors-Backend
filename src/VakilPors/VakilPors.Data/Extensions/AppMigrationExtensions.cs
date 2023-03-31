@@ -32,7 +32,7 @@ namespace VakilPors.Data.Extensions
                         PhoneNumber="09116863556",
                         UserName="09116863556"
                     };
-                    await userManager.CreateAsync(admin,"Admin1");
+                    await userManager.CreateAsync(admin,"Admin123");
                     await userManager.AddToRoleAsync(admin,RoleNames.Admin);
                     Console.WriteLine("Creating default admin user...");
                 }
