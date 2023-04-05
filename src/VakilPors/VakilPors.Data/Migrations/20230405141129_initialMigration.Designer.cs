@@ -9,10 +9,10 @@ using VakilPors.Data.Context;
 
 #nullable disable
 
-namespace VakilPors.Data.VakilPos.Data.Migrations
+namespace VakilPors.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230405134903_initialMigration")]
+    [Migration("20230405141129_initialMigration")]
     partial class initialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

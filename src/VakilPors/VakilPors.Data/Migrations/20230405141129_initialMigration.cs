@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace VakilPors.Data.VakilPos.Data.Migrations
+namespace VakilPors.Data.Migrations
 {
     public partial class initialMigration : Migration
     {
