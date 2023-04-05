@@ -28,7 +28,7 @@ public class AuthServices : IAuthServices
 
     public AuthServices(IMapper mapper, UserManager<User> userManager, IConfiguration configuration, ILogger<AuthServices> logger,ISMSSender smsSender)
     {
-            this.smsSender = smsSender;
+        this.smsSender = smsSender;
         this._mapper = mapper;
         this._userManager = userManager;
         this._configuration = configuration;
@@ -107,7 +107,7 @@ public class AuthServices : IAuthServices
         {
             throw new BadArgumentException("Invalid Token");
         } 
-        var username = tokenContent.Claims.ToList().FirstOrDefault(q => q.Type == JwtRegisteredClaimNames.Email)?.Value;
+        var username = tokenContent.Claims.ToList().FirstOrDefault(q => q.Type == JwtRegisteredClaimNames.Sub)?.Value;
 
         _user = await _userManager.FindByNameAsync(username);
 
