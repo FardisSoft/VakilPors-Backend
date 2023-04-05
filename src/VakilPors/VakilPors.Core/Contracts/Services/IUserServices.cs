@@ -2,7 +2,7 @@
 
 namespace VakilPors.Core.Contracts.Services;
 
-public interface IUserService : IScopedDependency
+public interface IUserServices : IScopedDependency
 {
 }
 
