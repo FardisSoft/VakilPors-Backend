@@ -24,6 +24,8 @@ public class AppUnitOfWork : IAppUnitOfWork
 
     public IGenericRepo<User> UserRepo => _dbContext.GetService<IGenericRepo<User>>();
 
+    public IGenericRepo<Tranaction> TransactionRepo => _dbContext.GetService<IGenericRepo<Tranaction>>();
+
     #endregion
 
 }

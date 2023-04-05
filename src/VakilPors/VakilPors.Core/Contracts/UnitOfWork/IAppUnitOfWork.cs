@@ -10,6 +10,7 @@ public interface IAppUnitOfWork
     #region Repos
 
     public IGenericRepo<User> UserRepo { get; }
+    public IGenericRepo<Tranaction> TransactionRepo { get; }
     
     #endregion
 }

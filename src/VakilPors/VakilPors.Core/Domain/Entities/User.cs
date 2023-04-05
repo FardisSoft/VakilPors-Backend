@@ -15,11 +15,13 @@ public class User : IdentityUser<int>
     public DateTime RefreshTokenExpiryTime { get; set; }
     public string? ForgetPasswordCode { get; set; }
     public string? ActivationCode { get; set; }
+    public decimal Balance { get; set; }=0m;
     public bool IsActive
     {
         get { return PhoneNumberConfirmed; }
         set { PhoneNumberConfirmed = value; }
     }
+    public ICollection<Tranaction> Tranactions { get; set; }
 
 }
 
