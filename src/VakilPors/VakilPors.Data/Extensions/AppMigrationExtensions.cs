@@ -34,6 +34,7 @@ namespace VakilPors.Data.Extensions
                     };
                     await userManager.CreateAsync(admin,"Admin123");
                     await userManager.AddToRoleAsync(admin,RoleNames.Admin);
+                    await userManager.AddToRoleAsync(admin,RoleNames.User);
                     Console.WriteLine("Creating default admin user...");
                 }
             }
