@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using VakilPors.Core.Contracts.Services;
+using VakilPors.Core.Exceptions;
 
 namespace VakilPors.Core.Services
 {
@@ -46,7 +47,11 @@ namespace VakilPors.Core.Services
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadAsStringAsync();
-                 resultCode = int.Parse(result);
+                resultCode = int.Parse(result);
+            }
+            else
+            {
+                throw new InternalServerException("خطایی در ارسال پیامک به وجود آمده است.");
             }
 
             return resultCode;
