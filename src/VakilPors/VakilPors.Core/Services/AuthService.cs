@@ -74,15 +74,7 @@ public class AuthServices : IAuthServices
     {
         _user = _mapper.Map<User>(userDto);
         _user.UserName = userDto.PhoneNumber;
-        _user.Email= _user.Email==string.Empty ? "null@null.com":_user.Email;
         
-        //validate email using regex
-        Match match = Regex.Match(_user.Email,@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
-        if (!match.Success)
-        {
-            throw new BadArgumentException("Invalid Email");
-        }
-
         var result = await _userManager.CreateAsync(_user, userDto.Password);
 
         if (result.Succeeded)
@@ -150,7 +142,7 @@ public class AuthServices : IAuthServices
             new Claim(JwtRegisteredClaimNames.Sub, _user.PhoneNumber),
             new Claim(JwtRegisteredClaimNames.Name, _user.Name),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, _user.PhoneNumber),
+            new Claim(JwtRegisteredClaimNames.Email, _user.Email),
             new Claim("uid", _user.Id.ToString()),
         }
         .Union(userClaims).Union(roleClaims);
@@ -177,14 +169,7 @@ public class AuthServices : IAuthServices
         _user.ForgetPasswordCode = code;
         await _userManager.UpdateAsync(_user);
         
-        try
-        {
-            await smsSender.SendSmsAsync(forgetPasswordDto.PhoneNumber, $"کد بازیابی رمز عبور شما: {code} است");
-        }
-        catch (System.Exception)
-        {
-            throw new InternalServerException("sms sending failed");
-        }
+        await smsSender.SendSmsAsync(forgetPasswordDto.PhoneNumber, $"کد بازیابی رمز عبور شما: {code} است");
     }
 
     public async Task ResetPassword(ResetPasswordDto resetPasswordDto)

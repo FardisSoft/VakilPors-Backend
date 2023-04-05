@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace VakilPors.Core.Domain.Dtos
 {
-    public record SignUpDto: LoginDto
+    public record SignUpDto : LoginDto
     {
         [Required]
         public string Name { get; set; }
+        [Required]
+        [EmailAddress(ErrorMessage = "Invalid Email")]
         public string Email { get; set; }
-        public bool IsVakil { get; set; }=false;
+        public bool IsVakil { get; set; } = false;
     }
 }
