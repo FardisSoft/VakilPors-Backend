@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VakilPors.Contracts.Repositories;
 using VakilPors.Data.Context;
-
+using X.PagedList;
 namespace VakilPors.Data.Repositories;
 
 public class GenericRepo<TEntity> : IGenericRepo<TEntity> where TEntity : class
@@ -14,7 +14,12 @@ public class GenericRepo<TEntity> : IGenericRepo<TEntity> where TEntity : class
     
     public IQueryable<TEntity> AsQueryable()
         => Entities;
-
+    
+    public IQueryable<TEntity> AsQueryableNoTracking()
+        => Entities.AsNoTracking();
+    
+    public async Task<IPagedList<TEntity>> GetAllPaged(int pageNumber, int pageSize)
+        => await Entities.AsNoTracking().ToPagedListAsync(pageNumber, pageSize);
     public async Task<TEntity> FindAsync(object[] keyValues)
         => await Entities.FindAsync(keyValues);
 
@@ -36,5 +41,6 @@ public class GenericRepo<TEntity> : IGenericRepo<TEntity> where TEntity : class
     public void RemoveRange(IEnumerable<TEntity> entities)
         => Entities.RemoveRange(entities);
 
+    
 }
 
