@@ -27,9 +27,8 @@ namespace VakilPors.Web.Controllers
             var baseRoute = getBaseRoute();
             var Route=Url.Action(nameof(VerifyPayment)) ?? "/payment/verify";
             var callbackUrl = baseRoute + Route;
-            var phoneNumber = getPhoneNumber();
             var userId = getUserId();
-            return Ok(await paymentServices.RequestPayment(userId, phoneNumber, requestPaymentDto.Amount, requestPaymentDto.Description, callbackUrl));
+            return Ok(await paymentServices.RequestPayment(userId, requestPaymentDto.Amount, requestPaymentDto.Description, callbackUrl));
         }
 
 

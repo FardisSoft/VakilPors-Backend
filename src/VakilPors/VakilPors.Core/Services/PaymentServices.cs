@@ -25,7 +25,7 @@ namespace VakilPors.Core.Services
             this.walletServices = walletServices;
             this.appUnitOfWork = appUnitOfWork;
         }
-        public async Task<RequestPaymentOutput> RequestPayment(int userId, string phoneNumber,long amount, string description, string callbackUrl)
+        public async Task<RequestPaymentOutput> RequestPayment(int userId,long amount, string description, string callbackUrl)
         {
             var requestResult = await _zarinpal.RequestPaymentAsync(new()
             {
@@ -37,13 +37,14 @@ namespace VakilPors.Core.Services
             {
                 throw new BadArgumentException("خطا در درخواست پرداخت");
             }
-            await walletServices.AddTransaction(userId,phoneNumber,amount,description,requestResult.Authority,false,true);
+            await walletServices.AddTransaction(userId,amount,description,requestResult.Authority,false,true);
             return requestResult;
         }
 
         public async Task<VerifyPaymentOutput> VerifyPayment(string authority, string status)
         {
-            var amount=appUnitOfWork.TransactionRepo.AsQueryableNoTracking().FirstOrDefault(t=>t.Authority==authority).Amount;
+            var tranaction=appUnitOfWork.TransactionRepo.AsQueryableNoTracking().FirstOrDefault(t=>t.Authority==authority);
+            var amount=tranaction.Amount;
             var verificationResult = await _zarinpal.VerifyPaymentAsync(new()
             {
                 Amount = Convert.ToInt64(amount),
@@ -53,12 +54,7 @@ namespace VakilPors.Core.Services
             {
                 throw new BadArgumentException("خطا در تایید پرداخت");
             }
-            var transaction=appUnitOfWork.TransactionRepo.AsQueryableNoTracking().FirstOrDefault(t=>t.Authority==authority);
-            transaction.IsSuccess=true;
-            appUnitOfWork.TransactionRepo.Update(transaction);
-            await appUnitOfWork.SaveChangesAsync();
-            await walletServices.AddBalance(transaction.UserId,transaction.Amount);
-            
+            await walletServices.ApproveTransaction(tranaction.Id);
             return verificationResult;
         }
     }

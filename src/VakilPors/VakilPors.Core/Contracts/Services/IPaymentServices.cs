@@ -10,7 +10,7 @@ namespace VakilPors.Core.Contracts.Services
 {
     public interface IPaymentServices : IScopedDependency
     {
-        public Task<RequestPaymentOutput> RequestPayment(int userId, string phoneNumber,long amount, string description, string callbackUrl);
+        public Task<RequestPaymentOutput> RequestPayment(int userId,long amount, string description, string callbackUrl);
         public Task<VerifyPaymentOutput> VerifyPayment(string authority, string status);
     }
 }

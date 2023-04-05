@@ -25,59 +25,73 @@ namespace VakilPors.Core.Services
         }
         public async Task AddBalance(string phoneNumber, decimal amount)
         {
-            var user=await getUser(phoneNumber);
-            user.Balance += amount;
-            var result=await userManager.UpdateAsync(user);
-            if (!result.Succeeded)
-            {
-                throw new InternalServerException("error in update user balance");
-            }
+            var user = await getUser(phoneNumber);
+            await addBalance(user, amount);
+
         }
 
         public async Task AddBalance(int userId, decimal amount)
         {
-            var user=await getUser(userId);
+            var user = await getUser(userId);
+            await addBalance(user, amount);
+        }
+        private async Task addBalance(User user, decimal amount)
+        {
             user.Balance += amount;
-            var result=await userManager.UpdateAsync(user);
+            var result = await userManager.UpdateAsync(user);
             if (!result.Succeeded)
             {
                 throw new InternalServerException("error in update user balance");
             }
         }
 
-        public async Task AddTransaction(int userId, string phoneNumber, decimal amount, string description,string authority, bool isSuccess, bool isIncome)
+
+        public async Task AddTransaction(int userId, decimal amount, string description, string authority, bool isSuccess, bool isIncome)
         {
-            var tranaction=new Tranaction(){
-                UserId=userId,
-                Amount=amount,
-                Date=DateTime.Now,
-                Description=description,
-                Authority=authority,
-                IsIncome=isIncome,
-                IsSuccess=isSuccess,
+            var tranaction = new Tranaction()
+            {
+                UserId = userId,
+                Amount = amount,
+                Date = DateTime.Now,
+                Description = description,
+                Authority = authority,
+                IsIncome = isIncome,
+                IsSuccess = isSuccess,
             };
             await appUnitOfWork.TransactionRepo.AddAsync(tranaction);
             await appUnitOfWork.SaveChangesAsync();
-            if(isSuccess)
-                await AddBalance(phoneNumber, (isIncome?amount:-amount));
+            if (isSuccess)
+                await AddBalance(userId, (isIncome ? amount : -amount));
         }
-        
+        public async Task ApproveTransaction(int tranactionId)
+        {
+            var transaction = await appUnitOfWork.TransactionRepo.FindAsync(tranactionId);
+            if (transaction.IsSuccess)
+            {
+                throw new InternalServerException("transaction is already applied");
+            }
+            transaction.IsSuccess = true;
+            appUnitOfWork.TransactionRepo.Update(transaction);
+            await appUnitOfWork.SaveChangesAsync();
+            await AddBalance(transaction.UserId, (transaction.IsIncome ? transaction.Amount : -transaction.Amount));
+        }
+
 
         public async Task<decimal> GetBalance(string phoneNumber)
         {
-            var user=await getUser(phoneNumber);
+            var user = await getUser(phoneNumber);
             return user.Balance;
         }
-        public async Task<IPagedList<Tranaction>> GetTransactions(string phoneNumber,PagedParams pagedParams)
+        public async Task<IPagedList<Tranaction>> GetTransactions(string phoneNumber, PagedParams pagedParams)
         {
-            var tranactions=await appUnitOfWork.UserRepo.AsQueryableNoTracking().Include(u=>u.Tranactions).Where(x=>x.PhoneNumber==phoneNumber).Select(x=>x.Tranactions).ToPagedListAsync(pagedParams.PageNumber, pagedParams.PageSize);
+            var tranactions = await appUnitOfWork.UserRepo.AsQueryableNoTracking().Include(u => u.Tranactions).Where(x => x.PhoneNumber == phoneNumber).Select(x => x.Tranactions).ToPagedListAsync(pagedParams.PageNumber, pagedParams.PageSize);
             return tranactions.FirstOrDefault().ToPagedList();
         }
 
-        
+
         private async Task<User> getUser(string phoneNumber)
         {
-            var user= await userManager.FindByNameAsync(phoneNumber);
+            var user = await userManager.FindByNameAsync(phoneNumber);
             if (user == null)
             {
                 throw new NotFoundException("user not found");
@@ -86,7 +100,7 @@ namespace VakilPors.Core.Services
         }
         private async Task<User> getUser(int userId)
         {
-            var user= await userManager.FindByIdAsync(userId.ToString());
+            var user = await userManager.FindByIdAsync(userId.ToString());
             if (user == null)
             {
                 throw new NotFoundException("user not found");
