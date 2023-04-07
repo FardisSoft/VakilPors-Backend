@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace VakilPors.Core.Domain.Dtos.Params
 {
-    public class PagedParams
+    public record PagedParams
     {
         private const int MinPageSize = 5;
         private const int MaxPageSize = 50;
