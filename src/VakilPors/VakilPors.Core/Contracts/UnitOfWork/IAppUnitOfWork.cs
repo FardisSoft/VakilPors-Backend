@@ -11,6 +11,7 @@ public interface IAppUnitOfWork
 
     public IGenericRepo<User> UserRepo { get; }
     public IGenericRepo<Tranaction> TransactionRepo { get; }
+    public IGenericRepo<Lawyer> LawyerRepo { get; }
     
     #endregion
 }
