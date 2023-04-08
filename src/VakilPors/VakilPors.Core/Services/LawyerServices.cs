@@ -25,7 +25,7 @@ namespace VakilPors.Core.Services
         {
             return await appUnitOfWork.LawyerRepo.AsQueryableNoTracking()
             .Include(l => l.User)
-            .Where(l => Fuzz.PartialRatio(l.User.Name, filterParams.Q) > 75 || l.ParvandeNo.Contains(filterParams.Q))
+            .Where(l => string.IsNullOrEmpty(filterParams.Q) || Fuzz.PartialRatio(l.User.Name, filterParams.Q) > 75 || l.ParvandeNo.Contains(filterParams.Q))
             .OrderBy((string.IsNullOrEmpty(filterParams.Sort) ? "Id" : filterParams.Sort), filterParams.IsAscending)
             .ToPagedListAsync(pagedParams.PageNumber, pagedParams.PageSize);
         }
