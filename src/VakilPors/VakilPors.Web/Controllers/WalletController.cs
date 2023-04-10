@@ -4,12 +4,14 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Params;
+using VakilPors.Core.Domain.Dtos.Payment;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
 using X.PagedList;
@@ -22,9 +24,11 @@ namespace VakilPors.Web.Controllers
     public class WalletController : MyControllerBase
     {
         private readonly IWalletServices walletServices;
+        private readonly IMapper mapper;
 
-        public WalletController(IWalletServices walletServices)
+        public WalletController(IWalletServices walletServices,IMapper mapper)
         {
+            this.mapper = mapper;
             this.walletServices = walletServices;
         }
         [HttpGet("GetBalance")]
@@ -41,11 +45,11 @@ namespace VakilPors.Web.Controllers
         }
         //get transactions
         [HttpGet("GetTransactions")]
-        public async Task<IPagedList<Tranaction>> GetTransactions([FromQuery]PagedParams pagedParams)
+        public async Task<IPagedList<TranactionDto>> GetTransactions([FromQuery]PagedParams pagedParams)
         {
             var phoneNumber= getPhoneNumber();
             var transactions=await walletServices.GetTransactions(phoneNumber,pagedParams);
-            return transactions;
+            return mapper.Map<IPagedList<TranactionDto>>(transactions);
         }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using VakilPors.Data.Context;
@@ -11,9 +12,10 @@ using VakilPors.Data.Context;
 namespace VakilPors.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230410184501_mig_add_lawyers_table")]
+    partial class mig_add_lawyers_table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -150,7 +152,7 @@ namespace VakilPors.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Lawyer", (string)null);
+                    b.ToTable("Lawyer");
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.Role", b =>
@@ -238,7 +240,7 @@ namespace VakilPors.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Tranaction", (string)null);
+                    b.ToTable("Tranaction");
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.User", b =>
