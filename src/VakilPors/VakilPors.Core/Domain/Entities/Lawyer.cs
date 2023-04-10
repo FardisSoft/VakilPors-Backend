@@ -12,7 +12,7 @@ namespace VakilPors.Core.Domain.Entities
     {
         [Key]
         public int Id { get; set; }
-        public double Rating { get; set; }
+        public double Rating { get; set; }=0d;
         public string ParvandeNo { get; set; }
         public bool IsAuthorized { get; set; }=false;
         public int UserId { get; set; }

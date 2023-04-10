@@ -22,8 +22,8 @@ public class User : IdentityUser<int>
         set { PhoneNumberConfirmed = value; }
     }
     public ICollection<Tranaction> Tranactions { get; set; }
-    public int? LawyerId { get; set; }
+    public int? LawyerId { get; set; }=null;
     [ForeignKey(nameof(LawyerId))]
-    public Lawyer Lawyer { get; set; }
+    public Lawyer? Lawyer { get; set; }
 }
 
