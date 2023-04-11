@@ -28,5 +28,6 @@ namespace VakilPors.Web.Controllers
             var all=await lawyerServices.GetLawyers(pagedParams,filterParams);
             return mapper.Map<IPagedList<LawyerDto>>(all);
         }
+
     }
 }
