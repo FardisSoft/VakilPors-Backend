@@ -10,6 +10,7 @@ using VakilPors.Core.Domain.Dtos.Params;
 using X.PagedList;
 using VakilPors.Shared.Extensions;
 using VakilPors.Core.Domain.Entities;
+using AutoMapper.QueryableExtensions;
 
 namespace VakilPors.Core.Services
 {
@@ -28,6 +29,12 @@ namespace VakilPors.Core.Services
             .Where(l => string.IsNullOrEmpty(filterParams.Q) || Fuzz.PartialRatio(l.User.Name, filterParams.Q) > 75 || l.ParvandeNo.Contains(filterParams.Q))
             .OrderBy((string.IsNullOrEmpty(filterParams.Sort) ? "Id" : filterParams.Sort), filterParams.IsAscending)
             .ToPagedListAsync(pagedParams.PageNumber, pagedParams.PageSize);
+        }
+        public async Task<Lawyer> GetLawyerByID(int id)
+        {
+            //return appUnitOfWork.LawyerRepo.AsQueryableNoTracking().Where(l => l.User.Id == id).FirstOrDefault();
+            return await appUnitOfWork.LawyerRepo.FindAsync(id);
+
         }
     }
 }

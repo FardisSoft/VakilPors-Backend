@@ -12,5 +12,6 @@ namespace VakilPors.Core.Contracts.Services
     public interface ILawyerServices:IScopedDependency
     {
         Task<IPagedList<Lawyer>> GetLawyers(PagedParams pagedParams, FilterParams filterParams);
+        Task <Lawyer> GetLawyerByID (int id);
     }
 }

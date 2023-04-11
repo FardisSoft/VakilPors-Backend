@@ -28,6 +28,12 @@ namespace VakilPors.Web.Controllers
             var all=await lawyerServices.GetLawyers(pagedParams,filterParams);
             return mapper.Map<IPagedList<LawyerDto>>(all);
         }
+        [HttpGet("GetByID")]
+        public async Task<LawyerDto> GetLawyer([FromQuery] int id)
+        {
+            var lawyer = await lawyerServices.GetLawyerByID(id);
+            return mapper.Map<LawyerDto>(lawyer);
+        }
 
     }
 }
