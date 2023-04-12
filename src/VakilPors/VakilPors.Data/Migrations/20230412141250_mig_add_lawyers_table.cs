@@ -38,35 +38,16 @@ namespace VakilPors.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_LawyerId",
-                table: "AspNetUsers",
-                column: "LawyerId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Lawyer_UserId",
                 table: "Lawyer",
-                column: "UserId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_AspNetUsers_Lawyer_LawyerId",
-                table: "AspNetUsers",
-                column: "LawyerId",
-                principalTable: "Lawyer",
-                principalColumn: "Id");
+                column: "UserId",
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_AspNetUsers_Lawyer_LawyerId",
-                table: "AspNetUsers");
-
             migrationBuilder.DropTable(
                 name: "Lawyer");
-
-            migrationBuilder.DropIndex(
-                name: "IX_AspNetUsers_LawyerId",
-                table: "AspNetUsers");
 
             migrationBuilder.DropColumn(
                 name: "LawyerId",

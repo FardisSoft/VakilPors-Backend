@@ -16,6 +16,7 @@ namespace VakilPors.Core.Contracts.Services
         Task<decimal> GetBalance(string phoneNumber);
         Task AddTransaction(int userId, decimal amount, string description,string authority, bool isSuccess, bool isIncome);
         Task ApproveTransaction(int tranactionId);
+        Task ApplyTransaction(int tranactionId);
         Task<IPagedList<Tranaction>> GetTransactions(string phoneNumber,PagedParams pagedParams);
         // Task<bool> HasEnoughBalance(string phoneNumber, decimal amount);
         // Task<bool> HasEnoughBalance(string phoneNumber, decimal amount, decimal discount);

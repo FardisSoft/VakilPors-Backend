@@ -12,7 +12,7 @@ using VakilPors.Data.Context;
 namespace VakilPors.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230410184501_mig_add_lawyers_table")]
+    [Migration("20230412141250_mig_add_lawyers_table")]
     partial class mig_add_lawyers_table
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -150,7 +150,8 @@ namespace VakilPors.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("Lawyer");
                 });
@@ -326,8 +327,6 @@ namespace VakilPors.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LawyerId");
-
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -395,8 +394,8 @@ namespace VakilPors.Data.Migrations
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.Lawyer", b =>
                 {
                     b.HasOne("VakilPors.Core.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                        .WithOne("Lawyer")
+                        .HasForeignKey("VakilPors.Core.Domain.Entities.Lawyer", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -416,15 +415,8 @@ namespace VakilPors.Data.Migrations
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.User", b =>
                 {
-                    b.HasOne("VakilPors.Core.Domain.Entities.Lawyer", "Lawyer")
-                        .WithMany()
-                        .HasForeignKey("LawyerId");
-
                     b.Navigation("Lawyer");
-                });
 
-            modelBuilder.Entity("VakilPors.Core.Domain.Entities.User", b =>
-                {
                     b.Navigation("Tranactions");
                 });
 #pragma warning restore 612, 618
