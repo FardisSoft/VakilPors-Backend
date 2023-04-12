@@ -14,7 +14,7 @@ namespace VakilPors.Core.Domain.Entities
         public int Id { get; set; }
         public int UserId { get; set; }
         public decimal Amount { get; set; }
-        public DateTime Date { get; set; }
+        public DateTime Date { get; set; }=DateTime.Now;
         public string? Authority { get; set; }
         public string? Description { get; set; }
         public bool IsSuccess { get; set; }

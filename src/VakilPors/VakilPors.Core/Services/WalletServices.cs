@@ -75,6 +75,19 @@ namespace VakilPors.Core.Services
             await appUnitOfWork.SaveChangesAsync();
             await AddBalance(transaction.UserId, (transaction.IsIncome ? transaction.Amount : -transaction.Amount));
         }
+        public async Task ApplyTransaction(int tranactionId)
+        {
+            var transaction = await appUnitOfWork.TransactionRepo.AsQueryable().Include(t=>t.User).FirstOrDefaultAsync(t=>t.Id==tranactionId);
+            var user=transaction.User;
+            if (!transaction.IsSuccess || (!transaction.IsIncome && user.Balance<transaction.Amount))
+            {
+                return;
+            }
+            var amount=(transaction.IsIncome ? transaction.Amount : -transaction.Amount);
+            user.Balance += amount;
+            appUnitOfWork.UserRepo.Update(user);
+            await appUnitOfWork.SaveChangesAsync();
+        }
 
 
         public async Task<decimal> GetBalance(string phoneNumber)
