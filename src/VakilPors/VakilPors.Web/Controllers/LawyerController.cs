@@ -69,7 +69,7 @@ namespace VakilPors.Web.Controllers;
         [HttpGet("GetAll")]
         public async Task<ActionResult<IPagedList<LawyerDto>>> GetAllPaged([FromQuery] PagedParams pagedParams,[FromQuery] FilterParams filterParams){
             var all=await _lawyerServices.GetLawyers(pagedParams,filterParams);
-            var res=all.ToMappedPagedList<Lawyer,LawyerDto>(mapper); 
+            var res=all.ToMappedPagedList<Lawyer,LawyerDto>(_mapper); 
             return Ok(new AppResponse<IPagedList<LawyerDto>>(res,"success"));
         }
 
