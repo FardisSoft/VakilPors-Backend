@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 using VakilPors.Shared.Entities;
@@ -21,6 +23,10 @@ public class User : IdentityUser<int>
         get { return PhoneNumberConfirmed; }
         set { PhoneNumberConfirmed = value; }
     }
+    public string Job { get; set; }
+    public string Bio { get; set; }
+
+    public string ProfileImageUrl { get; set; }
     public ICollection<Tranaction> Tranactions { get; set; }
     public int? LawyerId { get; set; }
     [ForeignKey(nameof(LawyerId))]

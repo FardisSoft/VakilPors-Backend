@@ -14,12 +14,11 @@ namespace VakilPors.Core.Domain.Dtos.User
         public virtual string Email { get; set; }
         public decimal Balance { get; set; } = 0m;
         public virtual bool PhoneNumberConfirmed { get; set; }
+        public bool IsActive { get; set; }
+        public string Job { get; set; }
+        public string Bio { get; set; }
+        public string ProfileImageUrl { get; set; }
 
-        public bool IsActive
-        {
-            get { return PhoneNumberConfirmed; }
-            set { PhoneNumberConfirmed = value; }
-        }
         public ICollection<TranactionDto> Tranactions { get; set; }
     }
 }
