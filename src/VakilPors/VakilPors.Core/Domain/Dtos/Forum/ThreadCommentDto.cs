@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using VakilPors.Core.Domain.Dtos.User;
+using VakilPors.Core.Domain.Entities;
 
 namespace VakilPors.Core.Domain.Dtos;
 
