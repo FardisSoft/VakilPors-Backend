@@ -9,10 +9,11 @@ using VakilPors.Core.Domain.Dtos.Payment;
 using VakilPors.Core.Domain.Dtos.User;
 using VakilPors.Core.Domain.Entities;
 using ForumThread = VakilPors.Core.Domain.Entities.ForumThread;
+using X.PagedList;
 
 namespace VakilPors.Core.Mapper
 {
-    public class MapperProfile: Profile
+    public class MapperProfile : Profile
     {
         public MapperProfile()
         {
@@ -22,6 +23,17 @@ namespace VakilPors.Core.Mapper
             CreateMap<Tranaction, TranactionDto>();
             CreateMap<ForumThread, ThreadDto>();
             CreateMap<ThreadComment, ThreadCommentDto>();
+
+        }
+    }
+    public static class MapperExtensions
+    {
+        public static IPagedList<TDestination> ToMappedPagedList<TSource, TDestination>(this IPagedList<TSource> list,IMapper mapper)
+        {
+            IEnumerable<TDestination> sourceList = mapper.Map<IEnumerable<TSource>, IEnumerable<TDestination>>(list);
+            IPagedList<TDestination> pagedResult = new StaticPagedList<TDestination>(sourceList, list.GetMetaData());
+            return pagedResult;
+
         }
     }
 }

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,10 +8,11 @@ using VakilPors.Core.Domain.Dtos.Params;
 using VakilPors.Core.Domain.Dtos.User;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Shared.Response;
+using VakilPors.Core.Mapper;
 using X.PagedList;
 
-namespace VakilPors.Web.Controllers
-{
+namespace VakilPors.Web.Controllers;
+
     [ApiController]
     [Route("[controller]/[action]")]
     public class LawyerController : MyControllerBase
@@ -24,11 +21,11 @@ namespace VakilPors.Web.Controllers
         private readonly IMapper _mapper;
         private readonly ILogger<LawyerController> _logger;
 
-        public LawyerController(ILawyerServices lawyerServices,IMapper mapper, ILogger<LawyerController> logger)
+        public LawyerController(ILawyerServices _lawyerServices,IMapper mapper, ILogger<LawyerController> logger)
         {
             this._mapper = mapper;
             _logger = logger;
-            this._lawyerServices = lawyerServices;
+            this._lawyerServices = _lawyerServices;
         }
 
         [HttpGet]
@@ -69,5 +66,11 @@ namespace VakilPors.Web.Controllers
             var result = await _lawyerServices.GetLawyerByUserId(getUserId());
             return Ok(new AppResponse<object>(result, "success"));
         }
-}
+        [HttpGet("GetAll")]
+        public async Task<ActionResult<IPagedList<LawyerDto>>> GetAllPaged([FromQuery] PagedParams pagedParams,[FromQuery] FilterParams filterParams){
+            var all=await _lawyerServices.GetLawyers(pagedParams,filterParams);
+            var res=all.ToMappedPagedList<Lawyer,LawyerDto>(mapper); 
+            return Ok(new AppResponse<IPagedList<LawyerDto>>(res,"success"));
+        }
+
 }
