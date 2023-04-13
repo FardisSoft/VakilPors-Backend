@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VakilPors.Core.Domain.Dtos.Lawyer;
 using VakilPors.Core.Domain.Dtos.Params;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Shared.Services;
@@ -13,5 +14,7 @@ namespace VakilPors.Core.Contracts.Services
     {
         Task<IPagedList<Lawyer>> GetLawyers(PagedParams pagedParams, FilterParams filterParams);
         Task <Lawyer> GetLawyerByID (int id);
+        Task EditLawyer(int id, LawyerDto lawyer);
+
     }
 }

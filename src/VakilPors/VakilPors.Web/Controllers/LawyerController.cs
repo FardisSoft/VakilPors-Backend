@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Lawyer;
 using VakilPors.Core.Domain.Dtos.Params;
+using VakilPors.Core.Domain.Entities;
 using X.PagedList;
 
 namespace VakilPors.Web.Controllers
@@ -33,6 +34,12 @@ namespace VakilPors.Web.Controllers
         {
             var lawyer = await lawyerServices.GetLawyerByID(id);
             return mapper.Map<LawyerDto>(lawyer);
+        }
+        [HttpPut("EditLawyer")]
+        public async Task EditLawyer([FromQuery] int id, [FromBody] LawyerDto lawyerDto)
+        {
+            //var lawyer = mapper.Map<Lawyer>(lawyerDto);
+            await lawyerServices.EditLawyer(id, lawyerDto);
         }
 
     }
