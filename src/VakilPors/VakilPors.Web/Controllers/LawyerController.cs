@@ -16,7 +16,8 @@ using X.PagedList;
 
 namespace VakilPors.Web.Controllers
 {
-    
+    [ApiController]
+    [Route("[controller]/[action]")]
     public class LawyerController : MyControllerBase
     {
         private readonly ILawyerServices _lawyerServices;
@@ -29,8 +30,8 @@ namespace VakilPors.Web.Controllers
             _logger = logger;
             this._lawyerServices = lawyerServices;
         }
-        [HttpGet("GetAll")]
-        public async Task<IPagedList<LawyerDto>> GetAllPaged([FromQuery] PagedParams pagedParams,[FromQuery] FilterParams filterParams){
+        
+        public async Task<IPagedList<LawyerDto>> GetAll([FromQuery] PagedParams pagedParams,[FromQuery] FilterParams filterParams){
             var all=await _lawyerServices.GetLawyers(pagedParams,filterParams);
             return _mapper.Map<IPagedList<LawyerDto>>(all);
         }

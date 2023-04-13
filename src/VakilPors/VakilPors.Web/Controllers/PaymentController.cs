@@ -11,6 +11,8 @@ using VakilPors.Core.Domain.Dtos.Payment;
 namespace VakilPors.Web.Controllers
 {
     [Authorize]
+    [ApiController]
+    [Route("[controller]")]
     public class PaymentController : MyControllerBase
     {
         private readonly IPaymentServices paymentServices;

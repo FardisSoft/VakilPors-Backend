@@ -20,6 +20,8 @@ namespace VakilPors.Web.Controllers
 {
 
     [Authorize]
+    [ApiController]
+    [Route("[controller]")]
     public class WalletController : MyControllerBase
     {
         private readonly IWalletServices walletServices;

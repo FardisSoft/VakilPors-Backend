@@ -8,6 +8,8 @@ using VakilPors.Web.Controllers;
 
 namespace VakilPors.Api.Controllers;
 
+[ApiController]
+[Route("[controller]/[action]")]
 public class CustomerController : MyControllerBase
 {
     private readonly IUserServices _userServices;
