@@ -30,7 +30,8 @@ namespace VakilPors.Web.Controllers
             _logger = logger;
             this._lawyerServices = lawyerServices;
         }
-        
+
+        [HttpGet]
         public async Task<IPagedList<LawyerDto>> GetAll([FromQuery] PagedParams pagedParams,[FromQuery] FilterParams filterParams){
             var all=await _lawyerServices.GetLawyers(pagedParams,filterParams);
             return _mapper.Map<IPagedList<LawyerDto>>(all);
