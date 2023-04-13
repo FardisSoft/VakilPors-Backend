@@ -36,8 +36,8 @@ namespace VakilPors.Web.Controllers;
             return Ok(new AppResponse<object>(result, "Profile Updated"));
         }
 
-        [HttpGet("GetAll")]
-        public async Task<IActionResult> GetAllLawyers()
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
         {
             _logger.LogInformation($"get all lawyers");
             var result = await _lawyerServices.GetAllLawyers();
@@ -60,8 +60,9 @@ namespace VakilPors.Web.Controllers;
             var result = await _lawyerServices.GetLawyerByUserId(getUserId());
             return Ok(new AppResponse<object>(result, "success"));
         }
-        [HttpGet("GetAllPaged")]
+        [HttpGet]
         public async Task<ActionResult<IPagedList<LawyerDto>>> GetAllPaged([FromQuery] PagedParams pagedParams,[FromQuery] FilterParams filterParams){
+            _logger.LogInformation($"GET ALL lawyers paged. page no:{pagedParams.PageNumber} page size:{pagedParams.PageSize}, search query:{filterParams.Q}, sort by:{filterParams.Sort}, isAscending:{filterParams.IsAscending}");
             var all=await _lawyerServices.GetLawyers(pagedParams,filterParams);
             var res=all.ToMappedPagedList<Lawyer,LawyerDto>(_mapper); 
             return Ok(new AppResponse<IPagedList<LawyerDto>>(res,"success"));
