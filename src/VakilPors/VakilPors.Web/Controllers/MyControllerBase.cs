@@ -10,6 +10,8 @@ using VakilPors.Core.Exceptions;
 
 namespace VakilPors.Web.Controllers
 {
+    [ApiController]
+    [Route("[controller]/[action]")]
     public class MyControllerBase : ControllerBase
     {
         protected string getPhoneNumber()

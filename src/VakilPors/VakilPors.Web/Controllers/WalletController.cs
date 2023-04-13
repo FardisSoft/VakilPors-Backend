@@ -18,8 +18,7 @@ using X.PagedList;
 
 namespace VakilPors.Web.Controllers
 {
-    [ApiController]
-    [Route("[controller]")]
+
     [Authorize]
     public class WalletController : MyControllerBase
     {

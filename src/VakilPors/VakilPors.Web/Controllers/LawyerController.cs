@@ -11,8 +11,7 @@ using X.PagedList;
 
 namespace VakilPors.Web.Controllers
 {
-    [ApiController]
-    [Route("[controller]")]
+    
     public class LawyerController : MyControllerBase
     {
         private readonly ILawyerServices lawyerServices;

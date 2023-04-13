@@ -12,10 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\VakilPors.Core\VakilPors.Core.csproj" />
     <ProjectReference Include="..\VakilPors.Data\VakilPors.Data.csproj" />
   </ItemGroup>
