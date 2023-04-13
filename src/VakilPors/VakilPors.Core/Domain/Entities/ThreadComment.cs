@@ -24,6 +24,6 @@ public class ThreadComment : IEntity
     public int ThreadId { get; set; }
 
     [ForeignKey(nameof(ThreadId))]
-    public Thread Thread { get; set; }
+    public ForumThread Thread { get; set; }
 }
 

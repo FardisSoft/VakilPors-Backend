@@ -5,7 +5,7 @@ using VakilPors.Shared.Entities;
 
 namespace VakilPors.Core.Domain.Entities;
 
-public class Thread : IEntity
+public class ForumThread : IEntity
 {
     [Key]
     public int Id { get; set; }

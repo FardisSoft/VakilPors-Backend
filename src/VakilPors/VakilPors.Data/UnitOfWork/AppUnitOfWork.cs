@@ -4,7 +4,7 @@ using VakilPors.Contracts.Repositories;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Data.Context;
-using Thread = VakilPors.Core.Domain.Entities.Thread;
+using ForumThread = VakilPors.Core.Domain.Entities.ForumThread;
 
 namespace VakilPors.Data.UnitOfWork;
 
@@ -29,7 +29,7 @@ public class AppUnitOfWork : IAppUnitOfWork
 
     public IGenericRepo<Lawyer> LawyerRepo => _dbContext.GetService<IGenericRepo<Lawyer>>();
 
-    public IGenericRepo<Thread> ThreadRepo => _dbContext.GetService<IGenericRepo<Thread>>();
+    public IGenericRepo<ForumThread> ForumThreadRepo => _dbContext.GetService<IGenericRepo<ForumThread>>();
 
     public IGenericRepo<ThreadComment> ThreadCommentRepo => _dbContext.GetService<IGenericRepo<ThreadComment>>();
 
