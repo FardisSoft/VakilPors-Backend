@@ -8,10 +8,11 @@ using VakilPors.Core.Domain.Dtos.Lawyer;
 using VakilPors.Core.Domain.Dtos.Payment;
 using VakilPors.Core.Domain.Dtos.User;
 using VakilPors.Core.Domain.Entities;
+using X.PagedList;
 
 namespace VakilPors.Core.Mapper
 {
-    public class MapperProfile: Profile
+    public class MapperProfile : Profile
     {
         public MapperProfile()
         {
@@ -19,7 +20,17 @@ namespace VakilPors.Core.Mapper
             CreateMap<Lawyer, LawyerDto>();
             CreateMap<User, UserDto>();
             CreateMap<Tranaction, TranactionDto>();
-            
+
+        }
+    }
+    public static class MapperExtensions
+    {
+        public static IPagedList<TDestination> ToMappedPagedList<TSource, TDestination>(this IPagedList<TSource> list,IMapper mapper)
+        {
+            IEnumerable<TDestination> sourceList = mapper.Map<IEnumerable<TSource>, IEnumerable<TDestination>>(list);
+            IPagedList<TDestination> pagedResult = new StaticPagedList<TDestination>(sourceList, list.GetMetaData());
+            return pagedResult;
+
         }
     }
 }

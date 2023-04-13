@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Lawyer;
 using VakilPors.Core.Domain.Dtos.Params;
+using VakilPors.Core.Domain.Entities;
+using VakilPors.Core.Mapper;
 using X.PagedList;
 
 namespace VakilPors.Web.Controllers
@@ -24,9 +22,10 @@ namespace VakilPors.Web.Controllers
             this.lawyerServices = lawyerServices;
         }
         [HttpGet("GetAll")]
-        public async Task<IPagedList<LawyerDto>> GetAllPaged([FromQuery] PagedParams pagedParams,[FromQuery] FilterParams filterParams){
+        public async Task<ActionResult<IPagedList<LawyerDto>>> GetAllPaged([FromQuery] PagedParams pagedParams,[FromQuery] FilterParams filterParams){
             var all=await lawyerServices.GetLawyers(pagedParams,filterParams);
-            return mapper.Map<IPagedList<LawyerDto>>(all);
+            var res=all.ToMappedPagedList<Lawyer,LawyerDto>(mapper); 
+            return Ok(res);
         }
     }
 }
