@@ -57,6 +57,10 @@ namespace VakilPors.Core.Services
             foundLawyer.CallingCardImageUrl = lawyerDto.CallingCardImageUrl;
             foundLawyer.ResumeLink = lawyerDto.ResumeLink;
             foundLawyer.Specialties = lawyerDto.Specialties;
+            foundLawyer.ProfileBackgroundPictureUrl = lawyerDto.ProfileBackgroundPictureUrl;
+            foundLawyer.NumberOfRates = lawyerDto.NumberOfRates;
+            foundLawyer.Gender = lawyerDto.Gender;
+
 
             _appUnitOfWork.LawyerRepo.Update(foundLawyer);
             var updateResult = await _appUnitOfWork.SaveChangesAsync();

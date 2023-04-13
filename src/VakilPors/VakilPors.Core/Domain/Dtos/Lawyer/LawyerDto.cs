@@ -29,5 +29,13 @@ namespace VakilPors.Core.Domain.Dtos.Lawyer
         public string ResumeLink { get; set; }
         public string Specialties { get; set; }
         public UserDto User { get; set; }
+        public string ProfileBackgroundPictureUrl { get; set; }
+        public int NumberOfRates { get; set; }
+        public string Gender { get; set; }
+        public int NumbereOfConsulations { get; set; }
+        public int NumberOfAnswers { get; set; }
+        public int NumberOfLikes { get; set; }
+        public int NumberOfVerifies { get; set; }
+        public List<string> RatesList { get; set; }
     }
 }

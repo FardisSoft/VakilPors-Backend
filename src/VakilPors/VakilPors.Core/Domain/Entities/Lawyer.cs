@@ -35,5 +35,13 @@ namespace VakilPors.Core.Domain.Entities
         public int UserId { get; set; }
         [ForeignKey(nameof(UserId))]
         public User User { get; set; }
+        public string ProfileBackgroundPictureUrl {get; set; }
+        public int NumberOfRates { get; set; } 
+        public string Gender { get; set; }
+        public int NumbereOfConsulations { get; set; } 
+        public int NumberOfAnswers { get; set; } 
+        public int NumberOfLikes { get; set; } 
+        public int NumberOfVerifies { get; set; } 
+        public List<string> RatesList { get; set; }
     }
 }
