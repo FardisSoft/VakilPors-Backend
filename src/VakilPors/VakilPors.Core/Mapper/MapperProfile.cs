@@ -8,6 +8,7 @@ using VakilPors.Core.Domain.Dtos.Lawyer;
 using VakilPors.Core.Domain.Dtos.Payment;
 using VakilPors.Core.Domain.Dtos.User;
 using VakilPors.Core.Domain.Entities;
+using Thread = VakilPors.Core.Domain.Entities.Thread;
 
 namespace VakilPors.Core.Mapper
 {
@@ -19,7 +20,8 @@ namespace VakilPors.Core.Mapper
             CreateMap<Lawyer, LawyerDto>();
             CreateMap<User, UserDto>();
             CreateMap<Tranaction, TranactionDto>();
-            
+            CreateMap<Thread, ThreadDto>();
+            CreateMap<ThreadComment, ThreadCommentDto>();
         }
     }
 }
