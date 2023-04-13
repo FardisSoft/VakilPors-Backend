@@ -8,6 +8,7 @@ namespace VakilPors.Core.Domain.Dtos.User
 {
     public record UserDto
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public virtual string UserName { get; set; }
         public virtual string PhoneNumber { get; set; }
