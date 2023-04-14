@@ -51,6 +51,13 @@ namespace VakilPors.Web.Controllers;
             var result = await _lawyerServices.GetLawyerById(lawyerId);
             return Ok(new AppResponse<object>(result, "success"));
         }
+        [HttpGet]
+        public async Task<IActionResult> GetLawyerByUserId(int userId)
+        {
+            _logger.LogInformation($"get lawyer data by user id for {userId}");
+            var result = await _lawyerServices.GetLawyerByUserId(userId);
+            return Ok(new AppResponse<object>(result, "success"));
+        }
 
         [HttpGet]
         [Authorize]
