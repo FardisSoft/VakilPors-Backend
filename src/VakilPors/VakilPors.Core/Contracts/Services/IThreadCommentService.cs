@@ -12,5 +12,6 @@ public interface IThreadCommentService : IScopedDependency
     Task<bool> DeleteComment(int userId, int commentId);
     Task<List<ThreadCommentDto>> GetCommentsForThread(int threadId);
     Task<ThreadCommentDto> GetCommentById(int commentId);
+    Task<int> GetCommentCountForThread(int threadId);
 }
 

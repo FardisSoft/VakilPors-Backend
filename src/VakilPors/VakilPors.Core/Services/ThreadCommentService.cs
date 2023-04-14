@@ -104,5 +104,11 @@ public class ThreadCommentService : IThreadCommentService
         return _mapper.Map<ThreadCommentDto>(comment);
 
     }
+
+    public async Task<int> GetCommentCountForThread(int threadId)
+        => await _uow.ThreadCommentRepo
+            .AsQueryable()
+            .Where(x => x.ThreadId == threadId)
+            .CountAsync();
 }
 

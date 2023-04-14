@@ -82,11 +82,18 @@ public class ThreadService : IThreadService
     }
 
     public async Task<List<ThreadDto>> GetThreadList()
-        => await _uow.ForumThreadRepo
+    {
+        var threads = await _uow.ForumThreadRepo
             .AsQueryable()
             .Include(x => x.User)
             .Select(x => _mapper.Map<ThreadDto>(x))
-            .ToListAsync(); 
+            .ToListAsync();
+
+        foreach (var thread in threads)
+            thread.CommentCount = await _threadCommentService.GetCommentCountForThread(thread.Id);
+
+        return threads;
+    } 
 
     public async Task<ThreadWithCommentsDto> GetThreadWithComments(int threadId)
     {
@@ -99,9 +106,12 @@ public class ThreadService : IThreadService
         if (thread == null)
             throw new BadArgumentException("thread not found");
 
+        var threadDto = _mapper.Map<ThreadDto>(thread);
+        threadDto.CommentCount = await _threadCommentService.GetCommentCountForThread(threadDto.Id);
+
         return new ThreadWithCommentsDto
         {
-            Thread = _mapper.Map<ThreadDto>(thread),
+            Thread = threadDto,
             Comments = await _threadCommentService.GetCommentsForThread(threadId)
         };
     }
