@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos;
 using VakilPors.Core.Domain.Entities;
@@ -25,9 +26,11 @@ public class AuthServices : IAuthServices
     private readonly ILogger<AuthServices> _logger;
     private User _user;
     private readonly ISMSSender smsSender;
+    private readonly IAppUnitOfWork appUnitOfWork;
 
-    public AuthServices(IMapper mapper, UserManager<User> userManager, IConfiguration configuration, ILogger<AuthServices> logger,ISMSSender smsSender)
+    public AuthServices(IMapper mapper, UserManager<User> userManager, IConfiguration configuration, ILogger<AuthServices> logger, ISMSSender smsSender, IAppUnitOfWork appUnitOfWork)
     {
+        this.appUnitOfWork = appUnitOfWork;
         this.smsSender = smsSender;
         this._mapper = mapper;
         this._userManager = userManager;
@@ -38,9 +41,9 @@ public class AuthServices : IAuthServices
 
     public async Task<string> CreateRefreshToken()
     {
-        var newRefreshToken = Guid.NewGuid().ToString().Replace("-","");
-        _user.RefreshToken=newRefreshToken;
-        _user.RefreshTokenExpiryTime=DateTime.Now.AddDays(Convert.ToInt32(_configuration["JwtSettings:RefreshTokenValidityInDays"]));
+        var newRefreshToken = Guid.NewGuid().ToString().Replace("-", "");
+        _user.RefreshToken = newRefreshToken;
+        _user.RefreshTokenExpiryTime = DateTime.Now.AddDays(Convert.ToInt32(_configuration["JwtSettings:RefreshTokenValidityInDays"]));
         var result = await _userManager.UpdateAsync(_user);
         return newRefreshToken;
     }
@@ -49,16 +52,16 @@ public class AuthServices : IAuthServices
     {
         _logger.LogInformation($"Looking for user with phone number {loginDto.PhoneNumber}");
         _user = await _userManager.FindByNameAsync(loginDto.PhoneNumber);
-        if (_user==null)
+        if (_user == null)
         {
             _logger.LogWarning($"User with phone number {loginDto.PhoneNumber} was not found");
-            throw new BadArgumentException("incorrect credtials");            
+            throw new BadArgumentException("incorrect credtials");
         }
         bool isValidUser = await _userManager.CheckPasswordAsync(_user, loginDto.Password);
         if (isValidUser == false)
         {
             _logger.LogWarning($"User with phone number {loginDto.PhoneNumber} entered wrong password");
-            throw new BadArgumentException("incorrect credtials");            
+            throw new BadArgumentException("incorrect credtials");
         }
         var token = await GenerateToken();
         _logger.LogInformation($"Token generated for user with phone number {loginDto.PhoneNumber} | Token: {token}");
@@ -74,15 +77,28 @@ public class AuthServices : IAuthServices
     {
         _user = _mapper.Map<User>(userDto);
         _user.UserName = userDto.PhoneNumber;
-        
+
         var result = await _userManager.CreateAsync(_user, userDto.Password);
 
         if (result.Succeeded)
         {
-            await _userManager.AddToRoleAsync(_user, userDto.IsVakil?RoleNames.Vakil: RoleNames.User);
+            await _userManager.AddToRoleAsync(_user, userDto.IsVakil ? RoleNames.Vakil : RoleNames.User);
+            if (userDto.IsVakil)
+            {
+
+                var userFromDb = await _userManager.FindByNameAsync(_user.UserName);
+                var lawyer=new Lawyer(){
+                    UserId=userFromDb.Id,
+                };
+                await appUnitOfWork.LawyerRepo.AddAsync(lawyer);
+                await appUnitOfWork.SaveChangesAsync();
+                userFromDb.LawyerId=lawyer.Id;
+                appUnitOfWork.UserRepo.Update(userFromDb);
+                await appUnitOfWork.SaveChangesAsync();
+            }
+            await SendActivationCode(_user.PhoneNumber);
         }
 
-        await SendActivationCode(_user.PhoneNumber);
 
         return result.Errors;
     }
@@ -93,12 +109,12 @@ public class AuthServices : IAuthServices
         JwtSecurityToken? tokenContent;
         try
         {
-            tokenContent= jwtSecurityTokenHandler.ReadJwtToken(request.Token);
+            tokenContent = jwtSecurityTokenHandler.ReadJwtToken(request.Token);
         }
         catch (System.ArgumentException)
         {
             throw new BadArgumentException("Invalid Token");
-        } 
+        }
         var username = tokenContent.Claims.ToList().FirstOrDefault(q => q.Type == JwtRegisteredClaimNames.Sub)?.Value;
 
         _user = await _userManager.FindByNameAsync(username);
@@ -165,10 +181,10 @@ public class AuthServices : IAuthServices
             throw new NotFoundException("no user found with this phone number");
         }
         //generating token 
-        var code = RandomEngine.Next(100000,1000000 ).ToString();
+        var code = RandomEngine.Next(100000, 1000000).ToString();
         _user.ForgetPasswordCode = code;
         await _userManager.UpdateAsync(_user);
-        
+
         await smsSender.SendSmsAsync(forgetPasswordDto.PhoneNumber, $"کد بازیابی رمز عبور شما: {code} است");
     }
 
@@ -183,11 +199,11 @@ public class AuthServices : IAuthServices
         {
             throw new BadArgumentException("passwords don't match");
         }
-        if (_user.ForgetPasswordCode!=resetPasswordDto.Code)
+        if (_user.ForgetPasswordCode != resetPasswordDto.Code)
         {
             throw new BadArgumentException("invalid code");
         }
-        _user.PasswordHash=_userManager.PasswordHasher.HashPassword(_user,resetPasswordDto.NewPassword);
+        _user.PasswordHash = _userManager.PasswordHasher.HashPassword(_user, resetPasswordDto.NewPassword);
         _user.ForgetPasswordCode = null;
         //update user
         var result = await _userManager.UpdateAsync(_user);
@@ -230,7 +246,7 @@ public class AuthServices : IAuthServices
         user.ActivationCode = code;
 
         var result = await _userManager.UpdateAsync(user);
-        
+
         if (!result.Succeeded)
             throw new InternalServerException("set activation code failed");
     }
