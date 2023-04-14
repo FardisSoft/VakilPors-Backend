@@ -17,6 +17,6 @@ public class ThreadDto
 
     public int LikeCount { get; set; }
 
-    public UserDto User { get; set; }
+    public int UserId { get; set; }
 }
 

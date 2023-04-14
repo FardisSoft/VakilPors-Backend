@@ -11,7 +11,7 @@ public class ThreadCommentDto
     public int Id { get; set; }
     public string Text { get; set; }
     public int LikeCount { get; set; }
-    public UserDto User { get; set; }
+    public int UserId { get; set; }
     public int ThreadId { get; set; }
 }
 
