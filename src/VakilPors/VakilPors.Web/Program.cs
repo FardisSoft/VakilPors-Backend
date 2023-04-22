@@ -4,6 +4,7 @@ using Serilog;
 using VakilPors.Business.Extensions;
 using VakilPors.Core.Authentication.Extensions;
 using VakilPors.Core.Exceptions.Extensions;
+using VakilPors.Core.Hubs;
 using VakilPors.Core.Mapper;
 using VakilPors.Data.Context;
 using VakilPors.Data.Extensions;
@@ -24,9 +25,9 @@ builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console().ReadFrom.Configuration
 builder.Services.AddZarinSharp(op =>
 {
     op.MerchantId = "831ql8a0-31ja-ms82-1e30-pzla92kd145s";//dummy merchant id
-    op.IsSandbox=true;
+    op.IsSandbox = true;
 });
-
+builder.Services.AddSignalR();
 builder.Services.AddControllers();
 
 builder.Services.AddCors(options =>
@@ -66,5 +67,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<ChatHub>("/chatHub");
 
 app.Run();
