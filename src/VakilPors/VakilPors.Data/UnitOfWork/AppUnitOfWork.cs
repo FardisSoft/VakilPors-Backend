@@ -33,6 +33,10 @@ public class AppUnitOfWork : IAppUnitOfWork
 
     public IGenericRepo<ThreadComment> ThreadCommentRepo => _dbContext.GetService<IGenericRepo<ThreadComment>>();
 
+    public IGenericRepo<Chat> ChatRepo => _dbContext.GetService<IGenericRepo<Chat>>();
+
+    public IGenericRepo<ChatMessage> ChatMessageRepo => _dbContext.GetService<IGenericRepo<ChatMessage>>();
+
 
     #endregion
 

@@ -50,13 +50,13 @@ namespace VakilPors.Data.Extensions
                     // userManager.Dispose();
                 }
                 int numTrans = await db.Set<Tranaction>().CountAsync();
-                if (numTrans<DatabaseSeeder.countTrans )
+                if (numTrans < DatabaseSeeder.countTrans)
                 {
-                    var trans=DatabaseSeeder.seedTransactions().ToArray();
+                    var trans = DatabaseSeeder.seedTransactions().ToArray();
                     await db.AddRangeAsync(trans);
                     await db.SaveChangesAsync();
-                    var walletService=scope.ServiceProvider.GetService<IWalletServices>();
-                    await applyTransactions(walletService,trans);
+                    var walletService = scope.ServiceProvider.GetService<IWalletServices>();
+                    await applyTransactions(walletService, trans);
                 }
             }
             catch (System.Exception)
@@ -64,7 +64,8 @@ namespace VakilPors.Data.Extensions
                 Console.WriteLine("An error occurred while migrating or seeding the database.");
             }
         }
-        private static async Task applyTransactions(IWalletServices walletServices,Tranaction[] tranactions){
+        private static async Task applyTransactions(IWalletServices walletServices, Tranaction[] tranactions)
+        {
             foreach (var trans in tranactions)
             {
                 await walletServices.ApplyTransaction(trans.Id);
