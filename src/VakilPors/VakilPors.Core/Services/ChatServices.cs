@@ -22,8 +22,8 @@ namespace VakilPors.Core.Services
                 chat = new Chat()
                 {
                     Users = new List<User>() {
-                        new User() { Id = userId1},
-                        new User() { Id = userId2 }
+                        await appUnitOfWork.UserRepo.FindAsync(userId1),
+                        await appUnitOfWork.UserRepo.FindAsync(userId2),
                     },
                 };
             }
@@ -34,12 +34,14 @@ namespace VakilPors.Core.Services
 
         public async Task<ICollection<Chat>> GetChatsOfUser(int userId)
         {
-            return await appUnitOfWork.ChatRepo.AsQueryableNoTracking().Where(c => c.Users.Select(u => u.Id).Contains(userId)).ToArrayAsync();
+            return await appUnitOfWork.ChatRepo.AsQueryableNoTracking().
+            Include(c => c.Users).Where(c => c.Users.Select(u => u.Id).Contains(userId)).ToArrayAsync();
         }
 
         public async Task<ICollection<Chat>> GetChatsWithMessagesOfUser(int userId)
         {
             return await appUnitOfWork.ChatRepo.AsQueryableNoTracking()
+            .Include(c => c.Users)
             .Include(c => c.ChatMessages)
             .ThenInclude(m => m.Sender)
             .Where(c => c.Users.Select(u => u.Id).Contains(userId)).ToArrayAsync();
