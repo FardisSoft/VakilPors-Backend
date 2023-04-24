@@ -168,6 +168,12 @@ namespace VakilPors.Data.Migrations
                     b.Property<int>("ChatId")
                         .HasColumnType("integer");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsEdited")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsFile")
                         .HasColumnType("boolean");
 

@@ -31,6 +31,8 @@ namespace VakilPors.Data.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Message = table.Column<string>(type: "text", nullable: true),
                     IsFile = table.Column<bool>(type: "boolean", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    IsEdited = table.Column<bool>(type: "boolean", nullable: false),
                     IsRead = table.Column<bool>(type: "boolean", nullable: false),
                     SendTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     SenderId = table.Column<int>(type: "integer", nullable: false),

@@ -6,5 +6,7 @@ public interface IChatClient
 {
     Task ReceiveMessage(ChatMessage message);
     Task ReadMessages();
+    Task DeleteMessage(string messageId);
+    Task EditMessage(ChatMessage message);
 
 }

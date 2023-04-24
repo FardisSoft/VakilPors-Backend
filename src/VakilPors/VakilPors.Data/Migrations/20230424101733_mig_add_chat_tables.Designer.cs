@@ -13,7 +13,7 @@ using VakilPors.Data.Context;
 namespace VakilPors.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230423212254_mig_add_chat_tables")]
+    [Migration("20230424101733_mig_add_chat_tables")]
     partial class mig_add_chat_tables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -169,6 +169,12 @@ namespace VakilPors.Data.Migrations
 
                     b.Property<int>("ChatId")
                         .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsEdited")
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsFile")
                         .HasColumnType("boolean");
