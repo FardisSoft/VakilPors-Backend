@@ -20,7 +20,7 @@ namespace VakilPors.Core.Hubs
         }
         public async Task ReadChatMessages(string chatId, IAppUnitOfWork appUnitOfWork)
         {
-            await Clients.Group(chatId).ReadMessages();
+            await Clients.Group(chatId).ReadMessages(chatId);
             var chatId_int = Convert.ToInt32(chatId);
             var userId = getUserId();
             var messages = await appUnitOfWork.ChatMessageRepo.AsQueryable().Where(m => m.ChatId == chatId_int).ToArrayAsync();
@@ -39,7 +39,7 @@ namespace VakilPors.Core.Hubs
             if (message.SenderId != userId)
                 throw new AccessViolationException("You do not have permission to perform this action");
             message.IsDeleted = true;
-            await Clients.Group(chatId).DeleteMessage(messageId);
+            await Clients.Group(chatId).DeleteMessage(message);
             await appUnitOfWork.SaveChangesAsync();
         }
         public async Task EditChatMessage(ChatMessage message, IAppUnitOfWork appUnitOfWork)
