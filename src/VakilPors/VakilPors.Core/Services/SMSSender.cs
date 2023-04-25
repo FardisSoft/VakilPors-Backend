@@ -16,9 +16,9 @@ namespace VakilPors.Core.Services
 
         public SMSSender(IConfiguration configuration)
         {
-            _smsSenderNumber= Environment.GetEnvironmentVariable("RAYGAN_SMS_SENDER_NUMBER",EnvironmentVariableTarget.User) ?? configuration["RAYGAN_SMS:SENDER_NUMBER"];
-            _smsUsername= Environment.GetEnvironmentVariable("RAYGAN_SMS_USERNAME",EnvironmentVariableTarget.User) ?? configuration["RAYGAN_SMS:USERNAME"];
-            _smsPassword= Environment.GetEnvironmentVariable("RAYGAN_SMS_PASSWORD",EnvironmentVariableTarget.User) ?? configuration["RAYGAN_SMS:PASSWORD"];
+            _smsSenderNumber = Environment.GetEnvironmentVariable("RAYGAN_SMS_SENDER_NUMBER", EnvironmentVariableTarget.User) ?? configuration["RAYGAN_SMS:SENDER_NUMBER"];
+            _smsUsername = Environment.GetEnvironmentVariable("RAYGAN_SMS_USERNAME", EnvironmentVariableTarget.User) ?? configuration["RAYGAN_SMS:USERNAME"];
+            _smsPassword = Environment.GetEnvironmentVariable("RAYGAN_SMS_PASSWORD", EnvironmentVariableTarget.User) ?? configuration["RAYGAN_SMS:PASSWORD"];
         }
 
         public async Task SendSmsAsync(string number, string message)
@@ -47,7 +47,7 @@ namespace VakilPors.Core.Services
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadAsStringAsync();
-                resultCode = int.Parse(result);
+                // resultCode = int.Parse(result);
             }
             else
             {

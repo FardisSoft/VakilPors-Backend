@@ -81,11 +81,11 @@ namespace VakilPors.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> ForgetPassword([FromQuery] ForgetPasswordDto forgetPasswordDto)
         {
-            await _authManager.CreateAndSendForgetPasswordToken(forgetPasswordDto);   
+            await _authManager.CreateAndSendForgetPasswordToken(forgetPasswordDto);
             _logger.LogInformation($"Forget password Token generated for {forgetPasswordDto.PhoneNumber} and sent!");
-            
 
-            return Ok(new AppResponse(HttpStatusCode.OK,"Forget Password Code sent to your phone number!")); //200
+
+            return Ok(new AppResponse(HttpStatusCode.OK, "Forget Password Code sent to your phone number!")); //200
         }
 
         [HttpPost]
@@ -101,7 +101,7 @@ namespace VakilPors.Web.Controllers
             }
             await _authManager.ResetPassword(resetPasswordDto);
             _logger.LogInformation($"Password has been Reset {resetPasswordDto.PhoneNumber}");
-            return Ok(new AppResponse(HttpStatusCode.OK, $"Password has been reset!"));    
+            return Ok(new AppResponse(HttpStatusCode.OK, $"Password has been reset!"));
         }
 
         [HttpPost]
@@ -126,7 +126,7 @@ namespace VakilPors.Web.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> SendActivationCode([FromBody] string phoneNumber)
+        public async Task<ActionResult> SendActivationCode([FromQuery] string phoneNumber)
         {
             if (!ModelState.IsValid)
             {

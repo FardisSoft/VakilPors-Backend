@@ -1,5 +1,6 @@
 
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Serilog;
 using VakilPors.Business.Extensions;
 using VakilPors.Core.Authentication.Extensions;
@@ -28,7 +29,9 @@ builder.Services.AddZarinSharp(op =>
     op.IsSandbox = true;
 });
 builder.Services.AddSignalR();
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 
 builder.Services.AddCors(options =>
 {
