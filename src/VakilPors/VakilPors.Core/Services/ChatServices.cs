@@ -26,9 +26,9 @@ namespace VakilPors.Core.Services
                         await appUnitOfWork.UserRepo.FindAsync(userId2),
                     },
                 };
+                await appUnitOfWork.ChatRepo.AddAsync(chat);
+                await appUnitOfWork.SaveChangesAsync();
             }
-            await appUnitOfWork.ChatRepo.AddAsync(chat);
-            await appUnitOfWork.SaveChangesAsync();
             return chat;
         }
 
