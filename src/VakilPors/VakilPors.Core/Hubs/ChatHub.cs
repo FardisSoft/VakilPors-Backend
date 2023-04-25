@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using VakilPors.Contracts.UnitOfWork;
@@ -12,7 +13,7 @@ namespace VakilPors.Core.Hubs
     [Authorize]
     public class ChatHub : Hub<IChatClient>
     {
-        public async Task SendMessage(ChatMessage message, IAppUnitOfWork appUnitOfWork)
+        public async Task SendMessage(ChatMessage message, [FromServices] IAppUnitOfWork appUnitOfWork)
         {
             await appUnitOfWork.ChatMessageRepo.AddAsync(message);
             await appUnitOfWork.SaveChangesAsync();
@@ -22,7 +23,7 @@ namespace VakilPors.Core.Hubs
         {
             await Clients.All.ReceiveMessage(message);
         }
-        public async Task ReadChatMessages(string chatId, IAppUnitOfWork appUnitOfWork)
+        public async Task ReadChatMessages(string chatId, [FromServices] IAppUnitOfWork appUnitOfWork)
         {
             await Clients.Group(chatId).ReadMessages(chatId);
             var chatId_int = Convert.ToInt32(chatId);
@@ -34,7 +35,7 @@ namespace VakilPors.Core.Hubs
             }
             await appUnitOfWork.SaveChangesAsync();
         }
-        public async Task DeleteChatMessage(string chatId, string messageId, IAppUnitOfWork appUnitOfWork)
+        public async Task DeleteChatMessage(string chatId, string messageId, [FromServices] IAppUnitOfWork appUnitOfWork)
         {
             var chatId_int = Convert.ToInt32(chatId);
             var messageId_int = Convert.ToInt32(messageId);
@@ -46,7 +47,7 @@ namespace VakilPors.Core.Hubs
             await Clients.Group(chatId).DeleteMessage(message);
             await appUnitOfWork.SaveChangesAsync();
         }
-        public async Task EditChatMessage(ChatMessage message, IAppUnitOfWork appUnitOfWork)
+        public async Task EditChatMessage(ChatMessage message, [FromServices] IAppUnitOfWork appUnitOfWork)
         {
             var chatId = message.ChatId.ToString();
             var userId = getUserId();
@@ -58,7 +59,7 @@ namespace VakilPors.Core.Hubs
             await appUnitOfWork.SaveChangesAsync();
         }
 
-        public async Task AddToChat(string chatId, IAppUnitOfWork appUnitOfWork)
+        public async Task AddToChat(string chatId, [FromServices] IAppUnitOfWork appUnitOfWork)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, chatId);
             var message = new ChatMessage()
