@@ -28,10 +28,10 @@ builder.Services.AddZarinSharp(op =>
     op.MerchantId = "831ql8a0-31ja-ms82-1e30-pzla92kd145s";//dummy merchant id
     op.IsSandbox = true;
 });
-builder.Services.AddSignalR();
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
         options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+builder.Services.AddSignalR();
 
 builder.Services.AddCors(options =>
 {

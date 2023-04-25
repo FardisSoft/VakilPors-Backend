@@ -18,6 +18,10 @@ namespace VakilPors.Core.Hubs
             await appUnitOfWork.SaveChangesAsync();
             await Clients.Group(message.ChatId.ToString()).ReceiveMessage(message);
         }
+        public async Task SendMessage2(ChatMessage message)
+        {
+            await Clients.All.ReceiveMessage(message);
+        }
         public async Task ReadChatMessages(string chatId, IAppUnitOfWork appUnitOfWork)
         {
             await Clients.Group(chatId).ReadMessages(chatId);
