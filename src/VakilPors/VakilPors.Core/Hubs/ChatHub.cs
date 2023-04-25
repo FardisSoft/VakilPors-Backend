@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using VakilPors.Contracts.UnitOfWork;
@@ -12,7 +13,7 @@ namespace VakilPors.Core.Hubs
     [Authorize]
     public class ChatHub : Hub<IChatClient>
     {
-        public async Task SendMessage(ChatMessage message, IAppUnitOfWork appUnitOfWork)
+        public async Task SendMessage(ChatMessage message, [FromServices] IAppUnitOfWork appUnitOfWork)
         {
             await appUnitOfWork.ChatMessageRepo.AddAsync(message);
             await appUnitOfWork.SaveChangesAsync();
