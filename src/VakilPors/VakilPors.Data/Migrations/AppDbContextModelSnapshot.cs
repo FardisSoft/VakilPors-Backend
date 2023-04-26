@@ -324,6 +324,44 @@ namespace VakilPors.Data.Migrations
                     b.ToTable("Lawyer");
                 });
 
+            modelBuilder.Entity("VakilPors.Core.Domain.Entities.Premium", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ServiceType")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Premium");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ServiceType = 0
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ServiceType = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            ServiceType = 2
+                        },
+                        new
+                        {
+                            Id = 4,
+                            ServiceType = 3
+                        });
+                });
+
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -374,6 +412,33 @@ namespace VakilPors.Data.Migrations
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
+                });
+
+            modelBuilder.Entity("VakilPors.Core.Domain.Entities.Subscribed", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
+
+                    b.Property<DateTime>("ExpireDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("PremiumID")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("PremiumID");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Subscribed");
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.ThreadComment", b =>
@@ -660,6 +725,25 @@ namespace VakilPors.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("VakilPors.Core.Domain.Entities.Subscribed", b =>
+                {
+                    b.HasOne("VakilPors.Core.Domain.Entities.Premium", "Premium")
+                        .WithMany()
+                        .HasForeignKey("PremiumID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("VakilPors.Core.Domain.Entities.User", "User")
+                        .WithOne("Subscribed")
+                        .HasForeignKey("VakilPors.Core.Domain.Entities.Subscribed", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Premium");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.ThreadComment", b =>
                 {
                     b.HasOne("VakilPors.Core.Domain.Entities.ForumThread", "Thread")
@@ -698,6 +782,8 @@ namespace VakilPors.Data.Migrations
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.User", b =>
                 {
                     b.Navigation("Lawyer");
+
+                    b.Navigation("Subscribed");
 
                     b.Navigation("Messages");
 

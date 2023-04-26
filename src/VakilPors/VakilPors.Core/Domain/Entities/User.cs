@@ -33,5 +33,13 @@ public class User : IdentityUser<int>
     public virtual Lawyer? Lawyer { get; set; }
     public virtual ICollection<Chat> Chats { get; set; }
     public virtual ICollection<ChatMessage> Messages { get; set; }
+    //public int PremiumID { get; set; }
+    //[ForeignKey(nameof(PremiumID))]
+    //public Premium Premium { get; set; }
+    //public int SubscribedID { get; set; }
+    //[ForeignKey(nameof(SubscribedID))]
+    public virtual Subscribed Subscribed { get; set; }
+
+
 }
 

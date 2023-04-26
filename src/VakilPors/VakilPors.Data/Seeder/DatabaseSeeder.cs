@@ -22,7 +22,19 @@ namespace VakilPors.Data.Seeder
         }
         public void Seed()
         {
+            seedPlans();
             seedIdentity();
+        }
+
+        private void seedPlans()
+        {
+            const int seed = 4;
+            List<Premium> plans = new List<Premium>();
+            for (int i = 0; i < seed ; i++)
+            {
+                plans.Add(new Premium() { Id = i + 1, ServiceType = (Plan)i });
+            }
+            modelBuilder.Entity<Premium>().HasData(plans);
         }
         private void seedIdentity()
         {
@@ -70,6 +82,8 @@ namespace VakilPors.Data.Seeder
             int uid = startUserId;
             int countUserslocal=countUsers/3;
             // long phoneNumber=09116863557;
+            const int startSubscribedId = 1;
+            int subscribedId = startSubscribedId;
             var fakerUser = new Faker<User>()
             .RuleFor(u => u.Id, f => uid++)
             .RuleFor(u => u.ConcurrencyStamp, f => f.Random.Guid().ToString())
@@ -77,8 +91,16 @@ namespace VakilPors.Data.Seeder
             .RuleFor(u => u.Email, f => f.Person.Email)
             .RuleFor(u => u.PhoneNumber, f => f.Person.Phone)
             .RuleFor(u => u.UserName, (f, u) => u.PhoneNumber)
-            .RuleFor(u => u.LawyerId, f=>0);
+            .RuleFor(u => u.LawyerId, f => 0);
+            var fakerSubscribed = new Faker<Subscribed>()
+                .RuleFor(u => u.ID, f => subscribedId++)
+                .RuleFor(u => u.UserId, f => uid++)
+                .RuleFor(u => u.PremiumID, f => 1);
+                
             var users = fakerUser.Generate(countUserslocal);
+            subscribedId = startSubscribedId;
+            uid = startUserId;
+            var subscribes = fakerSubscribed.Generate(countUserslocal);
             const string password="Password123";
             int userRoleId=RoleNames.GetAll().ToList().IndexOf(RoleNames.User)+1;
             int vakilRoleId=RoleNames.GetAll().ToList().IndexOf(RoleNames.Vakil)+1;
@@ -93,6 +115,7 @@ namespace VakilPors.Data.Seeder
                 //     RoleId=userRoleId
                 // });
                 await context.Users.AddAsync(users[i]);
+                await context.Set<Subscribed>().AddAsync(subscribes[i]);
                 await context.SaveChangesAsync();
                 await context.UserRoles.AddAsync(new IdentityUserRole<int>(){
                     RoleId=userRoleId,
