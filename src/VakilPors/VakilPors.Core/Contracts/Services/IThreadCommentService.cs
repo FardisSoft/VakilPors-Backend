@@ -13,5 +13,10 @@ public interface IThreadCommentService : IScopedDependency
     Task<List<ThreadCommentDto>> GetCommentsForThread(int threadId);
     Task<ThreadCommentDto> GetCommentById(int commentId);
     Task<int> GetCommentCountForThread(int threadId);
+    Task<int> LikeComment(int commentId);
+    Task<int> UndoLikeComment(int commentId);
+    Task<bool> SetAsAnswer(int userId, int commentId);
+    Task<bool> UndoSetAsAnswer(int userId, int commentId);
+    Task<bool> IsThreadHasAnswer(int threadId);
 }
 
