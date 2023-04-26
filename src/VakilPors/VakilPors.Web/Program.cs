@@ -31,7 +31,11 @@ builder.Services.AddZarinSharp(op =>
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
         options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = true;
+    // options.MaximumReceiveMessageSize = 102400000;
+});
 
 builder.Services.AddCors(options =>
 {

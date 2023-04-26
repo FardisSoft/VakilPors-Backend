@@ -24,6 +24,7 @@ namespace VakilPors.Core.Hubs
             await appUnitOfWork.ChatMessageRepo.AddAsync(message);
             await appUnitOfWork.SaveChangesAsync();
             message = await appUnitOfWork.ChatMessageRepo.AsQueryableNoTracking().Include(m => m.Sender).FirstOrDefaultAsync(m => m.Id == message.Id);
+            message.Sender.Messages = null;
             await Clients.Group(message.ChatId.ToString()).ReceiveMessage(message);
         }
         public async Task ReadChatMessages(string chatId)
