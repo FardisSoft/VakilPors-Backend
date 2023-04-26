@@ -58,5 +58,19 @@ namespace VakilPors.Api.Controllers
             return Ok(new AppResponse<object>(result, "success"));
         }
 
+        [HttpGet]
+        public async Task<IActionResult> LikeThread(int threadId)
+        {
+            var result = await _threadService.LikeThread(threadId);
+            return Ok(new AppResponse<object>(result, "success"));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> UndoLikeThread(int threadId)
+        {
+            var result = await _threadService.UndoLikeThread(threadId);
+            return Ok(new AppResponse<object>(result, "success"));
+        }
+
     }
 }

@@ -58,6 +58,33 @@ namespace VakilPors.Api.Controllers
             return Ok(new AppResponse<object>(result, "success"));
         }
 
+        [HttpGet]
+        public async Task<IActionResult> LikeComment(int commentId)
+        {
+            var result = await _threadCommentService.LikeComment(commentId);
+            return Ok(new AppResponse<object>(result, "success"));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> UndoLikeComment(int commentId)
+        {
+            var result = await _threadCommentService.UndoLikeComment(commentId);
+            return Ok(new AppResponse<object>(result, "success"));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SetAsAnswer(int commentId)
+        {
+            var result = await _threadCommentService.SetAsAnswer(getUserId() , commentId);
+            return Ok(new AppResponse<object>(result, "success"));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> UndoSetAsAnswer(int commentId)
+        {
+            var result = await _threadCommentService.UndoSetAsAnswer(getUserId(), commentId);
+            return Ok(new AppResponse<object>(result, "success"));
+        }
 
     }
 }
