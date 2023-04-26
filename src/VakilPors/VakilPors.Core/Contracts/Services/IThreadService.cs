@@ -11,5 +11,9 @@ public interface IThreadService : IScopedDependency
     Task<bool> DeleteThread(int userId, int threadId);
     Task<List<ThreadDto>> GetThreadList();
     Task<ThreadWithCommentsDto> GetThreadWithComments(int threadId);
+
+    Task<int> LikeThread(int threadId);
+
+    Task<int> UndoLikeThread(int threadId);
 }
 

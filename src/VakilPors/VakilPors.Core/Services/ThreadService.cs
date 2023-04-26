@@ -13,12 +13,14 @@ public class ThreadService : IThreadService
     private readonly IAppUnitOfWork _uow;
     private readonly IMapper _mapper;
     private readonly IThreadCommentService _threadCommentService;
+    private readonly ILawyerServices _lawyerServices;
 
-    public ThreadService(IAppUnitOfWork uow, IMapper mapper, IThreadCommentService threadCommentService)
+    public ThreadService(IAppUnitOfWork uow, IMapper mapper, IThreadCommentService threadCommentService, ILawyerServices lawyerServices)
     {
         _uow = uow;
         _mapper = mapper;
         _threadCommentService = threadCommentService;
+        _lawyerServices = lawyerServices;
     }
 
 
@@ -28,7 +30,10 @@ public class ThreadService : IThreadService
         {
             UserId = userId,
             Title = threadDto.Title,
-            Description = threadDto.Description
+            Description = threadDto.Description,
+            HasAnswer = false,
+            CreateDate = DateTime.Now,
+            LikeCount = 0
         };
         
         await _uow.ForumThreadRepo.AddAsync(thread);
@@ -37,7 +42,7 @@ public class ThreadService : IThreadService
         if (addResult <= 0)
             throw new Exception();
 
-        return _mapper.Map<ThreadDto>(thread);
+        return (await GetThreadWithComments(thread.Id)).Thread;
     }
 
     public async Task<ThreadDto> UpdateThread(int userId, ThreadDto threadDto)
@@ -45,7 +50,7 @@ public class ThreadService : IThreadService
         var foundThread = await _uow.ForumThreadRepo.FindAsync(threadDto.Id);
 
         if (foundThread == null)
-            throw new BadArgumentException("comment not found");
+            throw new BadArgumentException("thread not found");
 
         if (foundThread.UserId != userId)
             throw new AccessViolationException("You do not have permission to perform this action");
@@ -59,7 +64,7 @@ public class ThreadService : IThreadService
         if (updateResult <= 0)
             throw new Exception();
 
-        return threadDto;
+        return await GetThreadDtoFromThread(foundThread);
     }
 
     public async Task<bool> DeleteThread(int userId, int threadId)
@@ -67,7 +72,7 @@ public class ThreadService : IThreadService
         var foundThread = await _uow.ForumThreadRepo.FindAsync(threadId);
 
         if (foundThread == null)
-            throw new BadArgumentException("comment not found");
+            throw new BadArgumentException("thread not found");
 
         if (foundThread.UserId != userId)
             throw new AccessViolationException("You do not have permission to perform this action");
@@ -86,13 +91,16 @@ public class ThreadService : IThreadService
         var threads = await _uow.ForumThreadRepo
             .AsQueryable()
             .Include(x => x.User)
-            .Select(x => _mapper.Map<ThreadDto>(x))
             .ToListAsync();
 
-        foreach (var thread in threads)
-            thread.CommentCount = await _threadCommentService.GetCommentCountForThread(thread.Id);
+        var threadDtos = new List<ThreadDto>();
 
-        return threads;
+        foreach (var thread in threads)
+        {
+            threadDtos.Add(await GetThreadDtoFromThread(thread));
+        }
+                
+        return threadDtos;
     } 
 
     public async Task<ThreadWithCommentsDto> GetThreadWithComments(int threadId)
@@ -106,14 +114,77 @@ public class ThreadService : IThreadService
         if (thread == null)
             throw new BadArgumentException("thread not found");
 
-        var threadDto = _mapper.Map<ThreadDto>(thread);
-        threadDto.CommentCount = await _threadCommentService.GetCommentCountForThread(threadDto.Id);
-
+        var threadDto = await GetThreadDtoFromThread(thread);
+        
         return new ThreadWithCommentsDto
         {
             Thread = threadDto,
             Comments = await _threadCommentService.GetCommentsForThread(threadId)
         };
+    }
+
+    public async Task<int> LikeThread(int threadId)
+    {
+        var foundThread = await _uow.ForumThreadRepo.FindAsync(threadId);
+
+        if (foundThread == null)
+            throw new BadArgumentException("thread not found");
+
+
+        foundThread.LikeCount++;
+
+        _uow.ForumThreadRepo.Update(foundThread);
+
+        var updateResult = await _uow.SaveChangesAsync();
+        if (updateResult <= 0)
+            throw new Exception();
+
+        return foundThread.LikeCount;
+    }
+
+    public async Task<int> UndoLikeThread(int threadId)
+    {
+        var foundThread = await _uow.ForumThreadRepo.FindAsync(threadId);
+
+        if (foundThread == null)
+            throw new BadArgumentException("thread not found");
+
+        if (foundThread.LikeCount >= 1)
+        {
+            foundThread.LikeCount--;
+
+            _uow.ForumThreadRepo.Update(foundThread);
+
+            var updateResult = await _uow.SaveChangesAsync();
+            if (updateResult <= 0)
+                throw new Exception();
+        }
+
+        return foundThread.LikeCount;
+    }
+
+    private async Task<ThreadDto> GetThreadDtoFromThread(ForumThread thread)
+    {
+        var threadDto = new ThreadDto()
+        {
+            Id = thread.Id,
+            Title = thread.Title,
+            CommentCount = await _threadCommentService.GetCommentCountForThread(thread.Id),
+            CreateDate = thread.CreateDate,
+            Description = thread.Description,
+            UserId = thread.UserId,
+            LikeCount = thread.LikeCount,
+            HasAnswer = await _threadCommentService.IsThreadHasAnswer(thread.Id),
+            User = new ForumUserDto()
+            {
+                UserId = thread.UserId,
+                Name = thread.User.Name,
+                IsLawyer = await _lawyerServices.IsLawyer(thread.UserId),
+                IsPremium = false
+            }
+        };
+
+        return threadDto;
     }
 }
 
