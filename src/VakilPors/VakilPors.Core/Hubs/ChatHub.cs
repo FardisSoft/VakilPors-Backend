@@ -66,15 +66,15 @@ namespace VakilPors.Core.Hubs
         public async Task AddToChat(string chatId)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, chatId);
-            var message = new ChatMessage()
-            {
-                ChatId = Convert.ToInt32(chatId),
-                SenderId = getUserId(),
-                Message = "من آنلاین شدم!",
-            };
-            await Clients.Group(chatId).ReceiveMessage(message);
-            await appUnitOfWork.ChatMessageRepo.AddAsync(message);
-            await appUnitOfWork.SaveChangesAsync();
+            // var message = new ChatMessage()
+            // {
+            //     ChatId = Convert.ToInt32(chatId),
+            //     SenderId = getUserId(),
+            //     Message = "من آنلاین شدم!",
+            // };
+            // await Clients.Group(chatId).ReceiveMessage(message);
+            // await appUnitOfWork.ChatMessageRepo.AddAsync(message);
+            // await appUnitOfWork.SaveChangesAsync();
         }
         protected string getPhoneNumber()
         {
