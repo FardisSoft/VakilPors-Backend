@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VakilPors.Core.Domain.Dtos.Payment;
+using VakilPors.Core.Domain.Dtos.Premium;
+using VakilPors.Core.Domain.Entities;
 
 namespace VakilPors.Core.Domain.Dtos.User
 {
@@ -21,5 +23,6 @@ namespace VakilPors.Core.Domain.Dtos.User
         public string ProfileImageUrl { get; set; }
 
         public ICollection<TranactionDto> Tranactions { get; set; }
+        public SubscribedDto Subscribed { get; set; }
     }
 }

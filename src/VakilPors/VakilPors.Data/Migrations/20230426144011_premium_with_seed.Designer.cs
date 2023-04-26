@@ -13,8 +13,8 @@ using VakilPors.Data.Context;
 namespace VakilPors.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230426135229_Subscribed")]
-    partial class Subscribed
+    [Migration("20230426144011_premium_with_seed")]
+    partial class premium_with_seed
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -262,6 +262,28 @@ namespace VakilPors.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Premium");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ServiceType = 0
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ServiceType = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            ServiceType = 2
+                        },
+                        new
+                        {
+                            Id = 4,
+                            ServiceType = 3
+                        });
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.Role", b =>
@@ -337,7 +359,8 @@ namespace VakilPors.Data.Migrations
 
                     b.HasIndex("PremiumID");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("Subscribed");
                 });
@@ -491,9 +514,6 @@ namespace VakilPors.Data.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
-                    b.Property<int>("SubscribedID")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
 
@@ -509,8 +529,6 @@ namespace VakilPors.Data.Migrations
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
-
-                    b.HasIndex("SubscribedID");
 
                     b.HasIndex("UserName")
                         .IsUnique();
@@ -600,8 +618,8 @@ namespace VakilPors.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("VakilPors.Core.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                        .WithOne("Subscribed")
+                        .HasForeignKey("VakilPors.Core.Domain.Entities.Subscribed", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -642,18 +660,9 @@ namespace VakilPors.Data.Migrations
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.User", b =>
                 {
-                    b.HasOne("VakilPors.Core.Domain.Entities.Subscribed", "Subscribed")
-                        .WithMany()
-                        .HasForeignKey("SubscribedID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Lawyer");
 
                     b.Navigation("Subscribed");
-                });
-
-            modelBuilder.Entity("VakilPors.Core.Domain.Entities.User", b =>
-                {
-                    b.Navigation("Lawyer");
 
                     b.Navigation("Tranactions");
                 });

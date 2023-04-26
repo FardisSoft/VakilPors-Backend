@@ -36,8 +36,8 @@ public class User : IdentityUser<int>
     //public int PremiumID { get; set; }
     //[ForeignKey(nameof(PremiumID))]
     //public Premium Premium { get; set; }
-    public int SubscribedID { get; set; }
-    [ForeignKey(nameof(SubscribedID))]
+    //public int SubscribedID { get; set; }
+    //[ForeignKey(nameof(SubscribedID))]
     public virtual Subscribed Subscribed { get; set; }
 
 

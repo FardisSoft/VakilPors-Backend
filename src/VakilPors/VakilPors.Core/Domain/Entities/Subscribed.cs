@@ -21,7 +21,7 @@ namespace VakilPors.Core.Domain.Entities
         public int UserId { get; set; }
         [ForeignKey(nameof(UserId))]
         public virtual User User { get; set; }
-        public DateTime ExpireDate { get; set; }
+        public DateTime ExpireDate { get; set; } = DateTime.MaxValue;
         public int RemainingDays { get { return (DateTime.Now - ExpireDate).Days; } }
         public bool IsExpired { get { return DateTime.Now > ExpireDate; } }
 

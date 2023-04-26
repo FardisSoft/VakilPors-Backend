@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace VakilPors.Data.Migrations
 {
-    public partial class Subscribed : Migration
+    public partial class premium_with_seed : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -64,13 +64,6 @@ namespace VakilPors.Data.Migrations
                 type: "text[]",
                 nullable: true);
 
-            migrationBuilder.AddColumn<int>(
-                name: "SubscribedID",
-                table: "AspNetUsers",
-                type: "integer",
-                nullable: false,
-                defaultValue: 0);
-
             migrationBuilder.CreateTable(
                 name: "Premium",
                 columns: table => new
@@ -111,10 +104,16 @@ namespace VakilPors.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_SubscribedID",
-                table: "AspNetUsers",
-                column: "SubscribedID");
+            migrationBuilder.InsertData(
+                table: "Premium",
+                columns: new[] { "Id", "ServiceType" },
+                values: new object[,]
+                {
+                    { 1, 0 },
+                    { 2, 1 },
+                    { 3, 2 },
+                    { 4, 3 }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Subscribed_PremiumID",
@@ -124,32 +123,17 @@ namespace VakilPors.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Subscribed_UserId",
                 table: "Subscribed",
-                column: "UserId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_AspNetUsers_Subscribed_SubscribedID",
-                table: "AspNetUsers",
-                column: "SubscribedID",
-                principalTable: "Subscribed",
-                principalColumn: "ID",
-                onDelete: ReferentialAction.Cascade);
+                column: "UserId",
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_AspNetUsers_Subscribed_SubscribedID",
-                table: "AspNetUsers");
-
             migrationBuilder.DropTable(
                 name: "Subscribed");
 
             migrationBuilder.DropTable(
                 name: "Premium");
-
-            migrationBuilder.DropIndex(
-                name: "IX_AspNetUsers_SubscribedID",
-                table: "AspNetUsers");
 
             migrationBuilder.DropColumn(
                 name: "Gender",
@@ -182,10 +166,6 @@ namespace VakilPors.Data.Migrations
             migrationBuilder.DropColumn(
                 name: "RatesList",
                 table: "Lawyer");
-
-            migrationBuilder.DropColumn(
-                name: "SubscribedID",
-                table: "AspNetUsers");
         }
     }
 }
