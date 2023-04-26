@@ -22,13 +22,15 @@ namespace VakilPors.Core.Services
     {
         private readonly IAppUnitOfWork _appUnitOfWork;
         private readonly IMapper _mapper;
+        //private readonly IPremiumService _premiumservice;
 
         public PremiumService(IAppUnitOfWork appUnitOfWork, IMapper mapper)
         {
             _appUnitOfWork = appUnitOfWork;
             _mapper = mapper;
+            //_premiumservice = premiumservice;
+        
         }
-
 
         public async Task ActivatePremium(PremiumDto premium, int user_id)
         {

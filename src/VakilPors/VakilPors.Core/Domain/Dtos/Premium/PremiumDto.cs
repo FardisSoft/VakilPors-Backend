@@ -12,7 +12,7 @@ namespace VakilPors.Core.Domain.Dtos.Premium
     public record PremiumDto
     {
         public int Id { get; set; }
-        public int UserId { get; set; }
+        //public int UserId { get; set; }
         public UserDto User { get; set; }
         [RegularExpression("^(gold|silver|bronze)$")]
         public string ServiceType { get; set; }

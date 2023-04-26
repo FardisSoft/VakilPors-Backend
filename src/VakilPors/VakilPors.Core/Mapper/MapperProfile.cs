@@ -7,6 +7,7 @@ using VakilPors.Core.Domain.Dtos;
 using VakilPors.Core.Domain.Dtos.Lawyer;
 using VakilPors.Core.Domain.Dtos.Payment;
 using VakilPors.Core.Domain.Dtos.User;
+using VakilPors.Core.Domain.Dtos.Premium;
 using VakilPors.Core.Domain.Entities;
 using ForumThread = VakilPors.Core.Domain.Entities.ForumThread;
 using X.PagedList;
@@ -23,7 +24,8 @@ namespace VakilPors.Core.Mapper
             CreateMap<Tranaction, TranactionDto>();
             CreateMap<ForumThread, ThreadDto>();
             CreateMap<ThreadComment, ThreadCommentDto>();
-
+            CreateMap<Premium, PremiumDto>().ReverseMap();
+            
         }
     }
     public static class MapperExtensions

@@ -10,9 +10,9 @@ namespace VakilPors.Core.Contracts.Services
 {
     public interface IPremiumService :IScopedDependency
     {
-        public Task<PremiumDto> GetPremiumStatus(int user_id);
-        public Task ActivatePremium(PremiumDto premium, int user_id);
-        public Task DeactivatePremium(int user_id);
+        Task<PremiumDto> GetPremiumStatus(int user_id);
+        Task ActivatePremium(PremiumDto premium, int user_id);
+        Task DeactivatePremium(int user_id);
 
         
     }
