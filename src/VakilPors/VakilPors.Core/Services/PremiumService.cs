@@ -34,20 +34,22 @@ namespace VakilPors.Core.Services
         {
             var pr = _mapper.Map<Premium>(premium);
             await _appUnitOfWork.PremiumRepo.AddAsync(pr);
+            await _appUnitOfWork.SaveChangesAsync();
         }
 
         public async Task DeactivatePremium(int user_id)
         {
-            var foundpremium = await _appUnitOfWork.PremiumRepo.FindAsync(user_id);
+            var foundpremium = await _appUnitOfWork.PremiumRepo.AsQueryable().Where(x => x.UserId == user_id).FirstOrDefaultAsync();
             if (foundpremium == null)
                 throw new BadArgumentException("Lawyer Not Found");
             foundpremium.IsExpired = true;
-
+            _appUnitOfWork.PremiumRepo.Update(foundpremium);
+            await _appUnitOfWork.SaveChangesAsync();
         }
 
         public async Task<PremiumDto> GetPremiumStatus(int user_id)
         {
-            var _premium = await _appUnitOfWork.PremiumRepo.FindAsync(user_id);
+            var _premium = await _appUnitOfWork.PremiumRepo.AsQueryable().Where(x => x.UserId == user_id).FirstOrDefaultAsync();
             var premium = _mapper.Map<PremiumDto>(_premium);
             return premium;
         }

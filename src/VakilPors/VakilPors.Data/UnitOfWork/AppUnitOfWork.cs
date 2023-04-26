@@ -37,6 +37,7 @@ public class AppUnitOfWork : IAppUnitOfWork
 
     public IGenericRepo<ChatMessage> ChatMessageRepo => _dbContext.GetService<IGenericRepo<ChatMessage>>();
 
+    public IGenericRepo<Premium> PremiumRepo => _dbContext.GetService<IGenericRepo<Premium>>();
 
     #endregion
 
