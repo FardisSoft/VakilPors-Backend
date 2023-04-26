@@ -32,19 +32,53 @@ namespace VakilPors.Core.Services
         
         }
 
-        public Task ActivatePremium(PremiumDto premium, int user_id)
+        public async Task ActivatePremium(SubscribedDto premium, int user_id)
         {
-            throw new NotImplementedException();
+            DateTime expdate = DateTime.Now;
+            DateTime now = DateTime.Today;
+            int money = 0;
+            switch (premium.Premium.ServiceType)
+            {
+                 case Plan.Bronze:
+                    expdate = now.AddDays(30);
+                    money = 20000;
+                    break;
+                case Plan.Siler:
+                    expdate = now.AddDays(60);
+                    money = 30000;
+                    break;
+                case Plan.Gold:
+                    expdate = now.AddDays(60);
+                    money = 50000;
+                    break;
+            }
+            premium.ExpireDate = expdate;
+            premium.User.Balance -= money;
+            var subscribed = _mapper.Map<Subscribed>(premium);
+            await _appUnitOfWork.SubscribedRepo.AddAsync(subscribed);
+            await _appUnitOfWork.SaveChangesAsync();
         }
 
-        public Task DeactivatePremium(int user_id)
+        public async Task DeactivatePremium(int user_id)
         {
-            throw new NotImplementedException();
+            var subscribed = await _appUnitOfWork.SubscribedRepo.FindAsync(user_id);
+            subscribed.ExpireDate = DateTime.Now;
+            _appUnitOfWork.SubscribedRepo.Update(subscribed);
+            await _appUnitOfWork.SaveChangesAsync();    
         }
-
-        public Task<PremiumDto> GetPremiumStatus(int user_id)
+        public async Task UpdatePlan(SubscribedDto subscribedDto)
         {
-            throw new NotImplementedException();
+            var sub = await _appUnitOfWork.SubscribedRepo.FindAsync(subscribedDto.ID);
+            sub.Premium.ServiceType = subscribedDto.Premium.ServiceType;
+            _appUnitOfWork.SubscribedRepo.Update(sub);
+            await _appUnitOfWork.SaveChangesAsync();
+        }
+        public async Task<SubscribedDto> GetPremiumStatus(int user_id)
+        {
+            var subscribed = await _appUnitOfWork.SubscribedRepo.AsQueryable().Where(x => x.UserId == user_id).FirstOrDefaultAsync();
+            var subdto = _mapper.Map<SubscribedDto>(subscribed);
+            return subdto;
+
         }
     }
 }

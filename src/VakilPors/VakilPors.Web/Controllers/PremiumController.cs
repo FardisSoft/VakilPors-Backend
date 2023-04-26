@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using VakilPors.Core.Contracts.Services;
-using VakilPors.Core.Domain.Dtos;
 using VakilPors.Core.Domain.Dtos.Premium;
 using VakilPors.Shared.Response;
 
@@ -33,41 +26,38 @@ namespace VakilPors.Web.Controllers
         }
 
         [HttpGet]
-        [Route("GetPremiumStatus")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<PremiumDto>> GetPremiumStatus()
+        [Route("GetSubscriptionStatus")]
+        public async Task<ActionResult<SubscribedDto>> GetPremiumStatus()
         {
             int user_id = getUserId();
-            _logger.LogInformation($"GetPremiumStatus for the user by id {user_id}");
+            _logger.LogInformation($"GetSubsriptionStatus for the user by id {user_id}");
             var result = await _PremiumServices.GetPremiumStatus(user_id);
             return Ok(new AppResponse<object>(result, "success"));
         }
 
         [HttpPost]
-        [Route("ActivatePremium")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task ActivatePremium(PremiumDto premium)
+        [Route("ActivateSubscription")]
+        public async Task ActivatePremium(SubscribedDto subscribed)
         {
             int user_id = getUserId();
-            _logger.LogInformation($"activating premium for user by id{user_id} ");
-            await _PremiumServices.ActivatePremium(premium, user_id);
+            _logger.LogInformation($"activating subscriptions for user by id{user_id} ");
+            await _PremiumServices.ActivatePremium(subscribed, user_id);
         }
 
         [HttpPut]
-        [Route("DeactivePremium")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [Route("DeactiveSubscription")]
         public async Task DeactivePremium()
         {
             int user_id = getUserId();
-            _logger.LogInformation($"deactivating premium for user {user_id}");
+            _logger.LogInformation($"deactivating subscriptions for user {user_id}");
             await _PremiumServices.DeactivatePremium(user_id);
-
+        }
+        [HttpPut]
+        [Route("UpgradeSubscription")]
+        public async Task UpgradePremium(SubscribedDto subscribedDto)
+        {
+            _logger.LogInformation($"UpgradeSubscription for user {subscribedDto.User.Id}");
+            await _PremiumServices.UpdatePlan(subscribedDto);
         }
 
     }
