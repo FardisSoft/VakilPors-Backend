@@ -13,5 +13,8 @@ public class ThreadCommentDto
     public int LikeCount { get; set; }
     public int UserId { get; set; }
     public int ThreadId { get; set; }
+    public DateTime CreateDate { get; set; }
+    public bool IsSetAsAnswer { get; set; }
+    public ForumUserDto User { get; set; }
 }
 

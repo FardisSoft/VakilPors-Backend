@@ -20,5 +20,11 @@ public class ThreadDto
     public int UserId { get; set; }
 
     public int CommentCount { get; set; }
+
+    public DateTime CreateDate { get; set; }
+
+    public bool HasAnswer { get; set; }
+
+    public ForumUserDto User { get; set; }
 }
 
