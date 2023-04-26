@@ -18,6 +18,7 @@ public interface IAppUnitOfWork
     public IGenericRepo<Chat> ChatRepo { get; }
     public IGenericRepo<ChatMessage> ChatMessageRepo { get; }
 
+    public IGenericRepo<Premium> PremiumRepo { get; }
 
     #endregion
 }
