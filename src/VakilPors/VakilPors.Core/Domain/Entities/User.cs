@@ -33,5 +33,6 @@ public class User : IdentityUser<int>
     public virtual Lawyer? Lawyer { get; set; }
     public virtual ICollection<Chat> Chats { get; set; }
     public virtual ICollection<ChatMessage> Messages { get; set; }
+
 }
 
