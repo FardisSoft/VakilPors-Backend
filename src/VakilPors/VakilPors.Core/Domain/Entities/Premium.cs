@@ -11,18 +11,19 @@ using VakilPors.Shared.Entities;
 
 namespace VakilPors.Core.Domain.Entities
 {
+    public enum Plan
+    {
+        Free=0,
+        Bronze , 
+        Siler,
+        Gold,
+    }
     public class Premium:IEntity
     {
         [Key]
         public int Id { get; set; }
-        public int UserId { get; set; }
-        [ForeignKey(nameof(UserId))]
-        public User User { get; set; }
-        [RegularExpression("^(gold|silver|bronze)$")]
-        public string ServiceType { get; set; }
-        public DateTime ExpireDate { get; set; }
-        public int RemainingDays { get; set; }
-        public bool IsExpired { get; set; }
+        public Plan ServiceType { get; set; }
+
 
     }
 }

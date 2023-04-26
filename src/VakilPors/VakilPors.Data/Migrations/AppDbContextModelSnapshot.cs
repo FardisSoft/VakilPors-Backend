@@ -332,24 +332,10 @@ namespace VakilPors.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("ExpireDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsExpired")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("RemainingDays")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ServiceType")
-                        .HasColumnType("text");
-
-                    b.Property<int>("UserId")
+                    b.Property<int>("ServiceType")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Premium");
                 });
@@ -404,6 +390,32 @@ namespace VakilPors.Data.Migrations
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
+                });
+
+            modelBuilder.Entity("VakilPors.Core.Domain.Entities.Subscribed", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
+
+                    b.Property<DateTime>("ExpireDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("PremiumID")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("PremiumID");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Subscribed");
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.ThreadComment", b =>
@@ -561,6 +573,9 @@ namespace VakilPors.Data.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
+                    b.Property<int>("SubscribedID")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
 
@@ -576,6 +591,8 @@ namespace VakilPors.Data.Migrations
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
+
+                    b.HasIndex("SubscribedID");
 
                     b.HasIndex("UserName")
                         .IsUnique();
@@ -690,13 +707,21 @@ namespace VakilPors.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("VakilPors.Core.Domain.Entities.Premium", b =>
+            modelBuilder.Entity("VakilPors.Core.Domain.Entities.Subscribed", b =>
                 {
+                    b.HasOne("VakilPors.Core.Domain.Entities.Premium", "Premium")
+                        .WithMany()
+                        .HasForeignKey("PremiumID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("VakilPors.Core.Domain.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Premium");
 
                     b.Navigation("User");
                 });
@@ -734,6 +759,17 @@ namespace VakilPors.Data.Migrations
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.Chat", b =>
                 {
                     b.Navigation("ChatMessages");
+                });
+
+            modelBuilder.Entity("VakilPors.Core.Domain.Entities.User", b =>
+                {
+                    b.HasOne("VakilPors.Core.Domain.Entities.Subscribed", "Subscribed")
+                        .WithMany()
+                        .HasForeignKey("SubscribedID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Subscribed");
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.User", b =>
