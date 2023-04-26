@@ -21,6 +21,10 @@ public class ThreadComment : IEntity
     [ForeignKey(nameof(UserId))]
     public User User { get; set; }
 
+    public DateTime CreateDate { get; set; }
+
+    public bool IsSetAsAnswer { get; set; }
+
     public int ThreadId { get; set; }
 
     [ForeignKey(nameof(ThreadId))]

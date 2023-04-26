@@ -19,6 +19,10 @@ public class ForumThread : IEntity
 
     public int UserId { get; set; }
 
+    public DateTime CreateDate { get; set; }
+
+    public bool HasAnswer { get; set; }
+
     [ForeignKey(nameof(UserId))]
     public User User { get; set; }
 }
