@@ -104,5 +104,15 @@ namespace VakilPors.Core.Services
 
             return _mapper.Map<LawyerDto>(lawyer);
         }
+
+        public async Task<bool> IsLawyer(int userId)
+        {
+            var lawyer = await _appUnitOfWork.LawyerRepo
+                .AsQueryable()
+                .Include(x => x.User)
+                .FirstOrDefaultAsync(x => x.UserId == userId);
+
+            return lawyer == null;
+        }
     }
 }
