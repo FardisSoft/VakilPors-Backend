@@ -7,11 +7,11 @@ namespace VakilPors.Api.Controllers
     
     [ApiController]
     [Route("[controller]/[action]")]
-    public class FileTestController : Controller
+    public class FileController : Controller
     {
         private readonly IAwsFileService _fileService;
 
-        public FileTestController(IAwsFileService fileService)
+        public FileController(IAwsFileService fileService)
         {
             _fileService = fileService;
         }
@@ -26,6 +26,12 @@ namespace VakilPors.Api.Controllers
         public IActionResult GetUrl(string key)
         {
             return Ok(_fileService.GetFileUrl(key));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Download(string key)
+        {
+            return Ok(await _fileService.DownloadAsync(key));
         }
     }
 }
