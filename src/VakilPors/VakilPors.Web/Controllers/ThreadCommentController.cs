@@ -36,11 +36,11 @@ namespace VakilPors.Api.Controllers
             return Ok(new AppResponse<object>(result, "comment updated"));
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> DeleteComment(ThreadCommentDto commentDto)
+        [HttpGet]
+        public async Task<IActionResult> DeleteComment(int commentId)
         {
-            _logger.LogInformation($"delete comment {commentDto.Id}");
-            var result = await _threadCommentService.DeleteComment(getUserId(), commentDto.Id);
+            _logger.LogInformation($"delete comment {commentId}");
+            var result = await _threadCommentService.DeleteComment(getUserId(), commentId);
             return Ok(new AppResponse<object>(result, "comment deleted"));
         }
 

@@ -36,11 +36,11 @@ namespace VakilPors.Api.Controllers
             return Ok(new AppResponse<object>(result, "thread updated"));
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> DeleteThread(ThreadDto threadDto)
+        [HttpGet]
+        public async Task<IActionResult> DeleteThread(int threadId)
         {
-            _logger.LogInformation($"delete thread {threadDto.Id}");
-            var result = await _threadService.DeleteThread(getUserId(), threadDto.Id);
+            _logger.LogInformation($"delete thread {threadId}");
+            var result = await _threadService.DeleteThread(getUserId(), threadId);
             return Ok(new AppResponse<object>(result, "thread deleted"));
         }
 
