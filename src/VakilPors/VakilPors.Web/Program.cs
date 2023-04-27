@@ -13,6 +13,11 @@ using VakilPors.Web.Configuration.Extensions;
 using ZarinSharp.Extensions;
 using Amazon.S3;
 using Amazon;
+using Amazon.Extensions.NETCore.Setup;
+using Amazon.Runtime;
+using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
+using MimeKit.Cryptography;
+using VakilPors.Api.Configuration.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -53,7 +58,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerWithJWTSupport();
 
-builder.Services.AddAWSService<IAmazonS3>(configuration.GetAWSOptions());
+builder.Services.AddAwsFileService(configuration);
 
 var app = builder.Build();
 
