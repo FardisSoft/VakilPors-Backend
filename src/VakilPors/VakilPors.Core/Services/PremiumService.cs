@@ -72,10 +72,16 @@ namespace VakilPors.Core.Services
 
         public async Task DeactivatePremium(int user_id)
         {
-            var subscribed = await _appUnitOfWork.SubscribedRepo.FindAsync(user_id);
-            subscribed.ExpireDate = DateTime.Now;
-            _appUnitOfWork.SubscribedRepo.Update(subscribed);
-            await _appUnitOfWork.SaveChangesAsync();    
+            //var subscribed = await _appUnitOfWork.SubscribedRepo.FindAsync(user_id);
+            //subscribed.ExpireDate = DateTime.Now;
+            //_appUnitOfWork.SubscribedRepo.Update(subscribed);
+            //await _appUnitOfWork.SaveChangesAsync();    
+            var row = _appUnitOfWork.SubscribedRepo.AsQueryable().Where(x => x.UserId == user_id).First();
+            if (row == null)
+                throw new BadArgumentException("Subscription Not Found");
+            row.PremiumID = 1;
+            row.ExpireDate = DateTime.Now.AddYears(100);
+            await _appUnitOfWork.SaveChangesAsync();
         }
         public async Task UpdatePlan(SubscribedDto subscribedDto)
         {

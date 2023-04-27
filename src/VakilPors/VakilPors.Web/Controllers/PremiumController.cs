@@ -57,13 +57,13 @@ namespace VakilPors.Web.Controllers
             _logger.LogInformation($"deactivating subscriptions for user {user_id}");
             await _PremiumServices.DeactivatePremium(user_id);
         }
-        [HttpPut]
-        [Route("UpgradeSubscription")]
-        public async Task UpgradePremium(SubscribedDto subscribedDto)
-        {
-            _logger.LogInformation($"UpgradeSubscription for user {subscribedDto.User.Id}");
-            await _PremiumServices.UpdatePlan(subscribedDto);
-        }
+        //[HttpPut]
+        //[Route("UpgradeSubscription")]
+        //public async Task UpgradePremium(SubscribedDto subscribedDto)
+        //{
+        //    _logger.LogInformation($"UpgradeSubscription for user {subscribedDto.User.Id}");
+        //    await _PremiumServices.UpdatePlan(subscribedDto);
+        //}
 
     }
 }
