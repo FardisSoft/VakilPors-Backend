@@ -112,7 +112,7 @@ namespace VakilPors.Core.Services
                 .Include(x => x.User)
                 .FirstOrDefaultAsync(x => x.UserId == userId);
 
-            return lawyer == null;
+            return lawyer != null;
         }
     }
 }
