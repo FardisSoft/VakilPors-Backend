@@ -14,6 +14,7 @@ using VakilPors.Core.Domain.Dtos.Params;
 using VakilPors.Core.Domain.Dtos.Payment;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
+using VakilPors.Core.Mapper;
 using X.PagedList;
 
 namespace VakilPors.Web.Controllers
@@ -28,7 +29,7 @@ namespace VakilPors.Web.Controllers
         private readonly IMapper _mapper;
         private readonly ILogger<WalletController> _logger;
 
-        public WalletController(IWalletServices walletServices,IMapper mapper,ILogger<WalletController> logger)
+        public WalletController(IWalletServices walletServices, IMapper mapper, ILogger<WalletController> logger)
         {
             this._logger = logger;
             this._mapper = mapper;
@@ -37,25 +38,25 @@ namespace VakilPors.Web.Controllers
         [HttpGet("GetBalance")]
         public async Task<decimal> GetBalance()
         {
-            var phoneNumber= getPhoneNumber();
+            var phoneNumber = getPhoneNumber();
             _logger.LogInformation($"get balance for user with phone number:{phoneNumber}");
             return await _walletServices.GetBalance(phoneNumber);
         }
-        [Authorize(Roles=RoleNames.Admin)]
+        [Authorize(Roles = RoleNames.Admin)]
         [HttpPost("AddBalance")]
-        public async Task AddBalance(decimal amount,string phoneNumber)
+        public async Task AddBalance(decimal amount, string phoneNumber)
         {
             _logger.LogInformation($"add balance with amount:{amount} for user with phone number:{phoneNumber} by admin with phone number:{getPhoneNumber()}");
             await _walletServices.AddBalance(phoneNumber, amount);
         }
         //get transactions
         [HttpGet("GetTransactions")]
-        public async Task<IPagedList<TranactionDto>> GetTransactions([FromQuery]PagedParams pagedParams)
+        public async Task<IPagedList<TranactionDto>> GetTransactions([FromQuery] PagedParams pagedParams)
         {
-            var phoneNumber= getPhoneNumber();
+            var phoneNumber = getPhoneNumber();
             _logger.LogInformation($"get transactions for user with phone number:{phoneNumber}");
-            var transactions=await _walletServices.GetTransactions(phoneNumber,pagedParams);
-            return _mapper.Map<IPagedList<TranactionDto>>(transactions);
+            IPagedList<Tranaction> transactions = await _walletServices.GetTransactions(phoneNumber, pagedParams);
+            return transactions.ToMappedPagedList<Tranaction, TranactionDto>(_mapper);
         }
     }
 }
