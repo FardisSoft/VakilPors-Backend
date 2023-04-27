@@ -19,13 +19,13 @@ namespace VakilPors.Core.Services
         private readonly IWalletServices walletServices;
         private readonly IAppUnitOfWork appUnitOfWork;
 
-        public PaymentServices(ZarinPalService zarinPalService, IWalletServices walletServices,IAppUnitOfWork appUnitOfWork)
+        public PaymentServices(ZarinPalService zarinPalService, IWalletServices walletServices, IAppUnitOfWork appUnitOfWork)
         {
             this._zarinpal = zarinPalService;
             this.walletServices = walletServices;
             this.appUnitOfWork = appUnitOfWork;
         }
-        public async Task<RequestPaymentOutput> RequestPayment(int userId,long amount, string description, string callbackUrl)
+        public async Task<RequestPaymentOutput> RequestPayment(int userId, long amount, string description, string callbackUrl)
         {
             var requestResult = await _zarinpal.RequestPaymentAsync(new()
             {
@@ -37,24 +37,24 @@ namespace VakilPors.Core.Services
             {
                 throw new BadArgumentException("خطا در درخواست پرداخت");
             }
-            await walletServices.AddTransaction(userId,amount,description,requestResult.Authority,false,true);
+            await walletServices.AddTransaction(userId, amount, description, requestResult.Authority, false, true);
             return requestResult;
         }
 
         public async Task<VerifyPaymentOutput> VerifyPayment(string authority, string status)
         {
-            var tranaction=appUnitOfWork.TransactionRepo.AsQueryableNoTracking().FirstOrDefault(t=>t.Authority==authority);
-            var amount=tranaction.Amount;
+            var tranaction = appUnitOfWork.TransactionRepo.AsQueryableNoTracking().FirstOrDefault(t => t.Authority == authority);
+            var amount = tranaction.Amount;
             var verificationResult = await _zarinpal.VerifyPaymentAsync(new()
             {
                 Amount = Convert.ToInt64(amount),
                 Authority = authority,
             });
-            if (!verificationResult.WasSuccessful)
+            if (verificationResult.WasSuccessful)
             {
-                throw new BadArgumentException("خطا در تایید پرداخت");
+                // throw new BadArgumentException("خطا در تایید پرداخت");
+                await walletServices.ApproveTransaction(tranaction.Id);
             }
-            await walletServices.ApproveTransaction(tranaction.Id);
             return verificationResult;
         }
     }

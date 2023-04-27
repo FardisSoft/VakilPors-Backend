@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Payment;
+using VakilPors.Core.Exceptions;
+using ZarinSharp.OutputTypes;
 
 namespace VakilPors.Web.Controllers
 {
@@ -22,10 +24,10 @@ namespace VakilPors.Web.Controllers
 
         }
         [HttpPost("request")]
-        public async Task<IActionResult> RequestPayment([FromBody]RequestPaymentDto requestPaymentDto)
+        public async Task<IActionResult> RequestPayment([FromBody] RequestPaymentDto requestPaymentDto)
         {
             var baseRoute = getBaseRoute();
-            var Route=Url.Action(nameof(VerifyPayment)) ?? "/payment/verify";
+            var Route = Url.Action(nameof(VerifyPayment)) ?? "/payment/verify";
             var callbackUrl = baseRoute + Route;
             var userId = getUserId();
             return Ok(await paymentServices.RequestPayment(userId, requestPaymentDto.Amount, requestPaymentDto.Description, callbackUrl));
@@ -39,10 +41,10 @@ namespace VakilPors.Web.Controllers
             var res = await paymentServices.VerifyPayment(authority, status);
             var baseRoute = getBaseRoute().Replace("api.", "");
             //Todo: change this to react route in production
-            var Route="/payment/verify";
+            var Route = "/payment/verify";
             var url = baseRoute + Route;
             return Redirect($"{url}?{getQueryString(res)}");
         }
-        
+
     }
 }
