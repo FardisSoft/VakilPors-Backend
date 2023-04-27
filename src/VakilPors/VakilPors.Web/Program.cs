@@ -11,6 +11,8 @@ using VakilPors.Data.Context;
 using VakilPors.Data.Extensions;
 using VakilPors.Web.Configuration.Extensions;
 using ZarinSharp.Extensions;
+using Amazon.S3;
+using Amazon;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -28,10 +30,14 @@ builder.Services.AddZarinSharp(op =>
     op.MerchantId = "831ql8a0-31ja-ms82-1e30-pzla92kd145s";//dummy merchant id
     op.IsSandbox = true;
 });
-builder.Services.AddSignalR();
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
         options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = true;
+    // options.MaximumReceiveMessageSize = 102400000;
+});
 
 builder.Services.AddCors(options =>
 {
@@ -47,6 +53,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerWithJWTSupport();
 
+builder.Services.AddAWSService<IAmazonS3>(configuration.GetAWSOptions());
 
 var app = builder.Build();
 
