@@ -11,6 +11,8 @@ using VakilPors.Data.Context;
 using VakilPors.Data.Extensions;
 using VakilPors.Web.Configuration.Extensions;
 using ZarinSharp.Extensions;
+using Amazon.S3;
+using Amazon;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -47,6 +49,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerWithJWTSupport();
 
+builder.Services.AddAWSService<IAmazonS3>(configuration.GetAWSOptions());
 
 var app = builder.Build();
 
