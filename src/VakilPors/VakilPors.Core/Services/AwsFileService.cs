@@ -21,7 +21,7 @@ namespace VakilPors.Core.Services
         public AwsFileService(IAmazonS3 amazonS3, IConfiguration configuration)
         {
             _s3Client = amazonS3;
-            _bucketName = configuration["AWS:BucketName"];
+            _bucketName = Environment.GetEnvironmentVariable("FILE_BUCKET") ?? configuration["AWS:BucketName"];
         }
 
         public async Task<string> UploadAsync(IFormFile file)
@@ -64,15 +64,13 @@ namespace VakilPors.Core.Services
         }
         public string GetFileUrl(string key)
         {
-            var expirationTime = TimeSpan.FromHours(1);
-
             var request = new GetPreSignedUrlRequest
             {
                 BucketName = _bucketName,
                 Key = key,
-                Expires = DateTime.UtcNow.Add(expirationTime)
+                Expires = DateTime.Now.AddDays(1)
             };
-
+            
             return _s3Client.GetPreSignedURL(request);
         }
     }
