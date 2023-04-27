@@ -83,18 +83,43 @@ public class AuthServices : IAuthServices
         if (result.Succeeded)
         {
             await _userManager.AddToRoleAsync(_user, userDto.IsVakil ? RoleNames.Vakil : RoleNames.User);
+            var userFromDb = await _userManager.FindByNameAsync(_user.UserName);
             if (userDto.IsVakil)
             {
 
-                var userFromDb = await _userManager.FindByNameAsync(_user.UserName);
-                var lawyer=new Lawyer(){
-                    UserId=userFromDb.Id,
+                var lawyer = new Lawyer()
+                {
+                    UserId = userFromDb.Id,
                 };
                 await appUnitOfWork.LawyerRepo.AddAsync(lawyer);
                 await appUnitOfWork.SaveChangesAsync();
-                userFromDb.LawyerId=lawyer.Id;
+                userFromDb.LawyerId = lawyer.Id;
                 appUnitOfWork.UserRepo.Update(userFromDb);
                 await appUnitOfWork.SaveChangesAsync();
+            }
+            var sub = new Subscribed()
+            {
+                UserId = userFromDb.Id,
+                PremiumID = 1,
+                Premium = null,
+                User = null,
+            };
+            int id = appUnitOfWork.SubscribedRepo.AsQueryable().Max(s => s.ID) + 1;
+            int maxTry = 100;
+            while (maxTry-- > 0)
+            {
+                try
+                {
+                    sub.ID = id;
+                    await appUnitOfWork.SubscribedRepo.AddAsync(sub);
+                    await appUnitOfWork.SaveChangesAsync();
+                    break;
+                }
+                catch (Exception)
+                {
+                    id = appUnitOfWork.SubscribedRepo.AsQueryable().Max(s => s.ID) + 1;
+                }
+
             }
             await SendActivationCode(_user.PhoneNumber);
         }
@@ -182,6 +207,7 @@ public class AuthServices : IAuthServices
         }
         //generating token 
         var code = RandomEngine.Next(100000, 1000000).ToString();
+        _logger.LogInformation($"forget password code:{code} generated for user with phone number:{forgetPasswordDto.PhoneNumber}");
         _user.ForgetPasswordCode = code;
         await _userManager.UpdateAsync(_user);
 
@@ -218,6 +244,7 @@ public class AuthServices : IAuthServices
     {
         string code = GenerateActivationCode();
         await SetActivationCode(phoneNumber, code);
+        _logger.LogInformation($"activation code:{code} generated for user with phone number:{phoneNumber}");
         await SendActivationCodeSms(phoneNumber, code);
     }
 

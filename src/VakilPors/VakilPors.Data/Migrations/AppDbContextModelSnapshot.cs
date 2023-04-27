@@ -23,21 +23,6 @@ namespace VakilPors.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("ChatUser", b =>
-                {
-                    b.Property<int>("ChatsId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UsersId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("ChatsId", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("ChatUser");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.Property<int>("Id")
@@ -141,63 +126,6 @@ namespace VakilPors.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("VakilPors.Core.Domain.Entities.Chat", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Chat");
-                });
-
-            modelBuilder.Entity("VakilPors.Core.Domain.Entities.ChatMessage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ChatId")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsEdited")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsFile")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Message")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("SendTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("SenderId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ChatId");
-
-                    b.HasIndex("SenderId");
-
-                    b.ToTable("ChatMessage");
-                });
-
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.ForumThread", b =>
                 {
                     b.Property<int>("Id")
@@ -206,14 +134,8 @@ namespace VakilPors.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("Description")
                         .HasColumnType("text");
-
-                    b.Property<bool>("HasAnswer")
-                        .HasColumnType("boolean");
 
                     b.Property<int>("LikeCount")
                         .HasColumnType("integer");
@@ -229,7 +151,7 @@ namespace VakilPors.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ForumThread");
+                    b.ToTable("ForumThread", (string)null);
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.Lawyer", b =>
@@ -321,7 +243,7 @@ namespace VakilPors.Data.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Lawyer");
+                    b.ToTable("Lawyer", (string)null);
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.Premium", b =>
@@ -337,7 +259,7 @@ namespace VakilPors.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Premium");
+                    b.ToTable("Premium", (string)null);
 
                     b.HasData(
                         new
@@ -438,7 +360,7 @@ namespace VakilPors.Data.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Subscribed");
+                    b.ToTable("Subscribed", (string)null);
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.ThreadComment", b =>
@@ -448,12 +370,6 @@ namespace VakilPors.Data.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsSetAsAnswer")
-                        .HasColumnType("boolean");
 
                     b.Property<int>("LikeCount")
                         .HasColumnType("integer");
@@ -474,7 +390,7 @@ namespace VakilPors.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ThreadComment");
+                    b.ToTable("ThreadComment", (string)null);
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.Tranaction", b =>
@@ -510,7 +426,7 @@ namespace VakilPors.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Tranaction");
+                    b.ToTable("Tranaction", (string)null);
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.User", b =>
@@ -618,21 +534,6 @@ namespace VakilPors.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("ChatUser", b =>
-                {
-                    b.HasOne("VakilPors.Core.Domain.Entities.Chat", null)
-                        .WithMany()
-                        .HasForeignKey("ChatsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("VakilPors.Core.Domain.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("VakilPors.Core.Domain.Entities.Role", null)
@@ -682,25 +583,6 @@ namespace VakilPors.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("VakilPors.Core.Domain.Entities.ChatMessage", b =>
-                {
-                    b.HasOne("VakilPors.Core.Domain.Entities.Chat", "Chat")
-                        .WithMany("ChatMessages")
-                        .HasForeignKey("ChatId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("VakilPors.Core.Domain.Entities.User", "Sender")
-                        .WithMany("Messages")
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Chat");
-
-                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.ForumThread", b =>
@@ -774,18 +656,11 @@ namespace VakilPors.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("VakilPors.Core.Domain.Entities.Chat", b =>
-                {
-                    b.Navigation("ChatMessages");
-                });
-
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.User", b =>
                 {
                     b.Navigation("Lawyer");
 
                     b.Navigation("Subscribed");
-
-                    b.Navigation("Messages");
 
                     b.Navigation("Tranactions");
                 });
