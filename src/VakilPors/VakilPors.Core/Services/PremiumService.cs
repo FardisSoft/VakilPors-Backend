@@ -15,6 +15,7 @@ using VakilPors.Shared.Extensions;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
 using VakilPors.Core.Domain.Dtos.Premium;
+using VakilPors.Core.Services;
 
 namespace VakilPors.Core.Services
 {
@@ -22,41 +23,51 @@ namespace VakilPors.Core.Services
     {
         private readonly IAppUnitOfWork _appUnitOfWork;
         private readonly IMapper _mapper;
+        private readonly IWalletServices _walletservice;
         //private readonly IPremiumService _premiumservice;
 
-        public PremiumService(IAppUnitOfWork appUnitOfWork, IMapper mapper)
+        public PremiumService(IAppUnitOfWork appUnitOfWork, IMapper mapper, IWalletServices walletservice)
         {
             _appUnitOfWork = appUnitOfWork;
             _mapper = mapper;
+            _walletservice = walletservice;
             //_premiumservice = premiumservice;
-        
+
         }
 
-        public async Task ActivatePremium(SubscribedDto premium, int user_id)
+        public async Task<Subscribed> ActivatePremium(string premium,int user_id)
         {
-            DateTime expdate = DateTime.Now;
-            DateTime now = DateTime.Today;
-            int money = 0;
-            switch (premium.Premium.ServiceType)
+            var row = _appUnitOfWork.SubscribedRepo.AsQueryable().Where(x => x.UserId == user_id).First();
+            if (row == null)
+                throw new BadArgumentException("Subscription Not Found");
+            switch(premium)
             {
-                 case Plan.Bronze:
-                    expdate = now.AddDays(30);
-                    money = 20000;
+                case "gold":
+                    row.PremiumID = 3;
+                    await TransactUser("gold", user_id,50000, "طلایی");
+                    row.ExpireDate = DateTime.Now.AddDays(90);
                     break;
-                case Plan.Siler:
-                    expdate = now.AddDays(60);
-                    money = 30000;
+                case "silver":
+                    row.PremiumID = 2;
+                    await TransactUser("silver", user_id,30000,"نقره ای");
+                    row.ExpireDate = DateTime.Now.AddDays(60);
                     break;
-                case Plan.Gold:
-                    expdate = now.AddDays(60);
-                    money = 50000;
+                case "bronze":
+                    await TransactUser("bronze", user_id,20000,"برنزی");
+                    row.ExpireDate = DateTime.Now.AddDays(30);
+                    row.PremiumID = 1;
                     break;
             }
-            premium.ExpireDate = expdate;
-            premium.User.Balance -= money;
-            var subscribed = _mapper.Map<Subscribed>(premium);
-            await _appUnitOfWork.SubscribedRepo.AddAsync(subscribed);
             await _appUnitOfWork.SaveChangesAsync();
+            return row;
+
+        }
+
+        private async Task TransactUser(string v, int user_id, int amount,string baste)
+        {
+            var user = await _appUnitOfWork.UserRepo.FindAsync(user_id);
+            await _walletservice.AddTransaction(user_id, amount, $"خرید بسته {baste}", " ", true, false);
+            
         }
 
         public async Task DeactivatePremium(int user_id)

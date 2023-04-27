@@ -25,7 +25,9 @@ namespace VakilPors.Core.Mapper
             CreateMap<ForumThread, ThreadDto>();
             CreateMap<ThreadComment, ThreadCommentDto>();
             CreateMap<Premium, PremiumDto>().ReverseMap();
-            CreateMap<Subscribed, SubscribedDto>().ReverseMap();
+            CreateMap<Subscribed, SubscribedDto>();
+            CreateMap<SubscribedDto, Subscribed>();
+
         }
     }
     public static class MapperExtensions
