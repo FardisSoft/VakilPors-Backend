@@ -11,7 +11,7 @@ using VakilPors.Shared.Entities;
 
 namespace VakilPors.Core.Domain.Entities
 {
-    public class Subscribed :IEntity
+    public class Subscribed : IEntity
     {
         [Key]
         public int ID { get; set; }
@@ -21,7 +21,7 @@ namespace VakilPors.Core.Domain.Entities
         public int UserId { get; set; }
         [ForeignKey(nameof(UserId))]
         public virtual User User { get; set; }
-        public DateTime ExpireDate { get; set; } = DateTime.MaxValue;
+        public DateTime ExpireDate { get; set; } = DateTime.Now.AddYears(100);
         public int RemainingDays { get { return (DateTime.Now - ExpireDate).Days; } }
         public bool IsExpired { get { return DateTime.Now > ExpireDate; } }
 
