@@ -32,16 +32,21 @@ namespace VakilPors.Web.Controllers
             int user_id = getUserId();
             _logger.LogInformation($"GetSubsriptionStatus for the user by id {user_id}");
             var result = await _PremiumServices.GetPremiumStatus(user_id);
-            return Ok(new AppResponse<object>(result, "success"));
+            if (result == null)
+                return Ok(new AppResponse<object>(result, "user is not subscribed"));
+            else
+                return Ok(new AppResponse<object>(result, "success"));
         }
 
         [HttpPost]
         [Route("ActivateSubscription")]
-        public async Task ActivatePremium(SubscribedDto subscribed)
+        public async Task<ActionResult<SubscribedDto>> ActivatePremium(SubscribedDto subscribed)
         {
             int user_id = getUserId();
             _logger.LogInformation($"activating subscriptions for user by id{user_id} ");
             await _PremiumServices.ActivatePremium(subscribed, user_id);
+            return Ok(new AppResponse<object>(subscribed, "success"));
+            
         }
 
         [HttpPut]
