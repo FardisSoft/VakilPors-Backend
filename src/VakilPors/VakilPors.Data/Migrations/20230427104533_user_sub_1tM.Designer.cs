@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using VakilPors.Data.Context;
@@ -12,9 +13,10 @@ using VakilPors.Data.Context;
 namespace VakilPors.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230427104533_user_sub_1tM")]
+    partial class user_sub_1tM
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -435,8 +437,7 @@ namespace VakilPors.Data.Migrations
 
                     b.HasIndex("PremiumID");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("Subscribed");
                 });
@@ -734,8 +735,8 @@ namespace VakilPors.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("VakilPors.Core.Domain.Entities.User", "User")
-                        .WithOne("Subscribed")
-                        .HasForeignKey("VakilPors.Core.Domain.Entities.Subscribed", "UserId")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -784,8 +785,6 @@ namespace VakilPors.Data.Migrations
                     b.Navigation("Lawyer");
 
                     b.Navigation("Messages");
-
-                    b.Navigation("Subscribed");
 
                     b.Navigation("Tranactions");
                 });

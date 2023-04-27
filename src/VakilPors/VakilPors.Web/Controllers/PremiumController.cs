@@ -40,12 +40,12 @@ namespace VakilPors.Web.Controllers
 
         [HttpPost]
         [Route("ActivateSubscription")]
-        public async Task<ActionResult<SubscribedDto>> ActivatePremium(SubscribedDto subscribed)
+        public async Task<ActionResult> ActivatePremium(string PremiumPlan)
         {
             int user_id = getUserId();
             _logger.LogInformation($"activating subscriptions for user by id{user_id} ");
-            await _PremiumServices.ActivatePremium(subscribed, user_id);
-            return Ok(new AppResponse<object>(subscribed, "success"));
+            await _PremiumServices.ActivatePremium( PremiumPlan.ToLower(),user_id);
+            return Ok(new AppResponse<object>(PremiumPlan, "success"));
             
         }
 

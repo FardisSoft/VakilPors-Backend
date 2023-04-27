@@ -16,7 +16,7 @@ namespace VakilPors.Core.Domain.Dtos.Premium
         public int ID { get; set; }
         public virtual PremiumDto Premium { get; set; }
         public virtual UserDto User { get; set; }
-        public DateTime ExpireDate { get; set; }
+        public DateTime ExpireDate { get; set; } = DateTime.MaxValue;
         public int RemainingDays { get { return (DateTime.Now - ExpireDate).Days; } }
         public bool IsExpired { get { return DateTime.Now > ExpireDate; } }
 
