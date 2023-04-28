@@ -1,5 +1,8 @@
-﻿using AutoMapper;
+﻿using System.ComponentModel;
+using System.Threading;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos;
@@ -44,7 +47,7 @@ public class ThreadService : IThreadService
         if (addResult <= 0)
             throw new Exception();
 
-        return (await GetThreadWithComments(thread.Id)).Thread;
+        return (await GetThreadWithComments(userId, thread.Id)).Thread;
     }
 
     public async Task<ThreadDto> UpdateThread(int userId, ThreadDto threadDto)
@@ -66,7 +69,7 @@ public class ThreadService : IThreadService
         if (updateResult <= 0)
             throw new Exception();
 
-        return await GetThreadDtoFromThread(foundThread);
+        return (await GetThreadWithComments(userId, foundThread.Id)).Thread;
     }
 
     public async Task<bool> DeleteThread(int userId, int threadId)
@@ -88,7 +91,7 @@ public class ThreadService : IThreadService
         return true;
     }
 
-    public async Task<List<ThreadDto>> GetThreadList()
+    public async Task<List<ThreadDto>> GetThreadList(int userId)
     {
         var threads = await _uow.ForumThreadRepo
             .AsQueryable()
@@ -99,13 +102,13 @@ public class ThreadService : IThreadService
 
         foreach (var thread in threads)
         {
-            threadDtos.Add(await GetThreadDtoFromThread(thread));
+            threadDtos.Add(await GetThreadDtoFromThread(userId, thread));
         }
                 
         return threadDtos;
     } 
 
-    public async Task<ThreadWithCommentsDto> GetThreadWithComments(int threadId)
+    public async Task<ThreadWithCommentsDto> GetThreadWithComments(int userId, int threadId)
     {
         var thread = await _uow.ForumThreadRepo
             .AsQueryable()
@@ -116,24 +119,31 @@ public class ThreadService : IThreadService
         if (thread == null)
             throw new BadArgumentException("thread not found");
 
-        var threadDto = await GetThreadDtoFromThread(thread);
+        var threadDto = await GetThreadDtoFromThread(userId, thread);
         
         return new ThreadWithCommentsDto
         {
             Thread = threadDto,
-            Comments = await _threadCommentService.GetCommentsForThread(threadId)
+            Comments = await _threadCommentService.GetCommentsForThread(userId, threadId)
         };
     }
 
-    public async Task<int> LikeThread(int threadId)
+    public async Task<int> LikeThread(int userId, int threadId)
     {
-        var foundThread = await _uow.ForumThreadRepo.FindAsync(threadId);
+        var foundThread = await _uow.ForumThreadRepo
+            .AsQueryable()
+            .Include(x => x.UserLikes)
+            .FirstOrDefaultAsync(x => x.Id == threadId);
 
         if (foundThread == null)
             throw new BadArgumentException("thread not found");
 
+        var like = foundThread.UserLikes.FirstOrDefault(x => x.UserId == userId);
+        if (like != null)
+            return foundThread.LikeCount;
 
         foundThread.LikeCount++;
+        foundThread.UserLikes.Add(new UserThreadLike{ThreadId = threadId, UserId = userId});
 
         _uow.ForumThreadRepo.Update(foundThread);
 
@@ -144,15 +154,21 @@ public class ThreadService : IThreadService
         return foundThread.LikeCount;
     }
 
-    public async Task<int> UndoLikeThread(int threadId)
+    public async Task<int> UndoLikeThread(int userId, int threadId)
     {
-        var foundThread = await _uow.ForumThreadRepo.FindAsync(threadId);
+        var foundThread = await _uow.ForumThreadRepo
+            .AsQueryable()
+            .Include(x => x.UserLikes)
+            .FirstOrDefaultAsync(x => x.Id == threadId);
 
         if (foundThread == null)
             throw new BadArgumentException("thread not found");
 
-        if (foundThread.LikeCount >= 1)
+        var like = foundThread.UserLikes.FirstOrDefault(x => x.ThreadId == threadId && x.UserId == userId);
+
+        if (foundThread.LikeCount >= 1 && like != null)
         {
+            foundThread.UserLikes.Remove(like);
             foundThread.LikeCount--;
 
             _uow.ForumThreadRepo.Update(foundThread);
@@ -165,7 +181,7 @@ public class ThreadService : IThreadService
         return foundThread.LikeCount;
     }
 
-    private async Task<ThreadDto> GetThreadDtoFromThread(ForumThread thread)
+    private async Task<ThreadDto> GetThreadDtoFromThread(int userId, ForumThread thread)
     {
         var threadDto = new ThreadDto()
         {
@@ -177,6 +193,7 @@ public class ThreadService : IThreadService
             UserId = thread.UserId,
             LikeCount = thread.LikeCount,
             HasAnswer = await _threadCommentService.IsThreadHasAnswer(thread.Id),
+            IsCurrentUserLikedThread = await IsThreadLikedByUser(userId, thread.Id),
             User = new ForumUserDto()
             {
                 UserId = thread.UserId,
@@ -187,6 +204,17 @@ public class ThreadService : IThreadService
         };
 
         return threadDto;
+    }
+
+    private async Task<bool> IsThreadLikedByUser(int userId, int threadId)
+    {
+        var likes = await _uow.ForumThreadRepo
+            .AsQueryable()
+            .Include(x => x.UserLikes)
+            .Where(x => x.Id == threadId && x.UserLikes.FirstOrDefault(l => l.UserId == userId) != null)
+            .CountAsync();
+
+        return likes > 0;
     }
 }
 
