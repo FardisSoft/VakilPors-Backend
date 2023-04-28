@@ -30,9 +30,8 @@ namespace VakilPors.Core.Services
                 return null;
 
             var key = Guid.NewGuid().ToString();
-            var stream = new MemoryStream();
-            await file.CopyToAsync(stream);
-
+            var stream = file.OpenReadStream();
+            
             var request = new PutObjectRequest
             {
                 BucketName = _bucketName,

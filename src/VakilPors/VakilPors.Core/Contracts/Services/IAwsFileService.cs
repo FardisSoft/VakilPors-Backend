@@ -8,7 +8,7 @@ using VakilPors.Shared.Services;
 
 namespace VakilPors.Core.Contracts.Services
 {
-    public interface IAwsFileService : ITransientDependency
+    public interface IAwsFileService : IScopedDependency    
     {
         Task<string> UploadAsync(IFormFile file);
 
