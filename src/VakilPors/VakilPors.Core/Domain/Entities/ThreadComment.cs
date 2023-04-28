@@ -29,5 +29,8 @@ public class ThreadComment : IEntity
 
     [ForeignKey(nameof(ThreadId))]
     public ForumThread Thread { get; set; }
+
+    public virtual ICollection<UserCommentLike> UserLikes { get; set; }
+
 }
 

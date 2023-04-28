@@ -40,6 +40,10 @@ public class User : IdentityUser<int>
     //[ForeignKey(nameof(SubscribedID))]
     public virtual Subscribed Subscribed { get; set; }
 
+    public virtual ICollection<UserCommentLike> CommentLikes { get; set; }
+
+    public virtual ICollection<UserThreadLike> ThreadLikes { get; set; }
+
 
 }
 

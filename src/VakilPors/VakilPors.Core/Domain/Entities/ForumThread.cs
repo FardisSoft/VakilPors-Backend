@@ -25,5 +25,7 @@ public class ForumThread : IEntity
 
     [ForeignKey(nameof(UserId))]
     public User User { get; set; }
+
+    public virtual ICollection<UserThreadLike> UserLikes { get; set; }
 }
 
