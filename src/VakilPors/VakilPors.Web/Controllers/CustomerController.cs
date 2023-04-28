@@ -22,7 +22,7 @@ public class CustomerController : MyControllerBase
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateUser(UserDto userDto)
+    public async Task<IActionResult> UpdateUser([FromForm] UserDto userDto)
     {
         _logger.LogInformation($"update user attempt for {userDto.UserName}");
         var result = await _userServices.UpdateUser(userDto);

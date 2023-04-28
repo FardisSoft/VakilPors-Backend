@@ -89,7 +89,7 @@ namespace VakilPors.Core.Services
 
             await _userServices.UpdateUser(lawyerDto.User);
 
-            return ReplaceFileCodeWithUrl(lawyerDto);
+            return ReplaceFileCodeWithUrl(_mapper.Map<LawyerDto>(foundLawyer));
         }
 
         public async Task<List<LawyerDto>> GetAllLawyers()

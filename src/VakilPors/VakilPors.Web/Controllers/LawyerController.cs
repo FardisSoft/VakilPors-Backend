@@ -29,7 +29,7 @@ namespace VakilPors.Web.Controllers;
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateLawyer(LawyerDto lawyerDto)
+        public async Task<IActionResult> UpdateLawyer([FromForm] LawyerDto lawyerDto)
         {
             _logger.LogInformation($"update lawyer attempt for {lawyerDto.User.UserName ?? lawyerDto.Id.ToString()}");
             var result = await _lawyerServices.UpdateLawyer(lawyerDto);

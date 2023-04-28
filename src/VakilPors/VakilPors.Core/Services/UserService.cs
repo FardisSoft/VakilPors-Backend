@@ -46,7 +46,7 @@ public class UserService : IUserServices
         if (updateResult <= 0)
             throw new Exception();
 
-        return userDto;
+        return ReplaceImageKeyWithUrl(_mapper.Map<UserDto>(foundUser));
     }
 
     public async Task<List<UserDto>> GetAllUsers()
