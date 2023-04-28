@@ -97,5 +97,15 @@ namespace VakilPors.Core.Services
             return subdto;
 
         }
+
+        public async Task<bool> DoseUserHaveAnyActiveSubscription(int userId)
+        {
+            var sub = await GetPremiumStatus(userId);
+            bool isPremium =
+                sub is { IsExpired: false } &&
+                sub.Premium?.ServiceType != Plan.Free;
+
+            return isPremium;
+        }
     }
 }

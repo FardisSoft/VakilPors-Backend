@@ -16,6 +16,6 @@ namespace VakilPors.Core.Contracts.Services
         Task DeactivatePremium(int user_id);
         Task UpdatePlan(SubscribedDto subscribedDto);
 
-
+        Task<bool> DoseUserHaveAnyActiveSubscription(int userId);
     }
 }
