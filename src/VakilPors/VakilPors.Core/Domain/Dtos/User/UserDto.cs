@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using VakilPors.Core.Domain.Dtos.Payment;
 using VakilPors.Core.Domain.Dtos.Premium;
 using VakilPors.Core.Domain.Entities;
@@ -20,9 +21,11 @@ namespace VakilPors.Core.Domain.Dtos.User
         public bool IsActive { get; set; }
         public string Job { get; set; }
         public string Bio { get; set; }
+
+        public IFormFile ProfileImage { get; set; }
         public string ProfileImageUrl { get; set; }
 
-        public ICollection<TranactionDto> Tranactions { get; set; }
-        public SubscribedDto Subscribed { get; set; }
+        //public ICollection<TranactionDto> Tranactions { get; set; }
+        //public SubscribedDto Subscribed { get; set; }
     }
 }
