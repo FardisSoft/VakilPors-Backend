@@ -47,28 +47,28 @@ namespace VakilPors.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCommentsForThread(int threadId)
         {
-            var result = await _threadCommentService.GetCommentsForThread(threadId);
+            var result = await _threadCommentService.GetCommentsForThread(getUserId(), threadId);
             return Ok(new AppResponse<object>(result, "success"));
         }
 
         [HttpGet]
         public async Task<IActionResult> GetCommentById(int commentId)
         {
-            var result = await _threadCommentService.GetCommentById(commentId);
+            var result = await _threadCommentService.GetCommentById(getUserId(), commentId);
             return Ok(new AppResponse<object>(result, "success"));
         }
 
         [HttpGet]
         public async Task<IActionResult> LikeComment(int commentId)
         {
-            var result = await _threadCommentService.LikeComment(commentId);
+            var result = await _threadCommentService.LikeComment(getUserId(), commentId);
             return Ok(new AppResponse<object>(result, "success"));
         }
 
         [HttpGet]
         public async Task<IActionResult> UndoLikeComment(int commentId)
         {
-            var result = await _threadCommentService.UndoLikeComment(commentId);
+            var result = await _threadCommentService.UndoLikeComment(getUserId(), commentId);
             return Ok(new AppResponse<object>(result, "success"));
         }
 

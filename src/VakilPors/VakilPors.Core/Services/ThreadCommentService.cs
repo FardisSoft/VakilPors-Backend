@@ -46,7 +46,7 @@ public class ThreadCommentService : IThreadCommentService
         if (addResult <= 0)
             throw new Exception();
 
-        return await GetCommentById(comment.Id);
+        return await GetCommentById(userId, comment.Id);
     }
 
     public async Task<ThreadCommentDto> UpdateComment(int userId, ThreadCommentDto commentDto)
@@ -67,7 +67,7 @@ public class ThreadCommentService : IThreadCommentService
         if (updateResult <= 0)
             throw new Exception();
 
-        return await GetCommentDtoFromComment(foundComment);
+        return await GetCommentById(userId, foundComment.Id);
     }
 
     public async Task<bool> DeleteComment(int userId, int commentId)
@@ -89,7 +89,7 @@ public class ThreadCommentService : IThreadCommentService
         return true;
     }
 
-    public async Task<List<ThreadCommentDto>> GetCommentsForThread(int threadId)
+    public async Task<List<ThreadCommentDto>> GetCommentsForThread(int userId, int threadId)
     {
         var comments = await _uow.ThreadCommentRepo
             .AsQueryable()
@@ -101,15 +101,13 @@ public class ThreadCommentService : IThreadCommentService
 
         foreach (var comment in comments)
         {
-            commentDtoList.Add(await GetCommentDtoFromComment(comment));
+            commentDtoList.Add(await GetCommentDtoFromComment(userId, comment));
         }
 
         return commentDtoList;
     }
-        
     
-
-    public async Task<ThreadCommentDto> GetCommentById(int commentId)
+    public async Task<ThreadCommentDto> GetCommentById(int userId, int commentId)
     {
         var comment = await _uow.ThreadCommentRepo
             .AsQueryable()
@@ -121,7 +119,7 @@ public class ThreadCommentService : IThreadCommentService
         if (comment == null)
             throw new BadArgumentException("comment not found");
 
-        return await GetCommentDtoFromComment(comment);
+        return await GetCommentDtoFromComment(userId, comment);
 
     }
 
@@ -131,13 +129,21 @@ public class ThreadCommentService : IThreadCommentService
             .Where(x => x.ThreadId == threadId)
             .CountAsync();
 
-    public async Task<int> LikeComment(int commentId)
+    public async Task<int> LikeComment(int userId, int commentId)
     {
-        var foundComment = await _uow.ThreadCommentRepo.FindAsync(commentId);
+        var foundComment = await _uow.ThreadCommentRepo
+            .AsQueryable()
+            .Include(x => x.UserLikes)
+            .FirstOrDefaultAsync(x => x.Id == commentId);
 
         if (foundComment == null)
             throw new BadArgumentException("comment not found");
 
+        var like = foundComment.UserLikes.FirstOrDefault(x => x.UserId == userId);
+        if (like != null)
+            return foundComment.LikeCount;
+
+        foundComment.UserLikes.Add(new UserCommentLike { CommentId = commentId, UserId = userId });
         foundComment.LikeCount++;
 
         _uow.ThreadCommentRepo.Update(foundComment);
@@ -149,16 +155,21 @@ public class ThreadCommentService : IThreadCommentService
         return foundComment.LikeCount;
     }
 
-    public async Task<int> UndoLikeComment(int commentId)
+    public async Task<int> UndoLikeComment(int userId, int commentId)
     {
-        var foundComment = await _uow.ThreadCommentRepo.FindAsync(commentId);
+        var foundComment = await _uow.ThreadCommentRepo
+            .AsQueryable()
+            .Include(x => x.UserLikes)
+            .FirstOrDefaultAsync(x => x.Id == commentId);
 
         if (foundComment == null)
             throw new BadArgumentException("comment not found");
 
-        if (foundComment.LikeCount >= 1)
+        var like = foundComment.UserLikes.FirstOrDefault(x => x.UserId == userId);
+        if (foundComment.LikeCount >= 1 && like != null)
         {
             foundComment.LikeCount--;
+            foundComment.UserLikes.Remove(like);
 
             _uow.ThreadCommentRepo.Update(foundComment);
 
@@ -227,7 +238,7 @@ public class ThreadCommentService : IThreadCommentService
 
         return comments > 0;
     }
-    private async Task<ThreadCommentDto> GetCommentDtoFromComment(ThreadComment comment)
+    private async Task<ThreadCommentDto> GetCommentDtoFromComment(int userId, ThreadComment comment)
     {
         var threadCommentDto = new ThreadCommentDto()
         {
@@ -237,6 +248,7 @@ public class ThreadCommentService : IThreadCommentService
             Text = comment.Text,
             LikeCount = comment.LikeCount,
             UserId = comment.UserId,
+            IsCurrentUserLikedComment = await IsCommentLikedByUser(userId, comment.Id),
             User = new ForumUserDto()
             {
                 UserId = comment.UserId,
@@ -247,6 +259,17 @@ public class ThreadCommentService : IThreadCommentService
         };
 
         return threadCommentDto;
+    }
+
+    private async Task<bool> IsCommentLikedByUser(int userId, int commentId)
+    {
+        var likes = await _uow.ThreadCommentRepo
+            .AsQueryable()
+            .Include(x => x.UserLikes)
+            .Where(x => x.Id == commentId && x.UserLikes.FirstOrDefault(l => l.UserId == userId && l.CommentId == commentId) != null)
+            .CountAsync();
+
+        return likes > 0;
     }
 }
 
