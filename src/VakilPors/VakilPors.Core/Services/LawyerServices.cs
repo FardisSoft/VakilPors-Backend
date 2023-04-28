@@ -22,19 +22,28 @@ namespace VakilPors.Core.Services
         private readonly IAppUnitOfWork _appUnitOfWork;
         private readonly IUserServices _userServices;
         private readonly IMapper _mapper;
-        public LawyerServices(IAppUnitOfWork appUnitOfWork, IMapper mapper, IUserServices userServices)
+        private readonly IAwsFileService _fileService;
+        public LawyerServices(IAppUnitOfWork appUnitOfWork, IMapper mapper, IUserServices userServices, IAwsFileService fileService)
         {
             _appUnitOfWork = appUnitOfWork;
             _mapper = mapper;
             _userServices = userServices;
+            _fileService = fileService;
         }
         public async Task<IPagedList<Lawyer>> GetLawyers(PagedParams pagedParams, FilterParams filterParams)
         {
-            return await _appUnitOfWork.LawyerRepo.AsQueryableNoTracking()
+            var lawyers = await _appUnitOfWork.LawyerRepo.AsQueryableNoTracking()
             .Include(l => l.User)
             .Where(l => string.IsNullOrEmpty(filterParams.Q) || Fuzz.PartialRatio(l.User.Name, filterParams.Q) > 75 || l.ParvandeNo.Contains(filterParams.Q))
             .OrderBy((string.IsNullOrEmpty(filterParams.Sort) ? "Id" : filterParams.Sort), filterParams.IsAscending)
             .ToPagedListAsync(pagedParams.PageNumber, pagedParams.PageSize);
+
+            foreach (var lawyer in lawyers)
+            {
+                ReplaceFileCodeWithUrl(lawyer);
+            }
+
+            return lawyers;
         }
 
         public async Task<LawyerDto> UpdateLawyer(LawyerDto lawyerDto)
@@ -43,8 +52,21 @@ namespace VakilPors.Core.Services
             if (foundLawyer == null)
                 throw new BadArgumentException("Lawyer Not Found");
 
+            if (lawyerDto.CallingCardImage is { Length: > 0 })
+            {
+                var callingCardKey = await _fileService.UploadAsync(lawyerDto.CallingCardImage);
+                if(callingCardKey != null)
+                    foundLawyer.CallingCardImageUrl = callingCardKey;
+            }
+
+            if (lawyerDto.ProfileBackgroundPicture is { Length: > 0 })
+            {
+                var profileBackgroundKey = await _fileService.UploadAsync(lawyerDto.ProfileBackgroundPicture);
+                if (profileBackgroundKey != null)
+                    foundLawyer.ProfileBackgroundPictureUrl = profileBackgroundKey;
+            }
+
             foundLawyer.ParvandeNo = lawyerDto.ParvandeNo;
-            foundLawyer.ProfileImageUrl = lawyerDto.ProfileImageUrl;
             foundLawyer.Title = lawyerDto.Title;
             foundLawyer.City = lawyerDto.City;
             foundLawyer.Grade = lawyerDto.Grade;
@@ -54,10 +76,8 @@ namespace VakilPors.Core.Services
             foundLawyer.OfficeAddress = lawyerDto.OfficeAddress;
             foundLawyer.Education = lawyerDto.Education;
             foundLawyer.AboutMe = lawyerDto.AboutMe;
-            foundLawyer.CallingCardImageUrl = lawyerDto.CallingCardImageUrl;
             foundLawyer.ResumeLink = lawyerDto.ResumeLink;
             foundLawyer.Specialties = lawyerDto.Specialties;
-            foundLawyer.ProfileBackgroundPictureUrl = lawyerDto.ProfileBackgroundPictureUrl;
             foundLawyer.NumberOfRates = lawyerDto.NumberOfRates;
             foundLawyer.Gender = lawyerDto.Gender;
 
@@ -69,15 +89,25 @@ namespace VakilPors.Core.Services
 
             await _userServices.UpdateUser(lawyerDto.User);
 
-            return lawyerDto;
+            return ReplaceFileCodeWithUrl(lawyerDto);
         }
 
         public async Task<List<LawyerDto>> GetAllLawyers()
-            => await _appUnitOfWork.LawyerRepo
+        {
+            var lawyers = await _appUnitOfWork.LawyerRepo
                 .AsQueryable()
                 .Include(x => x.User)
                 .Select(x => _mapper.Map<LawyerDto>(x))
                 .ToListAsync();
+
+            foreach (var lawyer in lawyers)
+            {
+                ReplaceFileCodeWithUrl(lawyer);
+            }
+
+            return lawyers;
+        }
+            
 
         public async Task<LawyerDto> GetLawyerById(int lawyerId)
         {
@@ -89,7 +119,7 @@ namespace VakilPors.Core.Services
             if (lawyer == null)
                 throw new BadArgumentException("Lawyer Not Found");
 
-            return _mapper.Map<LawyerDto>(lawyer);
+            return ReplaceFileCodeWithUrl(_mapper.Map<LawyerDto>(lawyer));
         }
 
         public async Task<LawyerDto> GetLawyerByUserId(int userId)
@@ -102,7 +132,7 @@ namespace VakilPors.Core.Services
             if (lawyer == null)
                 throw new BadArgumentException("Lawyer Not Found");
 
-            return _mapper.Map<LawyerDto>(lawyer);
+            return ReplaceFileCodeWithUrl(_mapper.Map<LawyerDto>(lawyer));
         }
 
         public async Task<bool> IsLawyer(int userId)
@@ -114,5 +144,28 @@ namespace VakilPors.Core.Services
 
             return lawyer != null;
         }
+
+        private LawyerDto ReplaceFileCodeWithUrl(LawyerDto lawyerDto)
+        {
+            if (lawyerDto.CallingCardImageUrl != null)
+                lawyerDto.CallingCardImageUrl = _fileService.GetFileUrl(lawyerDto.CallingCardImageUrl);
+
+            if (lawyerDto.ProfileBackgroundPictureUrl != null)
+                lawyerDto.ProfileBackgroundPictureUrl = _fileService.GetFileUrl(lawyerDto.ProfileBackgroundPictureUrl);
+
+            return lawyerDto;
+        }
+
+        private Lawyer ReplaceFileCodeWithUrl(Lawyer lawyer)
+        {
+            if (lawyer.CallingCardImageUrl != null)
+                lawyer.CallingCardImageUrl = _fileService.GetFileUrl(lawyer.CallingCardImageUrl);
+
+            if (lawyer.ProfileBackgroundPictureUrl != null)
+                lawyer.ProfileBackgroundPictureUrl = _fileService.GetFileUrl(lawyer.ProfileBackgroundPictureUrl);
+
+            return lawyer;
+        }
+
     }
 }

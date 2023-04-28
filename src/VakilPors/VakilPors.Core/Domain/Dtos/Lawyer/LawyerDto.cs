@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using VakilPors.Core.Domain.Dtos.User;
 
 namespace VakilPors.Core.Domain.Dtos.Lawyer
@@ -25,10 +26,14 @@ namespace VakilPors.Core.Domain.Dtos.Lawyer
         public string OfficeAddress { get; set; }
         public string Education { get; set; }
         public string AboutMe { get; set; }
+
+        public IFormFile CallingCardImage { get; set; }
         public string CallingCardImageUrl { get; set; }
         public string ResumeLink { get; set; }
         public string Specialties { get; set; }
         public UserDto User { get; set; }
+
+        public IFormFile ProfileBackgroundPicture { get; set; }
         public string ProfileBackgroundPictureUrl { get; set; }
         public int NumberOfRates { get; set; }
         public string Gender { get; set; }
