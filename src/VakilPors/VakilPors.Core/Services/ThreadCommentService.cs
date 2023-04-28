@@ -3,6 +3,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using System.Threading;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos;
@@ -16,12 +17,14 @@ public class ThreadCommentService : IThreadCommentService
     private readonly IAppUnitOfWork _uow;
     private readonly IMapper _mapper;
     private readonly ILawyerServices _lawyerServices;
+    private readonly IPremiumService _premiumService;
 
-    public ThreadCommentService(IAppUnitOfWork uow, IMapper mapper, ILawyerServices lawyerServices)
+    public ThreadCommentService(IAppUnitOfWork uow, IMapper mapper, ILawyerServices lawyerServices, IPremiumService premiumService)
     {
         _uow = uow;
         _mapper = mapper;
         _lawyerServices = lawyerServices;
+        _premiumService = premiumService;
     }
 
 
@@ -239,7 +242,7 @@ public class ThreadCommentService : IThreadCommentService
                 UserId = comment.UserId,
                 Name = comment.User.Name,
                 IsLawyer = await _lawyerServices.IsLawyer(comment.UserId),
-                IsPremium = false
+                IsPremium = await _premiumService.DoseUserHaveAnyActiveSubscription(comment.UserId)
             }
         };
 

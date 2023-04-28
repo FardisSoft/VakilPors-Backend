@@ -14,13 +14,15 @@ public class ThreadService : IThreadService
     private readonly IMapper _mapper;
     private readonly IThreadCommentService _threadCommentService;
     private readonly ILawyerServices _lawyerServices;
+    private readonly IPremiumService _premiumService;
 
-    public ThreadService(IAppUnitOfWork uow, IMapper mapper, IThreadCommentService threadCommentService, ILawyerServices lawyerServices)
+    public ThreadService(IAppUnitOfWork uow, IMapper mapper, IThreadCommentService threadCommentService, ILawyerServices lawyerServices, IPremiumService premiumService)
     {
         _uow = uow;
         _mapper = mapper;
         _threadCommentService = threadCommentService;
         _lawyerServices = lawyerServices;
+        _premiumService = premiumService;
     }
 
 
@@ -180,7 +182,7 @@ public class ThreadService : IThreadService
                 UserId = thread.UserId,
                 Name = thread.User.Name,
                 IsLawyer = await _lawyerServices.IsLawyer(thread.UserId),
-                IsPremium = false
+                IsPremium = await _premiumService.DoseUserHaveAnyActiveSubscription(thread.UserId)
             }
         };
 
