@@ -15,6 +15,8 @@ public class ThreadCommentDto
     public int ThreadId { get; set; }
     public DateTime CreateDate { get; set; }
     public bool IsSetAsAnswer { get; set; }
+
+    public bool IsCurrentUserLikedComment { get; set; }
     public ForumUserDto User { get; set; }
 }
 
