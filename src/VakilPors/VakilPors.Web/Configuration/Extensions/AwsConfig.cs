@@ -10,10 +10,10 @@ namespace VakilPors.Api.Configuration.Extensions
     {
         public static void AddAwsFileService(this IServiceCollection services, IConfiguration configuration)
         {
-            
-            string fileEndPoint = Environment.GetEnvironmentVariable("FILE_API_ENDPOINT") ?? configuration["AWS:ApiEndpoint"];
-            string accessKey = Environment.GetEnvironmentVariable("FILE_ACCESS_KEY") ?? configuration["AWS:AccessKey"];
-            string secretKey = Environment.GetEnvironmentVariable("FILE_SECRET_KEY") ?? configuration["AWS:SecretKey"];
+
+            string fileEndPoint = Environment.GetEnvironmentVariable("FILE_API_ENDPOINT") ?? Environment.GetEnvironmentVariable("FILE_API_ENDPOINT", EnvironmentVariableTarget.User) ?? configuration["AWS:ApiEndpoint"];
+            string accessKey = Environment.GetEnvironmentVariable("FILE_ACCESS_KEY") ?? Environment.GetEnvironmentVariable("FILE_ACCESS_KEY", EnvironmentVariableTarget.User) ?? configuration["AWS:AccessKey"];
+            string secretKey = Environment.GetEnvironmentVariable("FILE_SECRET_KEY") ?? Environment.GetEnvironmentVariable("FILE_SECRET_KEY", EnvironmentVariableTarget.User) ?? configuration["AWS:SecretKey"];
 
             var awsConfig = new AWSOptions
             {

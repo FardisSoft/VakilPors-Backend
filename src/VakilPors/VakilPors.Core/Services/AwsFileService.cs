@@ -21,7 +21,7 @@ namespace VakilPors.Core.Services
         public AwsFileService(IAmazonS3 amazonS3, IConfiguration configuration)
         {
             _s3Client = amazonS3;
-            _bucketName = Environment.GetEnvironmentVariable("FILE_BUCKET") ?? configuration["AWS:BucketName"];
+            _bucketName = Environment.GetEnvironmentVariable("FILE_BUCKET") ?? Environment.GetEnvironmentVariable("FILE_BUCKET", EnvironmentVariableTarget.User) ?? configuration["AWS:BucketName"];
         }
 
         public async Task<string> UploadAsync(IFormFile file)
@@ -33,7 +33,7 @@ namespace VakilPors.Core.Services
 
             var key = Guid.NewGuid().ToString();
             var stream = file.OpenReadStream();
-            
+
             var request = new PutObjectRequest
             {
                 BucketName = _bucketName,
@@ -46,7 +46,7 @@ namespace VakilPors.Core.Services
             if (response.ETag == null)
                 return null;
 
-            return url+key;
+            return url + key;
         }
         public async Task<Stream> DownloadAsync(string key)
         {
@@ -71,7 +71,7 @@ namespace VakilPors.Core.Services
                 Key = key,
                 Expires = DateTime.Now.AddDays(1)
             };
-            
+
             return _s3Client.GetPreSignedURL(request);
         }
     }
