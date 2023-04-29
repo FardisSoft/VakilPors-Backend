@@ -46,7 +46,7 @@ public class UserService : IUserServices
         if (updateResult <= 0)
             throw new Exception();
 
-        return ReplaceImageKeyWithUrl(_mapper.Map<UserDto>(foundUser));
+        return _mapper.Map<UserDto>(foundUser);
     }
 
     public async Task<List<UserDto>> GetAllUsers()
@@ -55,9 +55,6 @@ public class UserService : IUserServices
             .AsQueryable()
             .Select(x => _mapper.Map<UserDto>(x))
             .ToListAsync();
-
-        foreach (var user in users)
-            ReplaceImageKeyWithUrl(user);
 
         return users;
     }
@@ -73,15 +70,15 @@ public class UserService : IUserServices
         if (user == null)
             throw new BadArgumentException("User Not Found");
 
-        return ReplaceImageKeyWithUrl( _mapper.Map<UserDto>(user));
+        return _mapper.Map<UserDto>(user);
     }
 
-    private UserDto ReplaceImageKeyWithUrl(UserDto userDto)
-    {
-        if (userDto.ProfileImageUrl != null)
-            userDto.ProfileImageUrl = _fileService.GetFileUrl(userDto.ProfileImageUrl);
+    //private UserDto ReplaceImageKeyWithUrl(UserDto userDto)
+    //{
+    //    if (userDto.ProfileImageUrl != null)
+    //        userDto.ProfileImageUrl = _fileService.GetFileUrl(userDto.ProfileImageUrl);
 
-        return userDto;
-    }
+    //    return userDto;
+    //}
 }
 

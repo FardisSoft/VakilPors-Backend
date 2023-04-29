@@ -26,6 +26,8 @@ namespace VakilPors.Core.Services
 
         public async Task<string> UploadAsync(IFormFile file)
         {
+            var url = "https://api.fardissoft.ir/File/Download?key=";
+
             if (file == null || file.Length < 1)
                 return null;
 
@@ -44,7 +46,7 @@ namespace VakilPors.Core.Services
             if (response.ETag == null)
                 return null;
 
-            return key;
+            return url+key;
         }
         public async Task<Stream> DownloadAsync(string key)
         {

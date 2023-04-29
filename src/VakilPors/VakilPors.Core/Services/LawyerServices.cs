@@ -38,11 +38,6 @@ namespace VakilPors.Core.Services
             .OrderBy((string.IsNullOrEmpty(filterParams.Sort) ? "Id" : filterParams.Sort), filterParams.IsAscending)
             .ToPagedListAsync(pagedParams.PageNumber, pagedParams.PageSize);
 
-            foreach (var lawyer in lawyers)
-            {
-                ReplaceFileCodeWithUrl(lawyer);
-            }
-
             return lawyers;
         }
 
@@ -96,7 +91,7 @@ namespace VakilPors.Core.Services
             if(lawyerDto.User != null && lawyerDto.User.Id > 0)
                 await _userServices.UpdateUser(lawyerDto.User);
 
-            return ReplaceFileCodeWithUrl(_mapper.Map<LawyerDto>(foundLawyer));
+            return _mapper.Map<LawyerDto>(foundLawyer);
         }
 
         public async Task<List<LawyerDto>> GetAllLawyers()
@@ -106,11 +101,6 @@ namespace VakilPors.Core.Services
                 .Include(x => x.User)
                 .Select(x => _mapper.Map<LawyerDto>(x))
                 .ToListAsync();
-
-            foreach (var lawyer in lawyers)
-            {
-                ReplaceFileCodeWithUrl(lawyer);
-            }
 
             return lawyers;
         }
@@ -126,7 +116,7 @@ namespace VakilPors.Core.Services
             if (lawyer == null)
                 throw new BadArgumentException("Lawyer Not Found");
 
-            return ReplaceFileCodeWithUrl(_mapper.Map<LawyerDto>(lawyer));
+            return _mapper.Map<LawyerDto>(lawyer);
         }
 
         public async Task<LawyerDto> GetLawyerByUserId(int userId)
@@ -139,7 +129,7 @@ namespace VakilPors.Core.Services
             if (lawyer == null)
                 throw new BadArgumentException("Lawyer Not Found");
 
-            return ReplaceFileCodeWithUrl(_mapper.Map<LawyerDto>(lawyer));
+            return _mapper.Map<LawyerDto>(lawyer);
         }
 
         public async Task<bool> IsLawyer(int userId)
@@ -152,33 +142,33 @@ namespace VakilPors.Core.Services
             return lawyer != null;
         }
 
-        private LawyerDto ReplaceFileCodeWithUrl(LawyerDto lawyerDto)
-        {
-            if (lawyerDto.CallingCardImageUrl != null)
-                lawyerDto.CallingCardImageUrl = _fileService.GetFileUrl(lawyerDto.CallingCardImageUrl);
+        //private LawyerDto ReplaceFileCodeWithUrl(LawyerDto lawyerDto)
+        //{
+        //    if (lawyerDto.CallingCardImageUrl != null)
+        //        lawyerDto.CallingCardImageUrl = _fileService.GetFileUrl(lawyerDto.CallingCardImageUrl);
 
-            if (lawyerDto.ProfileBackgroundPictureUrl != null)
-                lawyerDto.ProfileBackgroundPictureUrl = _fileService.GetFileUrl(lawyerDto.ProfileBackgroundPictureUrl);
+        //    if (lawyerDto.ProfileBackgroundPictureUrl != null)
+        //        lawyerDto.ProfileBackgroundPictureUrl = _fileService.GetFileUrl(lawyerDto.ProfileBackgroundPictureUrl);
 
-            if (lawyerDto.ResumeLink != null)
-                lawyerDto.ResumeLink = _fileService.GetFileUrl(lawyerDto.ResumeLink);
+        //    if (lawyerDto.ResumeLink != null)
+        //        lawyerDto.ResumeLink = _fileService.GetFileUrl(lawyerDto.ResumeLink);
 
-            return lawyerDto;
-        }
+        //    return lawyerDto;
+        //}
 
-        private Lawyer ReplaceFileCodeWithUrl(Lawyer lawyer)
-        {
-            if (lawyer.CallingCardImageUrl != null)
-                lawyer.CallingCardImageUrl = _fileService.GetFileUrl(lawyer.CallingCardImageUrl);
+        //private Lawyer ReplaceFileCodeWithUrl(Lawyer lawyer)
+        //{
+        //    if (lawyer.CallingCardImageUrl != null)
+        //        lawyer.CallingCardImageUrl = _fileService.GetFileUrl(lawyer.CallingCardImageUrl);
 
-            if (lawyer.ProfileBackgroundPictureUrl != null)
-                lawyer.ProfileBackgroundPictureUrl = _fileService.GetFileUrl(lawyer.ProfileBackgroundPictureUrl);
+        //    if (lawyer.ProfileBackgroundPictureUrl != null)
+        //        lawyer.ProfileBackgroundPictureUrl = _fileService.GetFileUrl(lawyer.ProfileBackgroundPictureUrl);
 
-            if (lawyer.ResumeLink != null)
-                lawyer.ResumeLink = _fileService.GetFileUrl(lawyer.ResumeLink);
+        //    if (lawyer.ResumeLink != null)
+        //        lawyer.ResumeLink = _fileService.GetFileUrl(lawyer.ResumeLink);
 
-            return lawyer;
-        }
+        //    return lawyer;
+        //}
 
     }
 }
