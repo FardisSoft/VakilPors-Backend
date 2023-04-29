@@ -51,9 +51,14 @@ namespace VakilPors.Core.Services
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadAsStringAsync();
-                logger.LogInformation($"SMS {message} sent to Number:{phone}");
-
-                // resultCode = int.Parse(result);
+                logger.LogInformation($"SMS with message: {message} sent to Number:{phone} successfully!");
+                try
+                {
+                    resultCode = int.Parse(result);
+                }
+                catch (System.Exception)
+                {
+                }
             }
             else
             {
