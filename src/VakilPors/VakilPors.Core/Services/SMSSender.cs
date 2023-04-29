@@ -18,9 +18,9 @@ namespace VakilPors.Core.Services
 
         public SMSSender(IConfiguration configuration, ILogger<SMSSender> logger)
         {
-            _smsSenderNumber = Environment.GetEnvironmentVariable("RAYGAN_SMS_SENDER_NUMBER", EnvironmentVariableTarget.User) ?? configuration["RAYGAN_SMS:SENDER_NUMBER"];
-            _smsUsername = Environment.GetEnvironmentVariable("RAYGAN_SMS_USERNAME", EnvironmentVariableTarget.User) ?? configuration["RAYGAN_SMS:USERNAME"];
-            _smsPassword = Environment.GetEnvironmentVariable("RAYGAN_SMS_PASSWORD", EnvironmentVariableTarget.User) ?? configuration["RAYGAN_SMS:PASSWORD"];
+            _smsSenderNumber = Environment.GetEnvironmentVariable("RAYGAN_SMS_SENDER_NUMBER") ?? Environment.GetEnvironmentVariable("RAYGAN_SMS_SENDER_NUMBER", EnvironmentVariableTarget.User) ?? configuration["RAYGAN_SMS:SENDER_NUMBER"];
+            _smsUsername = Environment.GetEnvironmentVariable("RAYGAN_SMS_USERNAME") ?? Environment.GetEnvironmentVariable("RAYGAN_SMS_USERNAME", EnvironmentVariableTarget.User) ?? configuration["RAYGAN_SMS:USERNAME"];
+            _smsPassword = Environment.GetEnvironmentVariable("RAYGAN_SMS_PASSWORD") ?? Environment.GetEnvironmentVariable("RAYGAN_SMS_PASSWORD", EnvironmentVariableTarget.User) ?? configuration["RAYGAN_SMS:PASSWORD"];
             this.logger = logger;
             logger.LogInformation($"Sender Number is:{_smsSenderNumber}");
         }
