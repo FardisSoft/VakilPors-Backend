@@ -30,6 +30,8 @@ namespace VakilPors.Core.Domain.Dtos.Lawyer
         public IFormFile CallingCardImage { get; set; }
         public string CallingCardImageUrl { get; set; }
         public string ResumeLink { get; set; }
+
+        public IFormFile Resume { get; set; }
         public string Specialties { get; set; }
         public UserDto User { get; set; }
 

@@ -66,6 +66,13 @@ namespace VakilPors.Core.Services
                     foundLawyer.ProfileBackgroundPictureUrl = profileBackgroundKey;
             }
 
+            if (lawyerDto.Resume is { Length: > 0 })
+            {
+                var resumeKey = await _fileService.UploadAsync(lawyerDto.Resume);
+                if (resumeKey != null)
+                    foundLawyer.ResumeLink = resumeKey;
+            }
+
             foundLawyer.ParvandeNo = lawyerDto.ParvandeNo;
             foundLawyer.Title = lawyerDto.Title;
             foundLawyer.City = lawyerDto.City;
@@ -76,7 +83,6 @@ namespace VakilPors.Core.Services
             foundLawyer.OfficeAddress = lawyerDto.OfficeAddress;
             foundLawyer.Education = lawyerDto.Education;
             foundLawyer.AboutMe = lawyerDto.AboutMe;
-            foundLawyer.ResumeLink = lawyerDto.ResumeLink;
             foundLawyer.Specialties = lawyerDto.Specialties;
             foundLawyer.NumberOfRates = lawyerDto.NumberOfRates;
             foundLawyer.Gender = lawyerDto.Gender;
@@ -87,7 +93,8 @@ namespace VakilPors.Core.Services
             if (updateResult <= 0)
                 throw new Exception();
 
-            await _userServices.UpdateUser(lawyerDto.User);
+            if(lawyerDto.User != null && lawyerDto.User.Id > 0)
+                await _userServices.UpdateUser(lawyerDto.User);
 
             return ReplaceFileCodeWithUrl(_mapper.Map<LawyerDto>(foundLawyer));
         }
@@ -153,6 +160,9 @@ namespace VakilPors.Core.Services
             if (lawyerDto.ProfileBackgroundPictureUrl != null)
                 lawyerDto.ProfileBackgroundPictureUrl = _fileService.GetFileUrl(lawyerDto.ProfileBackgroundPictureUrl);
 
+            if (lawyerDto.ResumeLink != null)
+                lawyerDto.ResumeLink = _fileService.GetFileUrl(lawyerDto.ResumeLink);
+
             return lawyerDto;
         }
 
@@ -163,6 +173,9 @@ namespace VakilPors.Core.Services
 
             if (lawyer.ProfileBackgroundPictureUrl != null)
                 lawyer.ProfileBackgroundPictureUrl = _fileService.GetFileUrl(lawyer.ProfileBackgroundPictureUrl);
+
+            if (lawyer.ResumeLink != null)
+                lawyer.ResumeLink = _fileService.GetFileUrl(lawyer.ResumeLink);
 
             return lawyer;
         }
