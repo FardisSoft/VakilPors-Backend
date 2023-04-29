@@ -269,7 +269,8 @@ public class AuthServices : IAuthServices
         var user = await _userManager.FindByNameAsync(phoneNumber);
         if (user == null)
             throw new NotFoundException("no user found with this phone number");
-
+        if (user.IsActive)
+            throw new BadArgumentException("user is already activated!");
         user.ActivationCode = code;
 
         var result = await _userManager.UpdateAsync(user);
