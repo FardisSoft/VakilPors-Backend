@@ -11,6 +11,7 @@ using VakilPors.Core.Domain.Dtos.Premium;
 using VakilPors.Core.Domain.Entities;
 using ForumThread = VakilPors.Core.Domain.Entities.ForumThread;
 using X.PagedList;
+using VakilPors.Core.Domain.Dtos.Case;
 
 namespace VakilPors.Core.Mapper
 {
@@ -27,6 +28,7 @@ namespace VakilPors.Core.Mapper
             CreateMap<Premium, PremiumDto>().ReverseMap();
             CreateMap<Subscribed, SubscribedDto>();
             CreateMap<SubscribedDto, Subscribed>();
+            CreateMap<LegalDocumentDto, LegalDocument>().ReverseMap();
 
         }
     }
