@@ -18,11 +18,15 @@
     - EMAIL_USERNAME
     - EMAIL_PASSWORD
     - EMAIL_USESSL (true/false)
+- File:
+    - FILE_BUCKET
+    - FILE_API_ENDPOINT
+    - FILE_ACCESS_KEY
+    - FILE_SECRET_KEY
+
 3. cd into VakilPors.Web
 4. run these commands:
 ```
-dotnet tool install --global dotnet-ef
-dotnet ef database update --project ../VakilPors.Data
 dotnet run
 ```
 5. open https://localhost:7032/swagger/index.html
