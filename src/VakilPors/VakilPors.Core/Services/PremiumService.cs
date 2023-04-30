@@ -35,25 +35,25 @@ namespace VakilPors.Core.Services
 
         }
 
-        public async Task<Subscribed> ActivatePremium(string premium,int user_id)
+        public async Task<Subscribed> ActivatePremium(string premium, int user_id)
         {
             var row = _appUnitOfWork.SubscribedRepo.AsQueryable().Where(x => x.UserId == user_id).First();
             if (row == null)
                 throw new BadArgumentException("Subscription Not Found");
-            switch(premium)
+            switch (premium)
             {
                 case "gold":
                     row.PremiumID = 3;
-                    await TransactUser("gold", user_id,50000, "طلایی");
+                    await TransactUser("gold", user_id, 50000, "طلایی");
                     row.ExpireDate = DateTime.Now.AddDays(90);
                     break;
                 case "silver":
                     row.PremiumID = 2;
-                    await TransactUser("silver", user_id,30000,"نقره ای");
+                    await TransactUser("silver", user_id, 30000, "نقره ای");
                     row.ExpireDate = DateTime.Now.AddDays(60);
                     break;
                 case "bronze":
-                    await TransactUser("bronze", user_id,20000,"برنزی");
+                    await TransactUser("bronze", user_id, 20000, "برنزی");
                     row.ExpireDate = DateTime.Now.AddDays(30);
                     row.PremiumID = 1;
                     break;
@@ -63,11 +63,11 @@ namespace VakilPors.Core.Services
 
         }
 
-        private async Task TransactUser(string v, int user_id, int amount,string baste)
+        private async Task TransactUser(string v, int user_id, int amount, string baste)
         {
             var user = await _appUnitOfWork.UserRepo.FindAsync(user_id);
             await _walletservice.AddTransaction(user_id, amount, $"خرید بسته {baste}", " ", true, false);
-            
+
         }
 
         public async Task DeactivatePremium(int user_id)
@@ -76,11 +76,11 @@ namespace VakilPors.Core.Services
             //subscribed.ExpireDate = DateTime.Now;
             //_appUnitOfWork.SubscribedRepo.Update(subscribed);
             //await _appUnitOfWork.SaveChangesAsync();    
-            var row = _appUnitOfWork.SubscribedRepo.AsQueryable().Where(x => x.UserId == user_id).First();
-            if (row == null)
+            var sub = await _appUnitOfWork.SubscribedRepo.AsQueryable().Where(x => x.UserId == user_id).FirstAsync();
+            if (sub == null)
                 throw new BadArgumentException("Subscription Not Found");
-            row.PremiumID = 1;
-            row.ExpireDate = DateTime.Now.AddYears(100);
+            sub.PremiumID = 1;
+            sub.ExpireDate = DateTime.MaxValue;
             await _appUnitOfWork.SaveChangesAsync();
         }
         public async Task UpdatePlan(SubscribedDto subscribedDto)
@@ -92,7 +92,7 @@ namespace VakilPors.Core.Services
         }
         public async Task<SubscribedDto> GetPremiumStatus(int user_id)
         {
-            var subscribed = await _appUnitOfWork.SubscribedRepo.AsQueryable().Where(x => x.UserId == user_id).FirstOrDefaultAsync();
+            var subscribed = await _appUnitOfWork.SubscribedRepo.AsQueryable().Include(x => x.Premium).Where(x => x.UserId == user_id).FirstOrDefaultAsync();
             var subdto = _mapper.Map<SubscribedDto>(subscribed);
             return subdto;
 
