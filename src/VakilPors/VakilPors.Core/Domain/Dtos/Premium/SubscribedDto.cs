@@ -17,8 +17,31 @@ namespace VakilPors.Core.Domain.Dtos.Premium
         public virtual PremiumDto Premium { get; set; }
         public virtual UserDto User { get; set; }
         public DateTime ExpireDate { get; set; } = DateTime.MaxValue;
-        public int RemainingDays { get { return (DateTime.Now - ExpireDate).Days; } }
+        public int RemainingDays { get { return (ExpireDate - DateTime.Now).Days; } }
         public bool IsExpired { get { return DateTime.Now > ExpireDate; } }
+        public string PremiumName { get { return PRName(); } }
 
+        private string PRName()
+        {
+            if (this.RemainingDays > 100)
+            {
+                return "Free";
+            }
+            else if (this.RemainingDays > 60 && this.RemainingDays < 90)
+            {
+                return "Gold";
+            }
+            else if (this.RemainingDays > 30 && this.RemainingDays < 60)
+            {
+                return "Silver";
+            }
+            else if (this.RemainingDays > 0 && this.RemainingDays < 30)
+            {
+                return "Bronze";
+            }
+            else
+                return "not found";
+            
+        }
     }
 }
