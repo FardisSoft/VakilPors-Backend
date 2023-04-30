@@ -43,5 +43,7 @@ namespace VakilPors.Core.Domain.Entities
         public int NumberOfLikes { get; set; } 
         public int NumberOfVerifies { get; set; } 
         public List<string> RatesList { get; set; }
+
+        public virtual ICollection<DocumentAccess> DocumentAccesses { get; set; }
     }
 }
