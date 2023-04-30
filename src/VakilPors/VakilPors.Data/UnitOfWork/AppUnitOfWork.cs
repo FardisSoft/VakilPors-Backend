@@ -39,7 +39,9 @@ public class AppUnitOfWork : IAppUnitOfWork
 
     public IGenericRepo<Premium> PremiumRepo => _dbContext.GetService<IGenericRepo<Premium>>();
     public IGenericRepo<Subscribed> SubscribedRepo => _dbContext.GetService<IGenericRepo<Subscribed>>();
-    
+
+    public IGenericRepo<LegalDocument> DocumentRepo => _dbContext.GetService<IGenericRepo<LegalDocument>>();
+
     #endregion
 
 }
