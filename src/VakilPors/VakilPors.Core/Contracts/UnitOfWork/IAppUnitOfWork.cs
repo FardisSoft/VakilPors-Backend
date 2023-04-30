@@ -21,6 +21,8 @@ public interface IAppUnitOfWork
     public IGenericRepo<Premium> PremiumRepo { get; }
     public IGenericRepo<Subscribed> SubscribedRepo { get; }
 
+    public IGenericRepo<LegalDocument> DocumentRepo { get; }
+
     #endregion
 }
 

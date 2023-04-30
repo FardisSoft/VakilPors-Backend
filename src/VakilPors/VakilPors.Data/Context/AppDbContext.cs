@@ -45,6 +45,17 @@ public class AppDbContext : IdentityDbContext<User, Role, int>
             .WithMany(t => t.UserLikes)
             .HasForeignKey(x => x.ThreadId);
 
+
+        modelBuilder.Entity<DocumentAccess>()
+            .HasOne(x => x.Lawyer)
+            .WithMany(l => l.DocumentAccesses)
+            .HasForeignKey(x => x.LawyerId);
+
+        modelBuilder.Entity<DocumentAccess>()
+            .HasOne(x => x.Document)
+            .WithMany(d => d.Accesses)
+            .HasForeignKey(x => x.DocumentId);
+
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.RegisterEntities(typeof(User).Assembly);
