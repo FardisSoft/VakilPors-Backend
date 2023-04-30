@@ -16,6 +16,9 @@ public class ChatMessage : IEntity
     public DateTime SendTime { get; set; } = DateTime.Now;
     public int SenderId { get; set; }
     public int ChatId { get; set; }
+    public int? ReplyId { get; set; }
+    [ForeignKey(nameof(ReplyId))]
+    public ChatMessage? ReplyMessage { get; set; }
     [ForeignKey(nameof(SenderId))]
     public virtual User Sender { get; set; }
     [ForeignKey(nameof(ChatId))]
