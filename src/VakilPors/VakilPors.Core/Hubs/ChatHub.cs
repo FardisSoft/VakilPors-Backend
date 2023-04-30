@@ -22,6 +22,16 @@ namespace VakilPors.Core.Hubs
             this.appUnitOfWork = appUnitOfWork;
             this.logger = logger;
         }
+        public override Task OnConnectedAsync()
+        {
+            logger.LogInformation($"user with id:{getUserId()} connected  with connection id:{Context.ConnectionId}");
+            return base.OnConnectedAsync();
+        }
+        public override Task OnDisconnectedAsync(Exception exception)
+        {
+            logger.LogInformation($"user with id:{getUserId()} disconnected  with connection id:{Context.ConnectionId} with exception message:{exception.Message}");
+            return base.OnDisconnectedAsync(exception);
+        }
         public async Task SendMessage(ChatMessage message)
         {
             await appUnitOfWork.ChatMessageRepo.AddAsync(message);
