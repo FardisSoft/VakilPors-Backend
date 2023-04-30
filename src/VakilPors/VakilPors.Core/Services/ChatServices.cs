@@ -44,12 +44,19 @@ namespace VakilPors.Core.Services
             .Include(c => c.Users)
             .Include(c => c.ChatMessages)
             .ThenInclude(m => m.Sender)
+            .Include(c => c.ChatMessages)
+            .ThenInclude(m => m.ReplyMessage)
             .Where(c => c.Users.Select(u => u.Id).Contains(userId)).ToArrayAsync();
         }
 
         public async Task<ICollection<ChatMessage>> GetMessagesOfChat(int userId, int chatId)
         {
-            var chat = await appUnitOfWork.ChatRepo.AsQueryableNoTracking().Include(c => c.ChatMessages).ThenInclude(m => m.Sender).FirstOrDefaultAsync(c => c.Id == chatId);
+            var chat = await appUnitOfWork.ChatRepo.AsQueryableNoTracking()
+            .Include(c => c.ChatMessages)
+            .ThenInclude(m => m.Sender)
+            .Include(c => c.ChatMessages)
+            .ThenInclude(m => m.ReplyMessage)
+            .FirstOrDefaultAsync(c => c.Id == chatId);
             if (!chat.Users.Select(u => u.Id).Contains(userId))
                 throw new AccessViolationException("You do not have permission to perform this action");
             return chat.ChatMessages;
