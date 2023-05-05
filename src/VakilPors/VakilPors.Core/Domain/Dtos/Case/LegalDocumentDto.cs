@@ -17,6 +17,12 @@ namespace VakilPors.Core.Domain.Dtos.Case
 
         public string Description { get; set; }
 
+        public string DocumentCategory { get; set; }
+
+        public int MinimumBudget { get; set; }
+
+        public int MaximumBudget { get; set; }
+
         public IFormFile File { get; set; }
     }
 }

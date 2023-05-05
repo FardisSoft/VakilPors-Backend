@@ -27,7 +27,7 @@ namespace VakilPors.Core.Contracts.Services
 
         Task<List<LawyerDto>> GetLawyersThatHaveAccessToDocument(int documentId);
 
-        Task<List<UserDto>> GetUsersThatLawyerHasAccessToThairDocuments(int lawyerId);
+        Task<List<UserDto>> GetUsersThatLawyerHasAccessToTheirDocuments(int lawyerId);
 
         Task<List<LegalDocumentDto>> GetDocumentsThatLawyerHasAccessToByUserId(LawyerDocumentAccessDto lawyerDocumentAccessDto);
     }

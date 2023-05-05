@@ -25,6 +25,12 @@ namespace VakilPors.Core.Domain.Entities
 
         public string Description { get; set; }
 
+        public string DocumentCategory { get; set; }
+
+        public int MinimumBudget { get; set; }
+
+        public int MaximumBudget { get; set; }
+
         public virtual ICollection<DocumentAccess> Accesses { get; set; }
     }
 }

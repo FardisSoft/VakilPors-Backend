@@ -78,9 +78,9 @@ namespace VakilPors.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetUsersThatLawyerHasAccessToThairDocuments(int lawyerId)
+        public async Task<IActionResult> GetUsersThatLawyerHasAccessToTheirDocuments(int lawyerId)
         {
-            var result = await _documentService.GetUsersThatLawyerHasAccessToThairDocuments(lawyerId);
+            var result = await _documentService.GetUsersThatLawyerHasAccessToTheirDocuments(lawyerId);
             return Ok(new AppResponse<object>(result, "success"));
         }
 
