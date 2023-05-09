@@ -14,8 +14,8 @@ namespace VakilPors.Core.Contracts.Services
         Task<RateDto> GetRateAsync(int user_id , int lawyer_id);
         Task<List<Rate>> GetAllRatesAsync(int lawyer_id);
         Task AddRateAsync(RateDto rate,int user_id , int lawyer_id);
-        Task UpdateRateAsync(RateDto rate , int user_id, int lawyer_id);
-        Task DeleteRateAsync(int user_id , int lawyer_id);
+        Task UpdateRateAsync(RateDto rate );
+        Task DeleteRateAsync(int rate_id);
         Task<double> CalculateRatingAsync(int laywer_id);
 
 

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,7 @@ using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Rate;
 using VakilPors.Core.Domain.Entities;
+using VakilPors.Core.Exceptions;
 
 namespace VakilPors.Core.Services
 {
@@ -22,35 +24,66 @@ namespace VakilPors.Core.Services
             _appUnitOfWork = appUnitOfWork;
         }
 
-        public Task AddRateAsync(RateDto rate, int user_id, int lawyer_id)
+        public async Task AddRateAsync(RateDto rate, int user_id, int lawyer_id)
         {
-            throw new NotImplementedException();
+            var ratee = await _appUnitOfWork.RateRepo.FindAsync(rate.Id);
+            if (ratee != null)
+            {
+                throw new BadArgumentException("Has rated before!");
+            }
+            var raate  = _mapper.Map<Rate>(rate);
+            raate.UserId = user_id;
+            raate.LawyerId = lawyer_id;
+            await _appUnitOfWork.RateRepo.AddAsync(raate);
+            await _appUnitOfWork.SaveChangesAsync();
         }
 
-        public Task<double> CalculateRatingAsync(int laywer_id)
+        public async Task<double> CalculateRatingAsync(int laywer_id)
         {
-            throw new NotImplementedException();
+            var rates = await GetAllRatesAsync(laywer_id);
+            double avg = 0, count = 0, sum = 0;
+            foreach (var rate in rates) 
+            {
+                sum += rate.RateNum;
+                count++;
+            }
+            avg = sum / count;
+            return avg;
         }
 
-        public Task DeleteRateAsync(int user_id, int lawyer_id)
+        public async Task DeleteRateAsync(int rate_id)
         {
-            throw new NotImplementedException();
+            var rate = await _appUnitOfWork.RateRepo.FindAsync(rate_id);
+            _appUnitOfWork.RateRepo.Remove(rate);
+            await _appUnitOfWork.SaveChangesAsync();
         }
 
-        public Task<List<Rate>> GetAllRatesAsync(int lawyer_id)
+        public async Task<List<Rate>> GetAllRatesAsync(int lawyer_id)
         {
-            throw new NotImplementedException();
+            List<Rate> rates = new List<Rate>();
+            rates = await _appUnitOfWork.RateRepo.AsQueryable().Where(x=> x.LawyerId == lawyer_id).ToListAsync();
+            return rates;
         }
 
-        public Task<RateDto> GetRateAsync(int user_id, int lawyer_id)
+        public async Task<RateDto> GetRateAsync(int user_id, int lawyer_id)
         {
-            throw new NotImplementedException();
-
+            var rate = await _appUnitOfWork.RateRepo.AsQueryable().Where(x => x.UserId == user_id && x.LawyerId == lawyer_id).FirstOrDefaultAsync();
+            var rate_dto = _mapper.Map<RateDto>(rate);
+            return rate_dto;
         }
 
-        public Task UpdateRateAsync(RateDto rate, int user_id, int lawyer_id)
+        public async Task UpdateRateAsync(RateDto rate)
         {
-            throw new NotImplementedException();
+            var ratte = await _appUnitOfWork.RateRepo.FindAsync(rate.Id);
+            if (ratte == null)
+            {
+                throw new BadArgumentException("Rate Not Found");
+            }
+            ratte.Comment = rate.Comment;
+            ratte.RateNum = rate.RateNum;
+            _appUnitOfWork.RateRepo.Update(ratte);
+            await _appUnitOfWork.SaveChangesAsync();
+            
         }
     }
 }
