@@ -31,6 +31,12 @@ public class ThreadService : IThreadService
 
     public async Task<ThreadDto> CreateThread(int userId, ThreadDto threadDto)
     {
+        var anti_spam = new AntiSpamService();
+        var result = await anti_spam.IsSpam(threadDto.Description);
+        if(result == "This message is detected as a spam and can not be shown.")
+        {
+            throw new BadArgumentException(result);
+        }
         var thread = new ForumThread()
         {
             UserId = userId,
@@ -52,6 +58,13 @@ public class ThreadService : IThreadService
 
     public async Task<ThreadDto> UpdateThread(int userId, ThreadDto threadDto)
     {
+        var anti_spam = new AntiSpamService();
+        var result = await anti_spam.IsSpam(threadDto.Description);
+        if (result == "This message is detected as a spam and can not be shown.")
+        {
+            throw new BadArgumentException(result);
+        }
+
         var foundThread = await _uow.ForumThreadRepo.FindAsync(threadDto.Id);
 
         if (foundThread == null)
