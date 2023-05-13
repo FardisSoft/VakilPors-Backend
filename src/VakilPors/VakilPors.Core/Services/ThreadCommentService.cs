@@ -238,6 +238,16 @@ public class ThreadCommentService : IThreadCommentService
 
         return comments > 0;
     }
+
+    public async Task<int> GetThreadAnswerCount(int threadId)
+    {
+        var comments = await _uow.ThreadCommentRepo
+            .AsQueryable()
+            .Where(x => x.ThreadId == threadId && x.IsSetAsAnswer == true)
+            .CountAsync();
+
+        return comments;
+    }
     private async Task<ThreadCommentDto> GetCommentDtoFromComment(int userId, ThreadComment comment)
     {
         var threadCommentDto = new ThreadCommentDto()

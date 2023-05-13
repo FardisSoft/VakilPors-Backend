@@ -191,7 +191,8 @@ public class ThreadService : IThreadService
             CreateDate = thread.CreateDate,
             Description = thread.Description,
             UserId = thread.UserId,
-            LikeCount = thread.LikeCount,
+            LikeCount = thread.LikeCount, 
+            AnswerCount = await _threadCommentService.GetThreadAnswerCount(thread.Id),
             HasAnswer = await _threadCommentService.IsThreadHasAnswer(thread.Id),
             IsCurrentUserLikedThread = await IsThreadLikedByUser(userId, thread.Id),
             User = new ForumUserDto()

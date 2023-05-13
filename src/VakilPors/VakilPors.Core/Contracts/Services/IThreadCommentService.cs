@@ -18,5 +18,6 @@ public interface IThreadCommentService : IScopedDependency
     Task<bool> SetAsAnswer(int userId, int commentId);
     Task<bool> UndoSetAsAnswer(int userId, int commentId);
     Task<bool> IsThreadHasAnswer(int threadId);
+    Task<int> GetThreadAnswerCount(int threadId);
 }
 
