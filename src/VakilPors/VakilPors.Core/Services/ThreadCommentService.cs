@@ -30,6 +30,12 @@ public class ThreadCommentService : IThreadCommentService
 
     public async Task<ThreadCommentDto> CreateComment(int userId, ThreadCommentDto commentDto)
     {
+        var anti_spam = new AntiSpamService();
+        var result = await anti_spam.IsSpam(commentDto.Text);
+        if (result == "This message is detected as a spam and can not be shown.")
+        {
+            throw new BadArgumentException(result);
+        }
         var comment = new ThreadComment()
         {
             UserId = userId,
@@ -51,6 +57,12 @@ public class ThreadCommentService : IThreadCommentService
 
     public async Task<ThreadCommentDto> UpdateComment(int userId, ThreadCommentDto commentDto)
     {
+        var anti_spam = new AntiSpamService();
+        var result = await anti_spam.IsSpam(commentDto.Text);
+        if (result == "This message is detected as a spam and can not be shown.")
+        {
+            throw new BadArgumentException(result);
+        }
         var foundComment = await _uow.ThreadCommentRepo.FindAsync(commentDto.Id);
 
         if (foundComment == null)

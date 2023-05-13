@@ -72,7 +72,7 @@ namespace VakilPors.Core.Services
                 r.user = _mapper.Map<UserDto>(uuser);
                 r.RateNum = rate.RateNum;
                 r.Comment = rate.Comment;
-                _rates.Add(r);
+                _rates.Add(r);  
             }
             if (_rates.Count == 0)
             {
