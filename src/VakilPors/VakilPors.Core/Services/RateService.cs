@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Rate;
+using VakilPors.Core.Domain.Dtos.User;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
 
@@ -40,7 +41,7 @@ namespace VakilPors.Core.Services
 
         public async Task<double> CalculateRatingAsync(int laywer_id)
         {
-            var rates = await GetAllRatesAsync(laywer_id);
+            var rates = await _appUnitOfWork.RateRepo.AsQueryable().Where(x=>x.LawyerId == laywer_id).ToListAsync();
             double avg = 0, count = 0, sum = 0;
             foreach (var rate in rates) 
             {
@@ -58,11 +59,26 @@ namespace VakilPors.Core.Services
             await _appUnitOfWork.SaveChangesAsync();
         }
 
-        public async Task<List<Rate>> GetAllRatesAsync(int lawyer_id)
+        public async Task<List<RateUserDto>> GetAllRatesAsync(int lawyer_id) 
         {
             List<Rate> rates = new List<Rate>();
             rates = await _appUnitOfWork.RateRepo.AsQueryable().Where(x=> x.LawyerId == lawyer_id).ToListAsync();
-            return rates;
+            List<RateUserDto> _rates = new List<RateUserDto>();
+            foreach (var rate in rates) 
+            {
+                RateUserDto r = new RateUserDto();
+                var rate_row = await _appUnitOfWork.RateRepo.FindAsync(rate.Id);
+                var uuser = await _appUnitOfWork.UserRepo.FindAsync(rate_row.UserId);
+                r.user = _mapper.Map<UserDto>(uuser);
+                r.RateNum = rate.RateNum;
+                r.Comment = rate.Comment;
+                _rates.Add(r);
+            }
+            if (_rates.Count == 0)
+            {
+                throw new BadArgumentException("NO RATES FOUND!");
+            }
+            return _rates;
         }
 
         public async Task<RateDto> GetRateAsync(int user_id, int lawyer_id)
@@ -72,9 +88,10 @@ namespace VakilPors.Core.Services
             return rate_dto;
         }
 
-        public async Task UpdateRateAsync(RateDto rate)
+        public async Task UpdateRateAsync(RateDto rate, int user_id, int lawyer_id)
         {
-            var ratte = await _appUnitOfWork.RateRepo.FindAsync(rate.Id);
+            //var ratte = await _appUnitOfWork.RateRepo.FindAsync(rate.Id);
+            var ratte = await _appUnitOfWork.RateRepo.AsQueryable().Where(x=>x.UserId == user_id && x.LawyerId == lawyer_id).FirstOrDefaultAsync();
             if (ratte == null)
             {
                 throw new BadArgumentException("Rate Not Found");
