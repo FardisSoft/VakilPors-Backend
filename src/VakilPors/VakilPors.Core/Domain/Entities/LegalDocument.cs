@@ -21,6 +21,8 @@ namespace VakilPors.Core.Domain.Entities
 
         public string FileUrl { get; set; }
 
+        public string CaseName { get; set; }
+
         public string Title { get; set; }
 
         public string Description { get; set; }

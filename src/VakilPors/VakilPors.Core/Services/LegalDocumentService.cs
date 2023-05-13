@@ -65,6 +65,7 @@ namespace VakilPors.Core.Services
             foundDoc.DocumentCategory = documentDto.DocumentCategory;
             foundDoc.MinimumBudget = documentDto.MinimumBudget;
             foundDoc.MaximumBudget = documentDto.MaximumBudget;
+            foundDoc.CaseName = documentDto.CaseName;  
 
             _uow.DocumentRepo.Update(foundDoc);
 
