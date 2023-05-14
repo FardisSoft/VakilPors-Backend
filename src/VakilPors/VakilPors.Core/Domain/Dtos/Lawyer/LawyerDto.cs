@@ -39,7 +39,7 @@ namespace VakilPors.Core.Domain.Dtos.Lawyer
         public string ProfileBackgroundPictureUrl { get; set; }
         public int NumberOfRates { get; set; }
         public string Gender { get; set; }
-        public int NumbereOfConsulations { get; set; }
+        public int NumberOfConsultations { get; set; }
         public int NumberOfAnswers { get; set; }
         public int NumberOfLikes { get; set; }
         public int NumberOfVerifies { get; set; }

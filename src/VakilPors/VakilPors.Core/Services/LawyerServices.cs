@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Amazon.S3.Transfer;
 using AutoMapper;
 using FuzzySharp;
+using Microsoft.AspNetCore.Mvc.TagHelpers.Cache;
 using Microsoft.EntityFrameworkCore;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
@@ -23,12 +25,19 @@ namespace VakilPors.Core.Services
         private readonly IUserServices _userServices;
         private readonly IMapper _mapper;
         private readonly IAwsFileService _fileService;
-        public LawyerServices(IAppUnitOfWork appUnitOfWork, IMapper mapper, IUserServices userServices, IAwsFileService fileService)
+        private readonly IChatServices _chatServices;
+        public LawyerServices(
+            IAppUnitOfWork appUnitOfWork, 
+            IMapper mapper, 
+            IUserServices userServices, 
+            IAwsFileService fileService, 
+            IChatServices chatServices)
         {
             _appUnitOfWork = appUnitOfWork;
             _mapper = mapper;
             _userServices = userServices;
             _fileService = fileService;
+            _chatServices = chatServices;
         }
         public async Task<IPagedList<Lawyer>> GetLawyers(PagedParams pagedParams, FilterParams filterParams)
         {
@@ -91,7 +100,7 @@ namespace VakilPors.Core.Services
             if(lawyerDto.User != null && lawyerDto.User.Id > 0)
                 await _userServices.UpdateUser(lawyerDto.User);
 
-            return _mapper.Map<LawyerDto>(foundLawyer);
+            return await GetLawyerDtoFormLawyer(foundLawyer);
         }
 
         public async Task<List<LawyerDto>> GetAllLawyers()
@@ -99,10 +108,13 @@ namespace VakilPors.Core.Services
             var lawyers = await _appUnitOfWork.LawyerRepo
                 .AsQueryable()
                 .Include(x => x.User)
-                .Select(x => _mapper.Map<LawyerDto>(x))
                 .ToListAsync();
 
-            return lawyers;
+            var lawyerDtos = new List<LawyerDto>();
+            foreach (var lawyer in lawyers)
+                lawyerDtos.Add(await GetLawyerDtoFormLawyer(lawyer));
+
+            return lawyerDtos;
         }
             
 
@@ -116,7 +128,7 @@ namespace VakilPors.Core.Services
             if (lawyer == null)
                 throw new BadArgumentException("Lawyer Not Found");
 
-            return _mapper.Map<LawyerDto>(lawyer);
+            return await GetLawyerDtoFormLawyer(lawyer);
         }
 
         public async Task<LawyerDto> GetLawyerByUserId(int userId)
@@ -129,7 +141,7 @@ namespace VakilPors.Core.Services
             if (lawyer == null)
                 throw new BadArgumentException("Lawyer Not Found");
 
-            return _mapper.Map<LawyerDto>(lawyer);
+            return await GetLawyerDtoFormLawyer(lawyer);
         }
 
         public async Task<bool> IsLawyer(int userId)
@@ -142,33 +154,45 @@ namespace VakilPors.Core.Services
             return lawyer != null;
         }
 
-        //private LawyerDto ReplaceFileCodeWithUrl(LawyerDto lawyerDto)
-        //{
-        //    if (lawyerDto.CallingCardImageUrl != null)
-        //        lawyerDto.CallingCardImageUrl = _fileService.GetFileUrl(lawyerDto.CallingCardImageUrl);
 
-        //    if (lawyerDto.ProfileBackgroundPictureUrl != null)
-        //        lawyerDto.ProfileBackgroundPictureUrl = _fileService.GetFileUrl(lawyerDto.ProfileBackgroundPictureUrl);
+        private async Task<LawyerDto> GetLawyerDtoFormLawyer(Lawyer lawyer)
+        {
+            var lawyerDto = _mapper.Map<LawyerDto>(lawyer);
 
-        //    if (lawyerDto.ResumeLink != null)
-        //        lawyerDto.ResumeLink = _fileService.GetFileUrl(lawyerDto.ResumeLink);
+            lawyerDto.NumberOfVerifies = await _appUnitOfWork.ThreadCommentRepo
+                .AsQueryable()
+                .Where(x => x.IsSetAsAnswer == true && x.UserId == lawyer.UserId)
+                .CountAsync();
 
-        //    return lawyerDto;
-        //}
+            lawyerDto.NumberOfAnswers = await _appUnitOfWork.ThreadCommentRepo
+                .AsQueryable()
+                .Where(x => x.UserId == lawyer.UserId)
+                .CountAsync();
 
-        //private Lawyer ReplaceFileCodeWithUrl(Lawyer lawyer)
-        //{
-        //    if (lawyer.CallingCardImageUrl != null)
-        //        lawyer.CallingCardImageUrl = _fileService.GetFileUrl(lawyer.CallingCardImageUrl);
+            var commentLikes = await _appUnitOfWork.ThreadCommentRepo
+                .AsQueryable()
+                .Where(x => x.UserId == lawyer.UserId)
+                .Select(x => x.LikeCount)
+                .SumAsync();
 
-        //    if (lawyer.ProfileBackgroundPictureUrl != null)
-        //        lawyer.ProfileBackgroundPictureUrl = _fileService.GetFileUrl(lawyer.ProfileBackgroundPictureUrl);
+            var threadLikes = await _appUnitOfWork.ThreadCommentRepo
+                .AsQueryable()
+                .Where(x => x.UserId == lawyer.UserId)
+                .Include(x => x.Thread)
+                .Select(x => x.Thread)
+                .Distinct()
+                .Select(t => t.LikeCount)
+                .SumAsync();
 
-        //    if (lawyer.ResumeLink != null)
-        //        lawyer.ResumeLink = _fileService.GetFileUrl(lawyer.ResumeLink);
+            lawyerDto.NumberOfLikes = commentLikes + threadLikes;
 
-        //    return lawyer;
-        //}
+
+            var chats = await _chatServices.GetChatsOfUser(lawyer.UserId);
+            lawyerDto.NumberOfConsultations = chats.Count;
+
+
+            return lawyerDto;
+        }
 
     }
 }
