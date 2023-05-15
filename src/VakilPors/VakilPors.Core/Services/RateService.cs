@@ -37,16 +37,16 @@ namespace VakilPors.Core.Services
             raate.LawyerId = lawyer_id;
             await _appUnitOfWork.RateRepo.AddAsync(raate);
             var lawyer = _appUnitOfWork.LawyerRepo.AsQueryable().Where(x => x.Id == lawyer_id).FirstOrDefault();
-            lawyer.NumberOfRates += 1;
             if(lawyer.Rating == 0)
             {
                 lawyer.Rating += rate.RateNum;
             }
             else
             {
-                var avg = ((lawyer.NumberOfRates * lawyer.Rating) + rate.RateNum) / lawyer.NumberOfRates;
+                var avg = ((lawyer.NumberOfRates * lawyer.Rating) + rate.RateNum) / (lawyer.NumberOfRates + 1);
                 lawyer.Rating = avg;
             }
+            lawyer.NumberOfRates += 1;
             await _appUnitOfWork.SaveChangesAsync();
         }
 
