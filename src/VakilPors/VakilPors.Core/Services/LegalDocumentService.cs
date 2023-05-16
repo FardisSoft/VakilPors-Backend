@@ -33,6 +33,9 @@ namespace VakilPors.Core.Services
 
         public async Task<LegalDocumentDto> AddDocument(int userId, LegalDocumentDto documentDto)
         {
+            if(await _lawyerServices.IsLawyer(userId))
+                throw new BadArgumentException("Lawyers can not have document");
+
             documentDto.UserId = userId;
 
             if (documentDto.File != null)
