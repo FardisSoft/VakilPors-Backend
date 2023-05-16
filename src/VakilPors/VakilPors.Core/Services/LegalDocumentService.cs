@@ -23,9 +23,9 @@ namespace VakilPors.Core.Services
         private readonly ILawyerServices _lawyerServices;
         private readonly IMapper _mapper;
 
-        public LegalDocumentService(ILawyerServices awyerServices, IAwsFileService fileService, IAppUnitOfWork uow, IMapper mapper)
+        public LegalDocumentService(ILawyerServices lawyerServices, IAwsFileService fileService, IAppUnitOfWork uow, IMapper mapper)
         {
-            _lawyerServices = awyerServices;
+            _lawyerServices = lawyerServices;
             _fileService = fileService;
             _uow = uow;
             _mapper = mapper;
@@ -33,6 +33,9 @@ namespace VakilPors.Core.Services
 
         public async Task<LegalDocumentDto> AddDocument(int userId, LegalDocumentDto documentDto)
         {
+            if(await _lawyerServices.IsLawyer(userId))
+                throw new BadArgumentException("Lawyers can not have document");
+
             documentDto.UserId = userId;
 
             if (documentDto.File != null)
@@ -62,6 +65,10 @@ namespace VakilPors.Core.Services
             foundDoc.Description = documentDto.Description;
             foundDoc.Title = documentDto.Title;
             foundDoc.FileUrl = documentDto.FileUrl;
+            foundDoc.DocumentCategory = documentDto.DocumentCategory;
+            foundDoc.MinimumBudget = documentDto.MinimumBudget;
+            foundDoc.MaximumBudget = documentDto.MaximumBudget;
+            foundDoc.CaseName = documentDto.CaseName;  
 
             _uow.DocumentRepo.Update(foundDoc);
 
@@ -170,7 +177,7 @@ namespace VakilPors.Core.Services
             return lawyers;
         }
 
-        public async Task<List<UserDto>> GetUsersThatLawyerHasAccessToThairDocuments(int lawyerId)
+        public async Task<List<UserDto>> GetUsersThatLawyerHasAccessToTheirDocuments(int lawyerId)
         {
             var users = await _uow.DocumentRepo
                 .AsQueryable()

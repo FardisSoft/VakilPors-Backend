@@ -9,30 +9,20 @@ using VakilPors.Shared.Entities;
 
 namespace VakilPors.Core.Domain.Entities
 {
-    public class LegalDocument : IEntity
+    public class Rate :IEntity
     {
         [Key]
         public int Id { get; set; }
-
+        [Required]
+        public string Comment { get; set; }
+        [Required]
+        public double RateNum { get; set; }
         public int UserId { get; set; }
-
         [ForeignKey(nameof(UserId))]
         public User User { get; set; }
+        public int LawyerId { get; set; }
+        [ForeignKey(nameof(LawyerId))]
+        public Lawyer Lawyer { get; set; }
 
-        public string FileUrl { get; set; }
-
-        public string CaseName { get; set; }
-
-        public string Title { get; set; }
-
-        public string Description { get; set; }
-
-        public string DocumentCategory { get; set; }
-
-        public int MinimumBudget { get; set; }
-
-        public int MaximumBudget { get; set; }
-
-        public virtual ICollection<DocumentAccess> Accesses { get; set; }
     }
 }

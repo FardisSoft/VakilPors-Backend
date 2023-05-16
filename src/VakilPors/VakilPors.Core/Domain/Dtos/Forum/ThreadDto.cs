@@ -25,6 +25,8 @@ public class ThreadDto
 
     public bool HasAnswer { get; set; }
 
+    public int AnswerCount { get; set; }
+
     public bool IsCurrentUserLikedThread { get; set; }
 
     public ForumUserDto User { get; set; }

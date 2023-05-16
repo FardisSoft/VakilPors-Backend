@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using VakilPors.Data.Context;
@@ -12,9 +13,10 @@ using VakilPors.Data.Context;
 namespace VakilPors.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230508122553_Rating")]
+    partial class Rating
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -183,9 +185,6 @@ namespace VakilPors.Data.Migrations
                     b.Property<string>("Message")
                         .HasColumnType("text");
 
-                    b.Property<int?>("ReplyId")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("SendTime")
                         .HasColumnType("timestamp with time zone");
 
@@ -195,8 +194,6 @@ namespace VakilPors.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ChatId");
-
-                    b.HasIndex("ReplyId");
 
                     b.HasIndex("SenderId");
 
@@ -359,9 +356,6 @@ namespace VakilPors.Data.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CaseName")
-                        .HasColumnType("text");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -835,10 +829,6 @@ namespace VakilPors.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("VakilPors.Core.Domain.Entities.ChatMessage", "ReplyMessage")
-                        .WithMany()
-                        .HasForeignKey("ReplyId");
-
                     b.HasOne("VakilPors.Core.Domain.Entities.User", "Sender")
                         .WithMany("Messages")
                         .HasForeignKey("SenderId")
@@ -846,8 +836,6 @@ namespace VakilPors.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Chat");
-
-                    b.Navigation("ReplyMessage");
 
                     b.Navigation("Sender");
                 });

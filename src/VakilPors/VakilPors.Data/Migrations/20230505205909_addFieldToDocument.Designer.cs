@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using VakilPors.Data.Context;
@@ -12,9 +13,10 @@ using VakilPors.Data.Context;
 namespace VakilPors.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230505205909_addFieldToDocument")]
+    partial class addFieldToDocument
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -183,9 +185,6 @@ namespace VakilPors.Data.Migrations
                     b.Property<string>("Message")
                         .HasColumnType("text");
 
-                    b.Property<int?>("ReplyId")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("SendTime")
                         .HasColumnType("timestamp with time zone");
 
@@ -195,8 +194,6 @@ namespace VakilPors.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ChatId");
-
-                    b.HasIndex("ReplyId");
 
                     b.HasIndex("SenderId");
 
@@ -360,9 +357,6 @@ namespace VakilPors.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CaseName")
-                        .HasColumnType("text");
-
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
@@ -427,36 +421,6 @@ namespace VakilPors.Data.Migrations
                             Id = 4,
                             ServiceType = 3
                         });
-                });
-
-            modelBuilder.Entity("VakilPors.Core.Domain.Entities.Rate", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Comment")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("LawyerId")
-                        .HasColumnType("integer");
-
-                    b.Property<double>("RateNum")
-                        .HasColumnType("double precision");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LawyerId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Rate");
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.Role", b =>
@@ -835,10 +799,6 @@ namespace VakilPors.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("VakilPors.Core.Domain.Entities.ChatMessage", "ReplyMessage")
-                        .WithMany()
-                        .HasForeignKey("ReplyId");
-
                     b.HasOne("VakilPors.Core.Domain.Entities.User", "Sender")
                         .WithMany("Messages")
                         .HasForeignKey("SenderId")
@@ -846,8 +806,6 @@ namespace VakilPors.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Chat");
-
-                    b.Navigation("ReplyMessage");
 
                     b.Navigation("Sender");
                 });
@@ -900,25 +858,6 @@ namespace VakilPors.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("VakilPors.Core.Domain.Entities.Rate", b =>
-                {
-                    b.HasOne("VakilPors.Core.Domain.Entities.Lawyer", "Lawyer")
-                        .WithMany()
-                        .HasForeignKey("LawyerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("VakilPors.Core.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Lawyer");
 
                     b.Navigation("User");
                 });
