@@ -1,10 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Statistics;
+using VakilPors.Core.Domain.Entities;
 
 namespace VakilPors.Web.Controllers;
 
+[Authorize(Roles = RoleNames.Admin)]
 [ApiController]
 [Route("[controller]/[action]")]
 public class StatisticsController : ControllerBase
