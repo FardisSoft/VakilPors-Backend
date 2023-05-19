@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -27,10 +28,12 @@ public class AuthServices : IAuthServices
     private User _user;
     private readonly ISMSSender smsSender;
     private readonly IAppUnitOfWork appUnitOfWork;
+    private readonly IEmailSender emailSender;
 
-    public AuthServices(IMapper mapper, UserManager<User> userManager, IConfiguration configuration, ILogger<AuthServices> logger, ISMSSender smsSender, IAppUnitOfWork appUnitOfWork)
+    public AuthServices(IMapper mapper, UserManager<User> userManager, IConfiguration configuration, ILogger<AuthServices> logger, ISMSSender smsSender, IAppUnitOfWork appUnitOfWork, IEmailSender emailSender)
     {
         this.appUnitOfWork = appUnitOfWork;
+        this.emailSender = emailSender;
         this.smsSender = smsSender;
         this._mapper = mapper;
         this._userManager = userManager;
@@ -200,18 +203,34 @@ public class AuthServices : IAuthServices
     }
     public async Task CreateAndSendForgetPasswordToken(ForgetPasswordDto forgetPasswordDto)
     {
-        var _user = await _userManager.FindByNameAsync(forgetPasswordDto.PhoneNumber);
+        User _user;
+
+        if (forgetPasswordDto.useSms)
+        {
+            _user = await _userManager.FindByNameAsync(forgetPasswordDto.PhoneNumber);
+        }
+        else
+        {
+            _user = await _userManager.FindByEmailAsync(forgetPasswordDto.Email);
+        }
+
         if (_user == null)
         {
-            throw new NotFoundException("no user found with this phone number");
+            throw new NotFoundException("no user found with this phoneNumber/Email.");
         }
         //generating token 
         var code = RandomEngine.Next(100000, 1000000).ToString();
-        _logger.LogInformation($"forget password code:{code} generated for user with phone number:{forgetPasswordDto.PhoneNumber}");
+        if (forgetPasswordDto.useSms)
+            _logger.LogInformation($"forget password code:{code} generated for user with phone number:{forgetPasswordDto.PhoneNumber}");
+        else
+            _logger.LogInformation($"forget password code:{code} generated for user with email:{forgetPasswordDto.Email}");
         _user.ForgetPasswordCode = code;
         await _userManager.UpdateAsync(_user);
 
-        await smsSender.SendSmsAsync(forgetPasswordDto.PhoneNumber, $"کد بازیابی رمز عبور شما: {code} است");
+        if (forgetPasswordDto.useSms)
+            await smsSender.SendSmsAsync(forgetPasswordDto.PhoneNumber, $"کد بازیابی رمز عبور شما: {code} است");
+        else
+            await emailSender.SendEmailAsync(forgetPasswordDto.Email, _user.Name, "فراموشی رمز عبور", $"کد بازیابی رمز عبور شما: {code} است");
     }
 
     public async Task ResetPassword(ResetPasswordDto resetPasswordDto)

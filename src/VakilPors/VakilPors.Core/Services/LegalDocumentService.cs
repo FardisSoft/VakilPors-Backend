@@ -22,18 +22,20 @@ namespace VakilPors.Core.Services
         private readonly IAwsFileService _fileService;
         private readonly ILawyerServices _lawyerServices;
         private readonly IMapper _mapper;
+        private readonly IEmailSender emailSender;
 
-        public LegalDocumentService(ILawyerServices lawyerServices, IAwsFileService fileService, IAppUnitOfWork uow, IMapper mapper)
+        public LegalDocumentService(ILawyerServices lawyerServices, IAwsFileService fileService, IAppUnitOfWork uow, IMapper mapper, IEmailSender emailSender)
         {
             _lawyerServices = lawyerServices;
             _fileService = fileService;
             _uow = uow;
             _mapper = mapper;
+            this.emailSender = emailSender;
         }
 
         public async Task<LegalDocumentDto> AddDocument(int userId, LegalDocumentDto documentDto)
         {
-            if(await _lawyerServices.IsLawyer(userId))
+            if (await _lawyerServices.IsLawyer(userId))
                 throw new BadArgumentException("Lawyers can not have document");
 
             documentDto.UserId = userId;
@@ -68,7 +70,7 @@ namespace VakilPors.Core.Services
             foundDoc.DocumentCategory = documentDto.DocumentCategory;
             foundDoc.MinimumBudget = documentDto.MinimumBudget;
             foundDoc.MaximumBudget = documentDto.MaximumBudget;
-            foundDoc.CaseName = documentDto.CaseName;  
+            foundDoc.CaseName = documentDto.CaseName;
 
             _uow.DocumentRepo.Update(foundDoc);
 
@@ -104,7 +106,7 @@ namespace VakilPors.Core.Services
                 .Select(x => _mapper.Map<LegalDocumentDto>(x))
                 .FirstOrDefaultAsync();
 
-            if(doc == null)
+            if (doc == null)
                 throw new BadArgumentException("document not found");
 
             return doc;
@@ -124,7 +126,7 @@ namespace VakilPors.Core.Services
         public async Task<bool> GrantAccessToLawyer(DocumentAccessDto documentAccessDto)
         {
             var doc = await GetDocumentWithAccesses(documentAccessDto.DocumentId);
-            var lawyer = await _lawyerServices.GetLawyerById(documentAccessDto.LawyerId);
+            var lawyer = await _uow.LawyerRepo.AsQueryable().Include(l => l.User).FirstOrDefaultAsync(l => l.Id == documentAccessDto.LawyerId);
 
             var access = doc.Accesses.FirstOrDefault(a => a.DocumentId == doc.Id && a.LawyerId == lawyer.Id);
 
@@ -139,7 +141,10 @@ namespace VakilPors.Core.Services
             if (result <= 0)
                 throw new Exception();
 
-            return true; 
+            await emailSender.SendEmailAsync(lawyer.User.Email, lawyer.User.Name, "اختصاص وکیل به پرونده", $"شما به پرونده با عنوان {doc.Title} اختصاص یافت.");
+            await emailSender.SendEmailAsync(doc.User.Email, doc.User.Name, "اختصاص وکیل به پرونده", $"وکیل با نام {lawyer.User.Name} به پرونده با عنوان {doc.Title} اختصاص یافت.");
+
+            return true;
 
         }
 
@@ -171,8 +176,8 @@ namespace VakilPors.Core.Services
 
             List<LawyerDto> lawyers = new();
 
-            foreach(int lawyerId in lawyerIdList)
-                lawyers.Add( await _lawyerServices.GetLawyerById(lawyerId));
+            foreach (int lawyerId in lawyerIdList)
+                lawyers.Add(await _lawyerServices.GetLawyerById(lawyerId));
 
             return lawyers;
         }
@@ -203,7 +208,7 @@ namespace VakilPors.Core.Services
         }
 
 
-        private async Task<LegalDocument> GetDocumentWithAccesses(int documentId) 
+        private async Task<LegalDocument> GetDocumentWithAccesses(int documentId)
         {
             var doc = await _uow.DocumentRepo
                 .AsQueryable()
