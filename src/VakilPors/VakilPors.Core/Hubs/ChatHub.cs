@@ -29,14 +29,7 @@ namespace VakilPors.Core.Hubs
         }
         public override Task OnDisconnectedAsync(Exception exception)
         {
-            if (exception is not null)
-            {
-                logger.LogWarning($"user with id:{getUserId()} disconnected with connection id:{Context.ConnectionId} with exception message:{exception.Message}");
-            }
-            else
-            {
-                logger.LogInformation($"user with id:{getUserId()} disconnected with connection id:{Context.ConnectionId}");
-            }
+            logger.LogInformation($"user with id:{getUserId()} disconnected with connection id:{Context.ConnectionId}");
             return base.OnDisconnectedAsync(exception);
         }
         public async Task SendMessage(ChatMessage message)

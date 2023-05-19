@@ -30,7 +30,7 @@ namespace VakilPors.Data.Seeder
         {
             const int seed = 4;
             List<Premium> plans = new List<Premium>();
-            for (int i = 0; i < seed ; i++)
+            for (int i = 0; i < seed; i++)
             {
                 plans.Add(new Premium() { Id = i + 1, ServiceType = (Plan)i });
             }
@@ -59,20 +59,20 @@ namespace VakilPors.Data.Seeder
             }
             modelBuilder.Entity<Role>().HasData(roles);
         }
-        public const int countUsers=30;
-        public const int countTrans=200;
-        public const int startUserId=100;
+        public const int countUsers = 30;
+        public const int countTrans = 200;
+        public const int startUserId = 100;
         public static IEnumerable<Tranaction> seedTransactions()
         {
             Randomizer.Seed = new Random(seed);
             var fakerTrans = new Faker<Tranaction>()
-            .RuleFor(t=>t.Amount,f=>f.Random.Decimal()*f.Random.Int(1000,1000_000))
-            .RuleFor(t=>t.Description,f=>f.Lorem.Paragraph())
-            .RuleFor(t=>t.IsIncome,f=>f.Random.Bool())
-            .RuleFor(t=>t.IsSuccess,f=>f.Random.Bool())
-            .RuleFor(t=>t.UserId,f=>f.Random.Int(startUserId,startUserId+ countUsers-1));
+            .RuleFor(t => t.Amount, f => f.Random.Decimal() * f.Random.Int(1000, 1000_000))
+            .RuleFor(t => t.Description, f => f.Lorem.Paragraph())
+            .RuleFor(t => t.IsIncome, f => f.Random.Bool())
+            .RuleFor(t => t.IsSuccess, f => f.Random.Bool())
+            .RuleFor(t => t.UserId, f => f.Random.Int(startUserId, startUserId + countUsers - 1));
 
-            var fakeData=fakerTrans.GenerateLazy(countTrans);
+            var fakeData = fakerTrans.GenerateLazy(countTrans);
             return fakeData;
             // modelBuilder.Entity<Role>().HasData(roles);
         }
@@ -80,7 +80,7 @@ namespace VakilPors.Data.Seeder
         {
             Randomizer.Seed = new Random(seed);
             int uid = startUserId;
-            int countUserslocal=countUsers/3;
+            int countUserslocal = countUsers / 3;
             // long phoneNumber=09116863557;
             const int startSubscribedId = 1;
             int subscribedId = startSubscribedId;
@@ -96,19 +96,19 @@ namespace VakilPors.Data.Seeder
                 .RuleFor(u => u.ID, f => subscribedId++)
                 .RuleFor(u => u.UserId, f => uid++)
                 .RuleFor(u => u.PremiumID, f => 1);
-                
+
             var users = fakerUser.Generate(countUserslocal);
             subscribedId = startSubscribedId;
             uid = startUserId;
             var subscribes = fakerSubscribed.Generate(countUserslocal);
-            const string password="Password123";
-            int userRoleId=RoleNames.GetAll().ToList().IndexOf(RoleNames.User)+1;
-            int vakilRoleId=RoleNames.GetAll().ToList().IndexOf(RoleNames.Vakil)+1;
+            const string password = "Password123";
+            int userRoleId = RoleNames.GetAll().ToList().IndexOf(RoleNames.User) + 1;
+            int vakilRoleId = RoleNames.GetAll().ToList().IndexOf(RoleNames.Vakil) + 1;
             // var ids=new List<int>();
-            PasswordHasher<User> hasher=new PasswordHasher<User>();
+            PasswordHasher<User> hasher = new PasswordHasher<User>();
             for (int i = 0; i < users.Count; i++)
             {
-                users[i].PasswordHash= hasher.HashPassword(users[i],password);
+                users[i].PasswordHash = hasher.HashPassword(users[i], password);
                 // modelBuilder.Entity<User>().HasData(users[i]);
                 // modelBuilder.Entity<IdentityUserRole<int>>().HasData(new IdentityUserRole<int>(){
                 //     UserId=users[i].Id,
@@ -117,20 +117,21 @@ namespace VakilPors.Data.Seeder
                 await context.Users.AddAsync(users[i]);
                 await context.Set<Subscribed>().AddAsync(subscribes[i]);
                 await context.SaveChangesAsync();
-                await context.UserRoles.AddAsync(new IdentityUserRole<int>(){
-                    RoleId=userRoleId,
-                    UserId=users[i].Id
+                await context.UserRoles.AddAsync(new IdentityUserRole<int>()
+                {
+                    RoleId = userRoleId,
+                    UserId = users[i].Id
                 });
                 await context.SaveChangesAsync();
                 // userManager.CreateAsync(users[i], password).Wait();
                 // users[i]=await context.Set<User>().FirstOrDefaultAsync(u=>u.UserName==users[i].UserName);
                 // userManager.AddToRoleAsync(users[i], RoleNames.Vakil).Wait();
             }
-            var ids=users.Select(u=>u.Id).ToList();
-            users=fakerUser.Generate(2*countUserslocal);
+            var ids = users.Select(u => u.Id).ToList();
+            users = fakerUser.Generate(2 * countUserslocal);
             for (int i = 0; i < users.Count; i++)
             {
-                users[i].PasswordHash= hasher.HashPassword(users[i],password);
+                users[i].PasswordHash = hasher.HashPassword(users[i], password);
                 // modelBuilder.Entity<User>().HasData(users[i]);
                 // modelBuilder.Entity<IdentityUserRole<int>>().HasData(new IdentityUserRole<int>(){
                 //     UserId=users[i].Id,
@@ -138,9 +139,10 @@ namespace VakilPors.Data.Seeder
                 // });
                 await context.Users.AddAsync(users[i]);
                 await context.SaveChangesAsync();
-                await context.UserRoles.AddAsync(new IdentityUserRole<int>(){
-                    RoleId=vakilRoleId,
-                    UserId=users[i].Id
+                await context.UserRoles.AddAsync(new IdentityUserRole<int>()
+                {
+                    RoleId = vakilRoleId,
+                    UserId = users[i].Id
                 });
                 await context.SaveChangesAsync();
                 // userManager.CreateAsync(users[i], password).Wait();
@@ -154,13 +156,13 @@ namespace VakilPors.Data.Seeder
                 .RuleFor(l => l.UserId, f => ids[vid_index++])
                 .RuleFor(l => l.ParvandeNo, f => f.Random.Int(10000, 99999).ToString());
 
-            var lawyers=fakerLawyer.Generate(countUserslocal);
+            var lawyers = fakerLawyer.Generate(countUserslocal);
             await context.Set<Lawyer>().AddRangeAsync(lawyers);
             await context.SaveChangesAsync();
             foreach (var lawyer in lawyers)
             {
-                var user=await context.Users.FindAsync(lawyer.UserId);
-                user.LawyerId=lawyer.Id;
+                var user = await context.Users.FindAsync(lawyer.UserId);
+                user.LawyerId = lawyer.Id;
                 context.Update(user);
             }
             await context.SaveChangesAsync();
