@@ -7,7 +7,9 @@ public class Visitor : IEntity
 {
     [Key]
     public int Id { get; set; }
+    [Required]
     public string UserGUID { get; set; }
+    [Required]
     public string IPv4 { get; set; }
     public DateTime visitTime { get; set; } = DateTime.Now;
 }
