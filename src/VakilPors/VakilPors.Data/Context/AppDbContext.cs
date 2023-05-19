@@ -17,7 +17,7 @@ public class AppDbContext : IdentityDbContext<User, Role, int>
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        
+
 
         modelBuilder.Entity<User>().HasIndex(user => user.UserName).IsUnique();
         modelBuilder.Entity<User>()
@@ -55,6 +55,10 @@ public class AppDbContext : IdentityDbContext<User, Role, int>
             .HasOne(x => x.Document)
             .WithMany(d => d.Accesses)
             .HasForeignKey(x => x.DocumentId);
+
+        modelBuilder.Entity<Visitor>()
+            .HasIndex(v => v.UserGUID)
+            .IsUnique();
 
         base.OnModelCreating(modelBuilder);
 
