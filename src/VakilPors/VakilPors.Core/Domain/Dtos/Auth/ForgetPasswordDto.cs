@@ -9,7 +9,8 @@ namespace VakilPors.Core.Domain.Dtos
 {
     public record ForgetPasswordDto
     {
-        [Required]
         public string PhoneNumber { get; set; }
+        public string Email { get; set; }
+        public bool useSms { get; set; } = true;
     }
 }

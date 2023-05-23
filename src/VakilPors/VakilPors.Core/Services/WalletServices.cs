@@ -17,11 +17,13 @@ namespace VakilPors.Core.Services
     {
         private readonly UserManager<User> userManager;
         private readonly IAppUnitOfWork appUnitOfWork;
+        private readonly IEmailSender emailSender;
 
-        public WalletServices(UserManager<User> userManager, IAppUnitOfWork appUnitOfWork)
+        public WalletServices(UserManager<User> userManager, IAppUnitOfWork appUnitOfWork, IEmailSender emailSender)
         {
             this.userManager = userManager;
             this.appUnitOfWork = appUnitOfWork;
+            this.emailSender = emailSender;
         }
         public async Task AddBalance(string phoneNumber, decimal amount)
         {
@@ -62,6 +64,15 @@ namespace VakilPors.Core.Services
             await appUnitOfWork.SaveChangesAsync();
             if (isSuccess)
                 await AddBalance(userId, (isIncome ? amount : -amount));
+            string body = $@"
+            تراکنش شما در تاریخ {DateTime.Now} ثبت شد.
+            مبلغ:{amount}
+            توضیحات:{description}
+            کد تراکنش:{authority}
+            تراکنش موفقیت آمیز بود:{isSuccess}
+            ";
+            var user = await getUser(userId);
+            await emailSender.SendEmailAsync(user.Email, user.Name, "تراکنش", body);
         }
         public async Task ApproveTransaction(int tranactionId)
         {
@@ -77,13 +88,13 @@ namespace VakilPors.Core.Services
         }
         public async Task ApplyTransaction(int tranactionId)
         {
-            var transaction = await appUnitOfWork.TransactionRepo.AsQueryable().Include(t=>t.User).FirstOrDefaultAsync(t=>t.Id==tranactionId);
-            var user=transaction.User;
-            if (!transaction.IsSuccess || (!transaction.IsIncome && user.Balance<transaction.Amount))
+            var transaction = await appUnitOfWork.TransactionRepo.AsQueryable().Include(t => t.User).FirstOrDefaultAsync(t => t.Id == tranactionId);
+            var user = transaction.User;
+            if (!transaction.IsSuccess || (!transaction.IsIncome && user.Balance < transaction.Amount))
             {
                 return;
             }
-            var amount=(transaction.IsIncome ? transaction.Amount : -transaction.Amount);
+            var amount = (transaction.IsIncome ? transaction.Amount : -transaction.Amount);
             user.Balance += amount;
             appUnitOfWork.UserRepo.Update(user);
             await appUnitOfWork.SaveChangesAsync();
