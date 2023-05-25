@@ -21,6 +21,7 @@ public class StatisticsController : ControllerBase
         this.logger = logger;
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public async Task<string> AddVisit()
     {
