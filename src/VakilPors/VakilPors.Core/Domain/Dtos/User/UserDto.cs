@@ -24,8 +24,7 @@ namespace VakilPors.Core.Domain.Dtos.User
 
         public IFormFile ProfileImage { get; set; }
         public string ProfileImageUrl { get; set; }
+        public long ChatId { get; set; }
 
-        //public ICollection<TranactionDto> Tranactions { get; set; }
-        //public SubscribedDto Subscribed { get; set; }
     }
 }
