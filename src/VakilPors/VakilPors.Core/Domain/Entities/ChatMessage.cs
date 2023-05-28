@@ -10,6 +10,7 @@ public class ChatMessage : IEntity
     public int Id { get; set; }
     public string Message { get; set; }
     public bool IsFile { get; set; } = false;
+    public bool IsCall { get; set; } = false;
     public bool IsDeleted { get; set; } = false;
     public bool IsEdited { get; set; } = false;
     public bool IsRead { get; set; } = false;
