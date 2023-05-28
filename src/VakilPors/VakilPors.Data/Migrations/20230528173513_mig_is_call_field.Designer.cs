@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using VakilPors.Data.Context;
@@ -12,9 +13,10 @@ using VakilPors.Data.Context;
 namespace VakilPors.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230528173513_mig_is_call_field")]
+    partial class mig_is_call_field
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -762,33 +764,6 @@ namespace VakilPors.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserThreadLike");
-                });
-
-            modelBuilder.Entity("VakilPors.Core.Domain.Entities.Visitor", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("IPv4")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserGUID")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("visitTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserGUID")
-                        .IsUnique();
-
-                    b.ToTable("Visitor");
                 });
 
             modelBuilder.Entity("ChatUser", b =>
