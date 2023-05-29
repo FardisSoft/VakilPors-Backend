@@ -35,7 +35,7 @@ namespace VakilPors.Data.Migrations
 
                     b.HasIndex("UsersId");
 
-                    b.ToTable("ChatUser");
+                    b.ToTable("ChatUser", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -154,7 +154,7 @@ namespace VakilPors.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Chat");
+                    b.ToTable("Chat", (string)null);
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.ChatMessage", b =>
@@ -200,7 +200,7 @@ namespace VakilPors.Data.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("ChatMessage");
+                    b.ToTable("ChatMessage", (string)null);
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.DocumentAccess", b =>
@@ -223,7 +223,7 @@ namespace VakilPors.Data.Migrations
 
                     b.HasIndex("LawyerId");
 
-                    b.ToTable("DocumentAccess");
+                    b.ToTable("DocumentAccess", (string)null);
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.ForumThread", b =>
@@ -257,7 +257,7 @@ namespace VakilPors.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ForumThread");
+                    b.ToTable("ForumThread", (string)null);
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.Lawyer", b =>
@@ -349,7 +349,7 @@ namespace VakilPors.Data.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Lawyer");
+                    b.ToTable("Lawyer", (string)null);
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.LegalDocument", b =>
@@ -388,7 +388,7 @@ namespace VakilPors.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("LegalDocument");
+                    b.ToTable("LegalDocument", (string)null);
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.Premium", b =>
@@ -404,7 +404,7 @@ namespace VakilPors.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Premium");
+                    b.ToTable("Premium", (string)null);
 
                     b.HasData(
                         new
@@ -456,7 +456,7 @@ namespace VakilPors.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Rate");
+                    b.ToTable("Rate", (string)null);
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.Role", b =>
@@ -535,7 +535,7 @@ namespace VakilPors.Data.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Subscribed");
+                    b.ToTable("Subscribed", (string)null);
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.ThreadComment", b =>
@@ -571,7 +571,7 @@ namespace VakilPors.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ThreadComment");
+                    b.ToTable("ThreadComment", (string)null);
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.Tranaction", b =>
@@ -607,7 +607,7 @@ namespace VakilPors.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Tranaction");
+                    b.ToTable("Tranaction", (string)null);
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.User", b =>
@@ -629,9 +629,6 @@ namespace VakilPors.Data.Migrations
 
                     b.Property<string>("Bio")
                         .HasColumnType("text");
-
-                    b.Property<long>("ChatId")
-                        .HasColumnType("bigint");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -738,7 +735,7 @@ namespace VakilPors.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserCommentLike");
+                    b.ToTable("UserCommentLike", (string)null);
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.UserThreadLike", b =>
@@ -761,7 +758,7 @@ namespace VakilPors.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserThreadLike");
+                    b.ToTable("UserThreadLike", (string)null);
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.Visitor", b =>
@@ -788,7 +785,7 @@ namespace VakilPors.Data.Migrations
                     b.HasIndex("UserGUID")
                         .IsUnique();
 
-                    b.ToTable("Visitor");
+                    b.ToTable("Visitor", (string)null);
                 });
 
             modelBuilder.Entity("ChatUser", b =>

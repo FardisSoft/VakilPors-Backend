@@ -38,7 +38,7 @@ public class User : IdentityUser<int>
     public virtual ICollection<UserCommentLike> CommentLikes { get; set; }
 
     public virtual ICollection<UserThreadLike> ThreadLikes { get; set; }
-    public long ChatId { get; set; }
+    public string Telegram { get; set; }
 
 }
 
