@@ -72,7 +72,22 @@ namespace VakilPors.Core.Hubs
             var chatId = message.ChatId.ToString();
             var userId = getUserId();
             if (message.SenderId != userId)
-                throw new AccessViolationException("You do not have permission to perform this action");
+            {
+                var messageFromDb = await appUnitOfWork.ChatMessageRepo.FindAsync(message.Id);
+                if (messageFromDb.IsCall)
+                {
+                    var chat = await appUnitOfWork.ChatRepo.AsQueryableNoTracking().Include(c => c.Users).FirstOrDefaultAsync(m => m.Id == message.ChatId);
+                    if (!chat.Users.Any(u => u.Id == userId))
+                    {
+                        throw new AccessViolationException("You do not have permission to perform this action");
+                    }
+                }
+                else
+                {
+                    throw new AccessViolationException("You do not have permission to perform this action");
+                }
+
+            }
             logger.LogInformation($"user with id:{userId} edited message {message.Message} of chat id:{chatId}");
             message.IsEdited = true;
             await Clients.Group(chatId).EditMessage(message);
