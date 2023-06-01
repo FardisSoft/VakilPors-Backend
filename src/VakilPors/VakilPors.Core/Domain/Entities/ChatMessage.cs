@@ -11,6 +11,7 @@ public class ChatMessage : IEntity
     public string Message { get; set; }
     public bool IsFile { get; set; } = false;
     public bool IsCall { get; set; } = false;
+    public CallStatus CallStatus { get; set; } = CallStatus.WAITING;
     public bool IsDeleted { get; set; } = false;
     public bool IsEdited { get; set; } = false;
     public bool IsRead { get; set; } = false;
@@ -24,4 +25,10 @@ public class ChatMessage : IEntity
     public virtual User Sender { get; set; }
     [ForeignKey(nameof(ChatId))]
     public virtual Chat Chat { get; set; }
+}
+public enum CallStatus
+{
+    WAITING = 0,
+    ACCEPT,
+    REJECT
 }
