@@ -73,7 +73,7 @@ namespace VakilPors.Core.Hubs
             var userId = getUserId();
             if (message.SenderId != userId)
             {
-                var messageFromDb = await appUnitOfWork.ChatMessageRepo.FindAsync(message.Id);
+                var messageFromDb = await appUnitOfWork.ChatMessageRepo.AsQueryableNoTracking().FirstOrDefaultAsync(m => m.Id == message.Id);
                 if (messageFromDb.IsCall)
                 {
                     var chat = await appUnitOfWork.ChatRepo.AsQueryableNoTracking().Include(c => c.Users).FirstOrDefaultAsync(m => m.Id == message.ChatId);
