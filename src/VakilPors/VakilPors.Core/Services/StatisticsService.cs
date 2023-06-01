@@ -31,7 +31,7 @@ public class StatisticsService : IStatisticsService
 
     public async Task<StatisticsDto> GetStatistics()
     {
-        var lawyersCounts = await appUnitOfWork.UserRepo.AsQueryableNoTracking().CountAsync();
+        var lawyersCounts = await appUnitOfWork.LawyerRepo.AsQueryableNoTracking().CountAsync();
         var usersCounts = await appUnitOfWork.UserRepo.AsQueryableNoTracking().CountAsync() - lawyersCounts;
         var result = new StatisticsDto()
         {
