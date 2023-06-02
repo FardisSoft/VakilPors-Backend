@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.User;
+using VakilPors.Core.Exceptions;
 using static System.Net.WebRequestMethods;
 
 namespace VakilPors.Core.Services
@@ -31,21 +32,21 @@ namespace VakilPors.Core.Services
             await _appUnitOfWork.SaveChangesAsync();
         }
 
-        public static Task SendToTelegram(string text, string chat_id)
+        public async static Task SendToTelegram(string text, string chat_id)
         {
             string jsonData = "{\"chat_id\":\"" + chat_id + "\",\"text\":\"" + text + "\"}";
             var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
             var client = new HttpClient();
             var url = "https://fardissoft.pythonanywhere.com/post";
-            var response = client.PostAsync(url, content);
-            if (response.Result.IsSuccessStatusCode)
+            var response = await client.PostAsync(url, content);
+            if (!response.IsSuccessStatusCode)
             {
-                return Task.CompletedTask;
+                throw new BadArgumentException("Error in sending message to telegram");
             }
-            else
-            {
-                return Task.FromException(new Exception("Error in sending message to telegram"));
-            }
+            //else
+            //{
+            //    return Task.FromException(new Exception("Error in sending message to telegram"));
+            //}
 
             
 

@@ -65,16 +65,14 @@ namespace VakilPors.Core.Services
             await appUnitOfWork.SaveChangesAsync();
             if (isSuccess)
                 await AddBalance(userId, (isIncome ? amount : -amount));
-            string body = $@"
-            تراکنش شما در تاریخ {DateTime.Now} ثبت شد.
-            مبلغ:{amount}
-            توضیحات:{description}
-            کد تراکنش:{authority}
-            تراکنش موفقیت آمیز بود:{isSuccess}
-            ";
+            string body = $@"تراکنش شما در تاریخ {DateTime.Now} ثبت شد.مبلغ: {amount} توضیحات: {description} کد تراکنش: {authority}  تراکنش موفقیت آمیز بود: {isSuccess}";
             var user = await getUser(userId);
             await emailSender.SendEmailAsync(user.Email, user.Name, "تراکنش", body);
-            await TelegramService.SendToTelegram(body,user.Telegram);
+            if (user.Telegram != null)
+            {
+                await TelegramService.SendToTelegram(body, user.Telegram);
+            }
+
 
         }
         public async Task ApproveTransaction(int tranactionId)

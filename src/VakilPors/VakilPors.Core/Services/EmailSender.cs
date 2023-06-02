@@ -57,7 +57,7 @@ namespace VakilPors.Core.Services
 
                     await client.SendAsync(message);
                     await client.DisconnectAsync(true);
-                }
+                }   
             }
             catch (System.Exception)
             {
