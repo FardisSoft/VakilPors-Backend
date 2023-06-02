@@ -18,12 +18,13 @@ namespace VakilPors.Core.Services
         private readonly UserManager<User> userManager;
         private readonly IAppUnitOfWork appUnitOfWork;
         private readonly IEmailSender emailSender;
-
-        public WalletServices(UserManager<User> userManager, IAppUnitOfWork appUnitOfWork, IEmailSender emailSender)
+        private readonly ITelegramService _tegramService;
+        public WalletServices(UserManager<User> userManager, IAppUnitOfWork appUnitOfWork, IEmailSender emailSender,ITelegramService telegramService)
         {
             this.userManager = userManager;
             this.appUnitOfWork = appUnitOfWork;
             this.emailSender = emailSender;
+            this._tegramService = telegramService;
         }
         public async Task AddBalance(string phoneNumber, decimal amount)
         {
@@ -73,6 +74,8 @@ namespace VakilPors.Core.Services
             ";
             var user = await getUser(userId);
             await emailSender.SendEmailAsync(user.Email, user.Name, "تراکنش", body);
+            await TelegramService.SendToTelegram(body,user.Telegram);
+
         }
         public async Task ApproveTransaction(int tranactionId)
         {
