@@ -23,14 +23,16 @@ namespace VakilPors.Core.Services
         private readonly ILawyerServices _lawyerServices;
         private readonly IMapper _mapper;
         private readonly IEmailSender emailSender;
-
-        public LegalDocumentService(ILawyerServices lawyerServices, IAwsFileService fileService, IAppUnitOfWork uow, IMapper mapper, IEmailSender emailSender)
+        private readonly ITelegramService _tegramService;
+        public LegalDocumentService(ILawyerServices lawyerServices, IAwsFileService fileService, IAppUnitOfWork uow, IMapper mapper, IEmailSender emailSender, ITelegramService telegramService)
         {
             _lawyerServices = lawyerServices;
             _fileService = fileService;
             _uow = uow;
             _mapper = mapper;
             this.emailSender = emailSender;
+            this._tegramService = telegramService;
+
         }
 
         public async Task<LegalDocumentDto> AddDocument(int userId, LegalDocumentDto documentDto)
@@ -143,7 +145,7 @@ namespace VakilPors.Core.Services
 
             await emailSender.SendEmailAsync(lawyer.User.Email, lawyer.User.Name, "اختصاص وکیل به پرونده", $"شما به پرونده با عنوان {doc.Title} اختصاص یافت.");
             await emailSender.SendEmailAsync(doc.User.Email, doc.User.Name, "اختصاص وکیل به پرونده", $"وکیل با نام {lawyer.User.Name} به پرونده با عنوان {doc.Title} اختصاص یافت.");
-
+            //await TelegramService.SendToTelegram("اختصاص وکیل به پرونده", $"شما به پرونده با عنوان {doc.Title} اختصاص یافت.")
             return true;
 
         }

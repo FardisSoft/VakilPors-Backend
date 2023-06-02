@@ -29,8 +29,8 @@ public class AuthServices : IAuthServices
     private readonly ISMSSender smsSender;
     private readonly IAppUnitOfWork appUnitOfWork;
     private readonly IEmailSender emailSender;
-
-    public AuthServices(IMapper mapper, UserManager<User> userManager, IConfiguration configuration, ILogger<AuthServices> logger, ISMSSender smsSender, IAppUnitOfWork appUnitOfWork, IEmailSender emailSender)
+    private readonly ITelegramService _tegramService;
+    public AuthServices(IMapper mapper, UserManager<User> userManager, IConfiguration configuration, ILogger<AuthServices> logger, ISMSSender smsSender, IAppUnitOfWork appUnitOfWork, IEmailSender emailSender,ITelegramService telegramService)
     {
         this.appUnitOfWork = appUnitOfWork;
         this.emailSender = emailSender;
@@ -39,7 +39,7 @@ public class AuthServices : IAuthServices
         this._userManager = userManager;
         this._configuration = configuration;
         this._logger = logger;
-
+        this._tegramService = telegramService;
     }
 
     public async Task<string> CreateRefreshToken()
@@ -231,6 +231,7 @@ public class AuthServices : IAuthServices
             await smsSender.SendSmsAsync(forgetPasswordDto.PhoneNumber, $"کد بازیابی رمز عبور شما: {code} است");
         else
             await emailSender.SendEmailAsync(forgetPasswordDto.Email, _user.Name, "فراموشی رمز عبور", $"کد بازیابی رمز عبور شما: {code} است");
+            await TelegramService.SendToTelegram($"کد بازیابی رمز عبور شما: {code} است", _user.Telegram);
     }
 
     public async Task ResetPassword(ResetPasswordDto resetPasswordDto)

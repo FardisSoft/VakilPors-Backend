@@ -12,6 +12,7 @@ namespace VakilPors.Core.Contracts.Services
     {
         //Task SaveChatId(string phone_number, string chat_id);
         Task SaveChatId(TelegramDto telegram);
+        //Task SendToTelegram(string text,string chat_id);
 
     }
 }

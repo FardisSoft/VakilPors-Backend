@@ -19,6 +19,7 @@ namespace VakilPors.Web.Controllers
         public async Task SaveChatId([FromBody] TelegramDto telegram)
         {
             await _telegramService.SaveChatId(telegram);
+            //await _telegramService.SendToTelegram("salam", "65878693");
 
         }
     }
