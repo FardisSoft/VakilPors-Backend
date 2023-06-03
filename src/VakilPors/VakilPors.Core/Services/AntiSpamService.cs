@@ -27,7 +27,7 @@ namespace VakilPors.Core.Services
                 return "ok";
             }
         }
-        public static bool SpamCheck(string text)
+        public  static bool SpamCheck(string text)
         {
             string pattern = @"(\+98|0)?9(\s?\d){9}"; // Pattern for Iranian phone numbers
             pattern += @"|\@\S*"; // Pattern for IDs starting with "@"

@@ -33,9 +33,14 @@ public class ThreadService : IThreadService
     {
         var anti_spam = new AntiSpamService();
         var result = await anti_spam.IsSpam(threadDto.Description);
-        if(result == "This message is detected as a spam and can not be shown.")
+        var result2 = await anti_spam.IsSpam(threadDto.Title);
+        if (result == "This message is detected as a spam and can not be shown.") 
         {
             throw new BadArgumentException(result);
+        }
+        if (result2 == "This message is detected as a spam and can not be shown.")
+        {
+            throw new BadArgumentException(result2);
         }
         var thread = new ForumThread()
         {
