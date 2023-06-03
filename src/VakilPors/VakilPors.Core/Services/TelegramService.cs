@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,11 +18,12 @@ namespace VakilPors.Core.Services
     {
         private readonly IAppUnitOfWork _appUnitOfWork;
         private readonly IMapper _mapper;
-
-        public TelegramService(IAppUnitOfWork appUnitOfWork, IMapper mapper)
+        public static  ILogger<TelegramService> _logger;
+        public TelegramService(IAppUnitOfWork appUnitOfWork, IMapper mapper, ILogger<TelegramService> logger)
         {
             _appUnitOfWork = appUnitOfWork;
             _mapper = mapper;
+            _logger = logger;
         }
 
         
@@ -34,19 +36,24 @@ namespace VakilPors.Core.Services
 
         public async static Task SendToTelegram(string text, string chat_id)
         {
-            string jsonData = "{\"chat_id\":\"" + chat_id + "\",\"text\":\"" + text + "\"}";
-            var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-            var client = new HttpClient();
-            var url = "https://fardissoft.pythonanywhere.com/post";
-            var response = await client.PostAsync(url, content);
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                throw new BadArgumentException("Error in sending message to telegram");
+                string jsonData = "{\"chat_id\":\"" + chat_id + "\",\"text\":\"" + text + "\"}";
+                var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+                var client = new HttpClient();
+                var url = "https://fardissoft.pythonanywhere.com/post";
+                var response = await client.PostAsync(url, content);
             }
-            //else
+            catch (System.Exception)
+            {
+                //throw new BadArgumentException("Error in sending message to telegram");
+                _logger.LogError("Error in sending message to telegram");
+            }
+            //if (!response.IsSuccessStatusCode)
             //{
-            //    return Task.FromException(new Exception("Error in sending message to telegram"));
+            //    throw new BadArgumentException("Error in sending message to telegram");
             //}
+            
 
             
 
