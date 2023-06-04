@@ -18,11 +18,13 @@ namespace VakilPors.Core.Services
     {
         private readonly IMapper _mapper;
         private readonly IAppUnitOfWork _appUnitOfWork;
+        private readonly ILawyerServices _lawyerServices;
 
-        public RateService(IMapper mapper, IAppUnitOfWork appUnitOfWork)
+        public RateService(IMapper mapper, IAppUnitOfWork appUnitOfWork, ILawyerServices lawyerServices)
         {
             _mapper = mapper;
             _appUnitOfWork = appUnitOfWork;
+            _lawyerServices = lawyerServices;
         }
 
         public async Task AddRateAsync(RateDto rate, int user_id, int lawyer_id)
@@ -47,6 +49,9 @@ namespace VakilPors.Core.Services
                 lawyer.Rating = avg;
             }
             lawyer.NumberOfRates += 1;
+
+            await _lawyerServices.AddToken(lawyer_id,  (int)Math.Floor(rate.RateNum));
+
             await _appUnitOfWork.SaveChangesAsync();
         }
 
