@@ -116,6 +116,8 @@ public class ThreadCommentService : IThreadCommentService
             commentDtoList.Add(await GetCommentDtoFromComment(userId, comment));
         }
 
+        commentDtoList = commentDtoList.OrderByDescending(x => x.User.IsPremium).ToList();
+
         return commentDtoList;
     }
     

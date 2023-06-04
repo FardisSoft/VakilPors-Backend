@@ -24,7 +24,8 @@ namespace VakilPors.Core.Services
         private readonly IMapper _mapper;
         private readonly IEmailSender emailSender;
         private readonly ITelegramService _tegramService;
-        public LegalDocumentService(ILawyerServices lawyerServices, IAwsFileService fileService, IAppUnitOfWork uow, IMapper mapper, IEmailSender emailSender, ITelegramService telegramService)
+        private readonly IPremiumService _premiumService;
+        public LegalDocumentService(ILawyerServices lawyerServices, IAwsFileService fileService, IAppUnitOfWork uow, IMapper mapper, IEmailSender emailSender, ITelegramService telegramService, IPremiumService premiumService)
         {
             _lawyerServices = lawyerServices;
             _fileService = fileService;
@@ -32,7 +33,7 @@ namespace VakilPors.Core.Services
             _mapper = mapper;
             this.emailSender = emailSender;
             this._tegramService = telegramService;
-
+            _premiumService = premiumService;
         }
 
         public async Task<LegalDocumentDto> AddDocument(int userId, LegalDocumentDto documentDto)
@@ -193,6 +194,10 @@ namespace VakilPors.Core.Services
                 .Where(x => x.Accesses.Select(a => a.LawyerId).Contains(lawyerId))
                 .Select(x => _mapper.Map<UserDto>(x.User))
                 .ToListAsync();
+
+            users = users
+                .OrderByDescending(x => _premiumService.DoseUserHaveAnyActiveSubscription(x.Id).Result)
+                .ToList();
 
             return users;
         }
