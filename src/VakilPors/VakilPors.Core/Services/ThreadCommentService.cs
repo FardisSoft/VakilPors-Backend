@@ -52,6 +52,10 @@ public class ThreadCommentService : IThreadCommentService
         if (addResult <= 0)
             throw new Exception();
 
+        var lawyer = await _uow.LawyerRepo.AsQueryable().FirstOrDefaultAsync(x => x.UserId == userId);
+        if (lawyer != null)
+            await _lawyerServices.AddToken(lawyer.Id, 1);
+
         return await GetCommentById(userId, comment.Id);
     }
 
@@ -215,6 +219,10 @@ public class ThreadCommentService : IThreadCommentService
         var updateResult = await _uow.SaveChangesAsync();
         if (updateResult <= 0)
             throw new Exception();
+
+        var lawyer = await _uow.LawyerRepo.AsQueryable().FirstOrDefaultAsync(x => x.UserId == userId);
+        if (lawyer != null)
+            await _lawyerServices.AddToken(lawyer.Id, 1);
 
         return true;
     }
