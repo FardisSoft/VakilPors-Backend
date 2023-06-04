@@ -26,21 +26,21 @@ namespace VakilPors.Core.Services
         private readonly IMapper _mapper;
         private readonly IAwsFileService _fileService;
         private readonly IChatServices _chatServices;
-        private readonly IRateService _rateService;
+        private readonly IWalletServices _walletServices;
         public LawyerServices(
             IAppUnitOfWork appUnitOfWork, 
             IMapper mapper, 
             IUserServices userServices, 
             IAwsFileService fileService, 
-            IChatServices chatServices, 
-            IRateService rateService)
+            IChatServices chatServices,
+            IWalletServices walletServices)
         {
             _appUnitOfWork = appUnitOfWork;
             _mapper = mapper;
             _userServices = userServices;
             _fileService = fileService;
             _chatServices = chatServices;
-            _rateService = rateService;
+            _walletServices = walletServices;
         }
         public async Task<IPagedList<Lawyer>> GetLawyers(PagedParams pagedParams, FilterParams filterParams)
         {
@@ -180,6 +180,48 @@ namespace VakilPors.Core.Services
             return true;
         }
 
+        public async Task AddToken(int lawyerId, int tokens)
+        {
+            var foundLawyer = await _appUnitOfWork.LawyerRepo.FindAsync(lawyerId);
+            if (foundLawyer == null)
+                throw new BadArgumentException("Lawyer Not Found");
+
+            foundLawyer.Tokens += tokens;
+
+            _appUnitOfWork.LawyerRepo.Update(foundLawyer);
+            var updateResult = await _appUnitOfWork.SaveChangesAsync();
+            if (updateResult <= 0)
+                throw new Exception();
+        }
+
+        private async Task SetTokens(int lawyerId, int tokens)
+        {
+            var foundLawyer = await _appUnitOfWork.LawyerRepo.FindAsync(lawyerId);
+            if (foundLawyer == null)
+                throw new BadArgumentException("Lawyer Not Found");
+
+            foundLawyer.Tokens = tokens;
+
+            _appUnitOfWork.LawyerRepo.Update(foundLawyer);
+            var updateResult = await _appUnitOfWork.SaveChangesAsync();
+            if (updateResult <= 0)
+                throw new Exception();
+        }
+
+        public async Task<bool> TransferToken(int lawyerId)
+        {
+            var lawyer = await GetLawyerById(lawyerId);
+            var tokenValue = 10;
+            var remainingTokens = lawyer.Tokens % tokenValue;
+            var tokensToTransfer = lawyer.Tokens - remainingTokens;
+            var transferAmount = tokensToTransfer * 1000;
+
+            await _walletServices.AddBalance(lawyer.User.Id, transferAmount);
+            await SetTokens(lawyerId, remainingTokens);
+
+            return true;
+        }
+
         private async Task<LawyerDto> GetLawyerDtoFormLawyer(Lawyer lawyer)
         {
             var lawyerDto = _mapper.Map<LawyerDto>(lawyer);
@@ -214,8 +256,6 @@ namespace VakilPors.Core.Services
 
             var chats = await _chatServices.GetChatsOfUser(lawyer.UserId);
             lawyerDto.NumberOfConsultations = chats.Count;
-
-            lawyerDto.Rating = await _rateService.CalculateRatingAsync(lawyer.Id);
 
             return lawyerDto;
         }

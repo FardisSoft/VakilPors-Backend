@@ -77,6 +77,16 @@ public class LawyerController : MyControllerBase
         return Ok(new AppResponse<object>(result, "success"));
     }
 
+
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> TransferToken(int lawyerId)
+    {
+        _logger.LogInformation($"transfer tokens");
+        var result = await _lawyerServices.TransferToken(lawyerId);
+        return Ok(new AppResponse<object>(result, "success"));
+    }
+
     [HttpGet]
     public async Task<ActionResult<IPagedList<LawyerDto>>> GetAllPaged([FromQuery] PagedParams pagedParams, [FromQuery] FilterParams filterParams)
     {
