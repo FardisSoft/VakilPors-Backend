@@ -26,18 +26,21 @@ namespace VakilPors.Core.Services
         private readonly IMapper _mapper;
         private readonly IAwsFileService _fileService;
         private readonly IChatServices _chatServices;
+        private readonly IRateService _rateService;
         public LawyerServices(
             IAppUnitOfWork appUnitOfWork, 
             IMapper mapper, 
             IUserServices userServices, 
             IAwsFileService fileService, 
-            IChatServices chatServices)
+            IChatServices chatServices, 
+            IRateService rateService)
         {
             _appUnitOfWork = appUnitOfWork;
             _mapper = mapper;
             _userServices = userServices;
             _fileService = fileService;
             _chatServices = chatServices;
+            _rateService = rateService;
         }
         public async Task<IPagedList<Lawyer>> GetLawyers(PagedParams pagedParams, FilterParams filterParams)
         {
@@ -212,6 +215,7 @@ namespace VakilPors.Core.Services
             var chats = await _chatServices.GetChatsOfUser(lawyer.UserId);
             lawyerDto.NumberOfConsultations = chats.Count;
 
+            lawyerDto.Rating = await _rateService.CalculateRatingAsync(lawyer.Id);
 
             return lawyerDto;
         }

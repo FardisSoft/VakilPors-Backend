@@ -54,12 +54,16 @@ namespace VakilPors.Core.Services
         {
             var rates = await _appUnitOfWork.RateRepo.AsQueryable().Where(x=>x.LawyerId == laywer_id).ToListAsync();
             double avg = 0, count = 0, sum = 0;
-            foreach (var rate in rates) 
+            if (rates.Count > 0)
             {
-                sum += rate.RateNum;
-                count++;
+                foreach (var rate in rates)
+                {
+                    sum += rate.RateNum;
+                    count++;
+                }
+
+                avg = sum / count;
             }
-            avg = sum / count;
             return avg;
         }
 
