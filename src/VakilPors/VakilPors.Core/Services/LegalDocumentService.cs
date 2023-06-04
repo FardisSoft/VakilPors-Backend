@@ -220,6 +220,7 @@ namespace VakilPors.Core.Services
             var doc = await _uow.DocumentRepo
                 .AsQueryable()
                 .Include(x => x.Accesses)
+                .Include(x => x.User)
                 .Where(x => x.Id == documentId)
                 .FirstOrDefaultAsync();
 
