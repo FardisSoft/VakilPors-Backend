@@ -2,6 +2,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Org.BouncyCastle.Asn1.IsisMtt.X509;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.User;
@@ -15,12 +16,14 @@ public class UserService : IUserServices
     private readonly IAppUnitOfWork _uow;
     private readonly IMapper _mapper;
     private readonly IAwsFileService _fileService;
+    private readonly IPremiumService _premiumService;
 
-    public UserService(IAppUnitOfWork uow, IMapper mapper, IAwsFileService fileService)
+    public UserService(IAppUnitOfWork uow, IMapper mapper, IAwsFileService fileService, IPremiumService premiumService)
     {
         _uow = uow;
         _mapper = mapper;
         _fileService = fileService;
+        _premiumService = premiumService;
     }
 
     public async Task<UserDto> UpdateUser(UserDto userDto)
@@ -46,21 +49,24 @@ public class UserService : IUserServices
         if (updateResult <= 0)
             throw new Exception();
 
-        return _mapper.Map<UserDto>(foundUser);
+        return await GetUserDtoFromUser(foundUser);
     }
 
     public async Task<List<UserDto>> GetAllUsers()
     {
         var users = await _uow.UserRepo
             .AsQueryable()
-            .Select(x => _mapper.Map<UserDto>(x))
             .ToListAsync();
 
-        return users;
+        var userDtos = new List<UserDto>();
+        foreach (var user in users)
+        {
+            userDtos.Add(await GetUserDtoFromUser(user));
+        }
+
+        return userDtos;
     }
-       
-
-
+    
     public async Task<UserDto> GetUserById(int userId)
     {
         var user = await _uow.UserRepo
@@ -70,7 +76,16 @@ public class UserService : IUserServices
         if (user == null)
             throw new BadArgumentException("User Not Found");
 
-        return _mapper.Map<UserDto>(user);
+        return await GetUserDtoFromUser(user);
+    }
+
+    private async Task<UserDto> GetUserDtoFromUser(User user)
+    {
+        var userDto = _mapper.Map<UserDto>(user);
+
+        userDto.IsPremium = await _premiumService.DoseUserHaveAnyActiveSubscription(user.Id);
+
+        return userDto;
     }
 
     //private UserDto ReplaceImageKeyWithUrl(UserDto userDto)

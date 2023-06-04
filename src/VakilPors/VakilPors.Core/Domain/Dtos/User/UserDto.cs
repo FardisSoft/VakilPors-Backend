@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -22,6 +23,7 @@ namespace VakilPors.Core.Domain.Dtos.User
         public string Job { get; set; }
         public string Bio { get; set; }
 
+        public bool IsPremium { get; set; }
         public IFormFile ProfileImage { get; set; }
         public string ProfileImageUrl { get; set; }
         public string Telegram { get; set; }
