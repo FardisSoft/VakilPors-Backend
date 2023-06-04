@@ -220,9 +220,9 @@ public class ThreadCommentService : IThreadCommentService
         if (updateResult <= 0)
             throw new Exception();
 
-        var lawyer = await _uow.LawyerRepo.AsQueryable().FirstOrDefaultAsync(x => x.UserId == userId);
+        var lawyer = await _uow.LawyerRepo.AsQueryable().FirstOrDefaultAsync(x => x.UserId == foundComment.UserId);
         if (lawyer != null)
-            await _lawyerServices.AddToken(lawyer.Id, 1);
+            await _lawyerServices.AddToken(lawyer.Id, 5);
 
         return true;
     }

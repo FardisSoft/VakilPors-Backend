@@ -80,10 +80,10 @@ public class LawyerController : MyControllerBase
 
     [HttpGet]
     [Authorize]
-    public async Task<IActionResult> TransferToken(int lawyerId)
+    public async Task<IActionResult> TransferToken()
     {
         _logger.LogInformation($"transfer tokens");
-        var result = await _lawyerServices.TransferToken(lawyerId);
+        var result = await _lawyerServices.TransferToken(getUserId());
         return Ok(new AppResponse<object>(result, "success"));
     }
 

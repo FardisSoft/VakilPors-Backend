@@ -208,16 +208,16 @@ namespace VakilPors.Core.Services
                 throw new Exception();
         }
 
-        public async Task<bool> TransferToken(int lawyerId)
+        public async Task<bool> TransferToken(int userId)
         {
-            var lawyer = await GetLawyerById(lawyerId);
+            var lawyer = await GetLawyerByUserId(userId);
             var tokenValue = 10;
             var remainingTokens = lawyer.Tokens % tokenValue;
             var tokensToTransfer = lawyer.Tokens - remainingTokens;
             var transferAmount = tokensToTransfer * 1000;
 
             await _walletServices.AddBalance(lawyer.User.Id, transferAmount);
-            await SetTokens(lawyerId, remainingTokens);
+            await SetTokens(lawyer.Id, remainingTokens);
 
             return true;
         }

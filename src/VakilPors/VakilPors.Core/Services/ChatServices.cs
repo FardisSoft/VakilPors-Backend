@@ -33,13 +33,13 @@ namespace VakilPors.Core.Services
                 var lawyer1 = await appUnitOfWork.LawyerRepo.AsQueryable().FirstOrDefaultAsync(x => x.UserId == userId1);
                 if (lawyer1 != null)
                 {
-                    lawyer1.Tokens += 1;
+                    lawyer1.Tokens += 2;
                     appUnitOfWork.LawyerRepo.Update(lawyer1);
                 }
 
                 var lawyer2 = await appUnitOfWork.LawyerRepo.AsQueryable().FirstOrDefaultAsync(x => x.UserId == userId2);
                 {
-                    lawyer2.Tokens += 1;
+                    lawyer2.Tokens += 2;
                     appUnitOfWork.LawyerRepo.Update(lawyer2);
                 }
 
