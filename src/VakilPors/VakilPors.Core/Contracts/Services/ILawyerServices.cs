@@ -20,6 +20,7 @@ namespace VakilPors.Core.Contracts.Services
         Task<LawyerDto> GetLawyerById(int lawyerId);
         Task<LawyerDto> GetLawyerByUserId(int userId);
 
+        Task<bool> VerifyLawyer(int lawyerId);
         Task<bool> IsLawyer(int userId);
     }
 }

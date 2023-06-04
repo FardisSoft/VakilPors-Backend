@@ -43,6 +43,14 @@ namespace VakilPors.Core.Domain.Dtos.Lawyer
         public int NumberOfAnswers { get; set; }
         public int NumberOfLikes { get; set; }
         public int NumberOfVerifies { get; set; }
+
+        public bool IsVerified { get; set; }
+
+        public string NationalCardImageUrl { get; set; }
+
+        public IFormFile NationalCardImage  { get; set; }
+
+        public int Token { get; set; }
         public List<string> RatesList { get; set; }
     }
 }

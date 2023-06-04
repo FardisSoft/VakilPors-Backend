@@ -70,6 +70,13 @@ namespace VakilPors.Core.Services
                     foundLawyer.ProfileBackgroundPictureUrl = profileBackgroundKey;
             }
 
+            if (lawyerDto.NationalCardImage is { Length: > 0 })
+            {
+                var nationalCardImageKey = await _fileService.UploadAsync(lawyerDto.NationalCardImage);
+                if (nationalCardImageKey != null)
+                    foundLawyer.NationalCardImageUrl = nationalCardImageKey;
+            }
+
             if (lawyerDto.Resume is { Length: > 0 })
             {
                 var resumeKey = await _fileService.UploadAsync(lawyerDto.Resume);
@@ -154,6 +161,21 @@ namespace VakilPors.Core.Services
             return lawyer != null;
         }
 
+        public async Task<bool> VerifyLawyer(int lawyerId)
+        {
+            var foundLawyer = await _appUnitOfWork.LawyerRepo.FindAsync(lawyerId);
+            if (foundLawyer == null)
+                throw new BadArgumentException("Lawyer Not Found");
+
+            foundLawyer.IsVerified = true;
+
+            _appUnitOfWork.LawyerRepo.Update(foundLawyer);
+            var updateResult = await _appUnitOfWork.SaveChangesAsync();
+            if (updateResult <= 0)
+                throw new Exception();
+
+            return true;
+        }
 
         private async Task<LawyerDto> GetLawyerDtoFormLawyer(Lawyer lawyer)
         {
