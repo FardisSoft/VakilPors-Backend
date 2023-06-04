@@ -122,6 +122,8 @@ public class ThreadService : IThreadService
         {
             threadDtos.Add(await GetThreadDtoFromThread(userId, thread));
         }
+
+        threadDtos = threadDtos.OrderByDescending(x => x.User.IsPremium).ToList();
                 
         return threadDtos;
     } 
