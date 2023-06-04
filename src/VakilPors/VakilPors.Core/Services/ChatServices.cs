@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Entities;
+using VakilPors.Core.Exceptions;
 
 namespace VakilPors.Core.Services
 {
@@ -18,6 +19,8 @@ namespace VakilPors.Core.Services
 
         public async Task<Chat> CreateChat(int userId1, int userId2)
         {
+            if (userId1 == userId2)
+                throw new BadArgumentException("cannnot start chat with yourself!");
             var chat = await appUnitOfWork.ChatRepo.AsQueryableNoTracking().Where(c => c.Users.Select(u => u.Id).Contains(userId1) && c.Users.Select(u => u.Id).Contains(userId2)).FirstOrDefaultAsync();
             if (chat is null)
             {
@@ -29,21 +32,24 @@ namespace VakilPors.Core.Services
                     },
                 };
                 await appUnitOfWork.ChatRepo.AddAsync(chat);
+                await appUnitOfWork.SaveChangesAsync();
 
                 var lawyer1 = await appUnitOfWork.LawyerRepo.AsQueryable().FirstOrDefaultAsync(x => x.UserId == userId1);
                 if (lawyer1 != null)
                 {
                     lawyer1.Tokens += 2;
                     appUnitOfWork.LawyerRepo.Update(lawyer1);
+                    await appUnitOfWork.SaveChangesAsync();
                 }
 
                 var lawyer2 = await appUnitOfWork.LawyerRepo.AsQueryable().FirstOrDefaultAsync(x => x.UserId == userId2);
+                if (lawyer2 != null)
                 {
                     lawyer2.Tokens += 2;
                     appUnitOfWork.LawyerRepo.Update(lawyer2);
+                    await appUnitOfWork.SaveChangesAsync();
                 }
 
-                await appUnitOfWork.SaveChangesAsync();
             }
 
             return chat;

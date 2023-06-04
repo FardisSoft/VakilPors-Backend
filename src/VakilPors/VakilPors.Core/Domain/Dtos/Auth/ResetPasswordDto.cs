@@ -9,8 +9,8 @@ namespace VakilPors.Core.Domain.Dtos
 {
     public record ResetPasswordDto
     {
-        [Required]
         public string PhoneNumber { get; set; }
+        public string Email { get; set; }
         [Required]
         public string Code { get; set; }
         [Required]
@@ -21,5 +21,6 @@ namespace VakilPors.Core.Domain.Dtos
         [Required]
         [Compare(nameof(NewPassword))]
         public string ConfirmPassword { get; set; }
+        public bool usePhoneNumber { get; set; } = true;
     }
 }
