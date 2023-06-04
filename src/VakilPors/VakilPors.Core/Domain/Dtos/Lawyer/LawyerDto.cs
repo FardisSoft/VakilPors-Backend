@@ -50,7 +50,7 @@ namespace VakilPors.Core.Domain.Dtos.Lawyer
 
         public IFormFile NationalCardImage  { get; set; }
 
-        public int Token { get; set; }
+        public int Tokens { get; set; }
         public List<string> RatesList { get; set; }
     }
 }

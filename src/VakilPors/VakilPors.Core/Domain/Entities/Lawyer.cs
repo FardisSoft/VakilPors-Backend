@@ -44,6 +44,7 @@ namespace VakilPors.Core.Domain.Entities
         public int NumberOfVerifies { get; set; } 
         public List<string> RatesList { get; set; }
 
+        public int Tokens { get; set; }
         public bool IsVerified { get; set; }
 
         public string NationalCardImageUrl { get; set; } 
