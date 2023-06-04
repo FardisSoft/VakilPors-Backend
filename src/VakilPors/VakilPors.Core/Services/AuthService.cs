@@ -30,7 +30,7 @@ public class AuthServices : IAuthServices
     private readonly IAppUnitOfWork appUnitOfWork;
     private readonly IEmailSender emailSender;
     private readonly ITelegramService _tegramService;
-    public AuthServices(IMapper mapper, UserManager<User> userManager, IConfiguration configuration, ILogger<AuthServices> logger, ISMSSender smsSender, IAppUnitOfWork appUnitOfWork, IEmailSender emailSender,ITelegramService telegramService)
+    public AuthServices(IMapper mapper, UserManager<User> userManager, IConfiguration configuration, ILogger<AuthServices> logger, ISMSSender smsSender, IAppUnitOfWork appUnitOfWork, IEmailSender emailSender, ITelegramService telegramService)
     {
         this.appUnitOfWork = appUnitOfWork;
         this.emailSender = emailSender;
@@ -231,15 +231,27 @@ public class AuthServices : IAuthServices
             await smsSender.SendSmsAsync(forgetPasswordDto.PhoneNumber, $"کد بازیابی رمز عبور شما: {code} است");
         else
             await emailSender.SendEmailAsync(forgetPasswordDto.Email, _user.Name, "فراموشی رمز عبور", $"کد بازیابی رمز عبور شما: {code} است");
-            await TelegramService.SendToTelegram($"کد بازیابی رمز عبور شما: {code} است", _user.Telegram);
+        await TelegramService.SendToTelegram($"کد بازیابی رمز عبور شما: {code} است", _user.Telegram);
     }
 
     public async Task ResetPassword(ResetPasswordDto resetPasswordDto)
     {
-        var _user = await _userManager.FindByNameAsync(resetPasswordDto.PhoneNumber);
+        User _user;
+        if (resetPasswordDto.usePhoneNumber)
+        {
+            _user = await _userManager.FindByNameAsync(resetPasswordDto.PhoneNumber);
+        }
+        else
+        {
+            _user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
+        }
         if (_user == null)
         {
-            throw new NotFoundException("no user found with this phone number");
+            throw new NotFoundException("no user found with this phoneNumber/Email.");
+        }
+        if (_user.ForgetPasswordCode == null)
+        {
+            throw new BadArgumentException("No code has been generated for this user!");
         }
         if (resetPasswordDto.ConfirmPassword != resetPasswordDto.NewPassword)
         {
