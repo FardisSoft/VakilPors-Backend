@@ -29,8 +29,23 @@ namespace VakilPors.Core.Services
                     },
                 };
                 await appUnitOfWork.ChatRepo.AddAsync(chat);
+
+                var lawyer1 = await appUnitOfWork.LawyerRepo.AsQueryable().FirstOrDefaultAsync(x => x.UserId == userId1);
+                if (lawyer1 != null)
+                {
+                    lawyer1.Tokens += 1;
+                    appUnitOfWork.LawyerRepo.Update(lawyer1);
+                }
+
+                var lawyer2 = await appUnitOfWork.LawyerRepo.AsQueryable().FirstOrDefaultAsync(x => x.UserId == userId2);
+                {
+                    lawyer2.Tokens += 1;
+                    appUnitOfWork.LawyerRepo.Update(lawyer2);
+                }
+
                 await appUnitOfWork.SaveChangesAsync();
             }
+
             return chat;
         }
 
@@ -52,7 +67,7 @@ namespace VakilPors.Core.Services
 
         public async Task<ICollection<Chat>> GetChatsWithMessagesOfUser(int userId)
         {
-            var chats =  await appUnitOfWork.ChatRepo.AsQueryableNoTracking()
+            var chats = await appUnitOfWork.ChatRepo.AsQueryableNoTracking()
             .Include(c => c.Users)
             .Include(c => c.ChatMessages)
             .ThenInclude(m => m.Sender)
