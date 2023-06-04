@@ -8,10 +8,12 @@ namespace VakilPors.Core.Services
     public class ChatServices : IChatServices
     {
         private readonly IAppUnitOfWork appUnitOfWork;
+        private readonly IPremiumService _premiumService;
 
-        public ChatServices(IAppUnitOfWork appUnitOfWork)
+        public ChatServices(IAppUnitOfWork appUnitOfWork, IPremiumService premiumService)
         {
             this.appUnitOfWork = appUnitOfWork;
+            _premiumService = premiumService;
         }
 
         public async Task<Chat> CreateChat(int userId1, int userId2)
@@ -34,19 +36,36 @@ namespace VakilPors.Core.Services
 
         public async Task<ICollection<Chat>> GetChatsOfUser(int userId)
         {
-            return await appUnitOfWork.ChatRepo.AsQueryableNoTracking().
-            Include(c => c.Users).Where(c => c.Users.Select(u => u.Id).Contains(userId)).ToArrayAsync();
+            var chats = await appUnitOfWork.ChatRepo
+                .AsQueryableNoTracking()
+                .Include(c => c.Users)
+                .Where(c => c.Users.Select(u => u.Id).Contains(userId))
+                .ToArrayAsync();
+
+            chats = chats
+                .OrderByDescending(x => x.Users
+                    .Where(u => u.Id != userId)
+                    .Any(u => _premiumService.DoseUserHaveAnyActiveSubscription(u.Id).Result)).ToArray();
+
+            return chats;
         }
 
         public async Task<ICollection<Chat>> GetChatsWithMessagesOfUser(int userId)
         {
-            return await appUnitOfWork.ChatRepo.AsQueryableNoTracking()
+            var chats =  await appUnitOfWork.ChatRepo.AsQueryableNoTracking()
             .Include(c => c.Users)
             .Include(c => c.ChatMessages)
             .ThenInclude(m => m.Sender)
             .Include(c => c.ChatMessages)
             .ThenInclude(m => m.ReplyMessage)
             .Where(c => c.Users.Select(u => u.Id).Contains(userId)).ToArrayAsync();
+
+            chats = chats
+                .OrderByDescending(x => x.Users
+                    .Where(u => u.Id != userId)
+                    .Any(u => _premiumService.DoseUserHaveAnyActiveSubscription(u.Id).Result)).ToArray();
+
+            return chats;
         }
 
         public async Task<ICollection<ChatMessage>> GetMessagesOfChat(int userId, int chatId)
