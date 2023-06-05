@@ -120,7 +120,10 @@ public class ThreadCommentService : IThreadCommentService
             commentDtoList.Add(await GetCommentDtoFromComment(userId, comment));
         }
 
-        commentDtoList = commentDtoList.OrderByDescending(x => x.User.IsPremium).ToList();
+        commentDtoList = commentDtoList
+            .OrderByDescending(x => x.User.IsPremium)
+            .ThenByDescending(x => x.LikeCount)
+            .ToList();
 
         return commentDtoList;
     }
