@@ -196,6 +196,7 @@ namespace VakilPors.Core.Services
                 .ToListAsync();
 
             users = users
+                .DistinctBy(x => x.Id)
                 .OrderByDescending(x => _premiumService.DoseUserHaveAnyActiveSubscription(x.Id).Result)
                 .ToList();
 
