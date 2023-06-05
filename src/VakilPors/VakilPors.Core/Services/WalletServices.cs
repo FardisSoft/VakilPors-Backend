@@ -49,7 +49,7 @@ namespace VakilPors.Core.Services
         }
 
 
-        public async Task AddTransaction(int userId, decimal amount, string description, string authority, bool isSuccess, bool isIncome)
+        public async Task AddTransaction(int userId, decimal amount, string description, string authority, bool isSuccess, bool isIncome, bool isWithdraw = false)
         {
             var tranaction = new Tranaction()
             {
@@ -60,6 +60,7 @@ namespace VakilPors.Core.Services
                 Authority = authority,
                 IsIncome = isIncome,
                 IsSuccess = isSuccess,
+                IsWithdraw = isWithdraw,
             };
             await appUnitOfWork.TransactionRepo.AddAsync(tranaction);
             await appUnitOfWork.SaveChangesAsync();
@@ -119,18 +120,36 @@ namespace VakilPors.Core.Services
             var tranactions = await appUnitOfWork.UserRepo.AsQueryableNoTracking().Include(u => u.Tranactions).Where(x => x.PhoneNumber == phoneNumber).Select(x => x.Tranactions).ToPagedListAsync(pagedParams.PageNumber, pagedParams.PageSize);
             return tranactions.FirstOrDefault().ToPagedList();
         }
-        public async Task Withdraw(int userId, decimal amount)
+        public async Task<IEnumerable<Tranaction>> GetWithdrawTransactions()
+        {
+            var tranactions = appUnitOfWork.TransactionRepo.AsQueryableNoTracking().Where(x => x.IsWithdraw);
+            return await tranactions.ToArrayAsync();
+        }
+        public async Task Withdraw(int userId, decimal amount, string cardNo)
         {
             var user = await getUser(userId);
             if (user.Balance < amount)
             {
                 throw new BadArgumentException("Not enough balance");
             }
-            await AddTransaction(userId, amount, "برداشت از کیف پول", "", true, false);
-            user.Balance -= amount;
+            await AddTransaction(userId, amount, $"برداشت از کیف پول، شماره کارت:{cardNo}", "", true, false, true);
             await userManager.UpdateAsync(user);
         }
-
+        public async Task PayWithdraw(int tranactionId)
+        {
+            var trans = await appUnitOfWork.TransactionRepo.FindAsync(tranactionId);
+            if (!trans.IsWithdraw)
+            {
+                throw new BadArgumentException("The transaction is not withdraw!");
+            }
+            if (trans.IsPaid)
+            {
+                throw new BadArgumentException("The transaction is already paid!");
+            }
+            trans.IsPaid = true;
+            appUnitOfWork.TransactionRepo.Update(trans);
+            await appUnitOfWork.SaveChangesAsync();
+        }
 
         private async Task<User> getUser(string phoneNumber)
         {

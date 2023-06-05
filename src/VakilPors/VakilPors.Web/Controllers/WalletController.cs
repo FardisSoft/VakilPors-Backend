@@ -62,14 +62,34 @@ namespace VakilPors.Web.Controllers
         }
 
         [Authorize(Roles = RoleNames.Vakil)]
-        [HttpPost("Withdraw")]
-        public async Task<ActionResult> Withdraw(decimal amount)
+        [HttpPost("MakeWithdraw")]
+        public async Task<ActionResult> MakeWithdraw(decimal amount, string cardNo)
         {
             var userId = getUserId();
             var phoneNumber = getPhoneNumber();
             _logger.LogInformation($"withdraw balance with amount:{amount} for lawyer with phone number:{phoneNumber}");
-            await _walletServices.Withdraw(userId, amount);
+            await _walletServices.Withdraw(userId, amount, cardNo);
             return Ok(new AppResponse(HttpStatusCode.OK, $"Withdrawn was successful!"));
+        }
+        [Authorize(Roles = RoleNames.Admin)]
+        [HttpPost("PayWithdraw")]
+        public async Task<IActionResult> PayWithdraw(int transactionId)
+        {
+            var phoneNumber = getPhoneNumber();
+            _logger.LogInformation($"admin with phone number:{phoneNumber} paid transaction with id:{transactionId}");
+            await _walletServices.PayWithdraw(transactionId);
+            return Ok(new AppResponse(HttpStatusCode.OK, $"Withdraw has been paid successfully!"));
+        }
+
+        [Authorize(Roles = RoleNames.Admin)]
+        [HttpGet("GetWithdrawTransactions")]
+        public async Task<IActionResult> GetWithdrawTransactions()
+        {
+            var phoneNumber = getPhoneNumber();
+            _logger.LogInformation($"get transactions for user with phone number:{phoneNumber}");
+            IEnumerable<Tranaction> transactions = await _walletServices.GetWithdrawTransactions();
+            IEnumerable<TranactionDto> result = _mapper.Map<IEnumerable<Tranaction>, IEnumerable<TranactionDto>>(transactions);
+            return Ok(new AppResponse<IEnumerable<TranactionDto>>(result, "Withdrawn Transactions fetched sueccessfully!"));
         }
     }
 }
