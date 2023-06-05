@@ -19,7 +19,7 @@ namespace VakilPors.Core.Services
         private readonly IAppUnitOfWork appUnitOfWork;
         private readonly IEmailSender emailSender;
         private readonly ITelegramService _tegramService;
-        public WalletServices(UserManager<User> userManager, IAppUnitOfWork appUnitOfWork, IEmailSender emailSender,ITelegramService telegramService)
+        public WalletServices(UserManager<User> userManager, IAppUnitOfWork appUnitOfWork, IEmailSender emailSender, ITelegramService telegramService)
         {
             this.userManager = userManager;
             this.appUnitOfWork = appUnitOfWork;
@@ -119,6 +119,17 @@ namespace VakilPors.Core.Services
             var tranactions = await appUnitOfWork.UserRepo.AsQueryableNoTracking().Include(u => u.Tranactions).Where(x => x.PhoneNumber == phoneNumber).Select(x => x.Tranactions).ToPagedListAsync(pagedParams.PageNumber, pagedParams.PageSize);
             return tranactions.FirstOrDefault().ToPagedList();
         }
+        public async Task Withdraw(int userId, decimal amount)
+        {
+            var user = await getUser(userId);
+            if (user.Balance < amount)
+            {
+                throw new BadArgumentException("Not enough balance");
+            }
+            await AddTransaction(userId, amount, "برداشت از کیف پول", "", true, false);
+            user.Balance -= amount;
+            await userManager.UpdateAsync(user);
+        }
 
 
         private async Task<User> getUser(string phoneNumber)
@@ -139,5 +150,6 @@ namespace VakilPors.Core.Services
             }
             return user;
         }
+
     }
 }

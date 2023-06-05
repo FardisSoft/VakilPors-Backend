@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -15,6 +16,7 @@ using VakilPors.Core.Domain.Dtos.Payment;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
 using VakilPors.Core.Mapper;
+using VakilPors.Shared.Response;
 using X.PagedList;
 
 namespace VakilPors.Web.Controllers
@@ -57,6 +59,17 @@ namespace VakilPors.Web.Controllers
             _logger.LogInformation($"get transactions for user with phone number:{phoneNumber}");
             IPagedList<Tranaction> transactions = await _walletServices.GetTransactions(phoneNumber, pagedParams);
             return transactions.ToMappedPagedList<Tranaction, TranactionDto>(_mapper);
+        }
+
+        [Authorize(Roles = RoleNames.Vakil)]
+        [HttpPost("Withdraw")]
+        public async Task<ActionResult> Withdraw(decimal amount)
+        {
+            var userId = getUserId();
+            var phoneNumber = getPhoneNumber();
+            _logger.LogInformation($"withdraw balance with amount:{amount} for lawyer with phone number:{phoneNumber}");
+            await _walletServices.Withdraw(userId, amount);
+            return Ok(new AppResponse(HttpStatusCode.OK, $"Withdrawn was successful!"));
         }
     }
 }
