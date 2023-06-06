@@ -123,7 +123,10 @@ public class ThreadService : IThreadService
             threadDtos.Add(await GetThreadDtoFromThread(userId, thread));
         }
 
-        threadDtos = threadDtos.OrderByDescending(x => x.User.IsPremium).ToList();
+        threadDtos = threadDtos
+            .OrderByDescending(x => x.User.IsPremium)
+            .ThenByDescending(x => x.LikeCount)
+            .ToList();
                 
         return threadDtos;
     } 
