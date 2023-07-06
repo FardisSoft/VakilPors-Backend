@@ -30,11 +30,16 @@ public class ThreadCommentService : IThreadCommentService
 
     public async Task<ThreadCommentDto> CreateComment(int userId, ThreadCommentDto commentDto)
     {
+        var check_2minutes = await CheckWithin2Minutes(userId, commentDto);
         var anti_spam = new AntiSpamService();
         var result = await anti_spam.IsSpam(commentDto.Text);
         if (result == "This message is detected as a spam and can not be shown.")
         {
             throw new BadArgumentException(result);
+        }
+        if (check_2minutes == "wrong")
+        {
+            throw new BadArgumentException("The new comment should be sent within 2 minutes after the last comment");
         }
         var comment = new ThreadComment()
         {
@@ -57,6 +62,27 @@ public class ThreadCommentService : IThreadCommentService
             await _lawyerServices.AddToken(lawyer.Id, 1);
 
         return await GetCommentById(userId, comment.Id);
+    }
+
+    public async Task<string> CheckWithin2Minutes(int userId, ThreadCommentDto commentDto)
+    {
+        var newest_comment = await _uow.ThreadCommentRepo.AsQueryable().Where(x => x.UserId == userId).OrderByDescending(x =>x.CreateDate).FirstOrDefaultAsync();
+        if (newest_comment == null)
+        {
+            return "ok";
+        }
+        var date = newest_comment.CreateDate;
+        DateTime now = DateTime.Now;
+        TimeSpan timeSinceComment = now - date;
+
+        if (timeSinceComment.TotalMinutes > 2 )
+        {
+            return "ok";
+        }
+        else
+        {
+            return "wrong";
+        }
     }
 
     public async Task<ThreadCommentDto> UpdateComment(int userId, ThreadCommentDto commentDto)
