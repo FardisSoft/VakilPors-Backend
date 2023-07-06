@@ -34,6 +34,9 @@ namespace VakilPors.Core.Services
             pattern += @"|\#\w+"; // pattern for hashtags
             pattern += @"|\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"; // Pattern for email addresses
             pattern += @"|\b(?:https?://|www\.)\S+\b"; // Pattern for URLs
+            pattern += @"|\b09\d{9}\b"; // Pattern for Iranian phone numbers starting with "09"
+            pattern += @"|\bwww\.\S+\b"; // Pattern for URLs starting with "www."
+            pattern += @"|\b021\d{8}\b"; // Pattern for Tehran static numbers starting with "021"
 
             MatchCollection matches = Regex.Matches(text, pattern);
             bool containsRepeatedSequences = CheckForRepeatedSequences(text);
