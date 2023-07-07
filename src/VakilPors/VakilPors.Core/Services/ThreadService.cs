@@ -18,14 +18,17 @@ public class ThreadService : IThreadService
     private readonly IThreadCommentService _threadCommentService;
     private readonly ILawyerServices _lawyerServices;
     private readonly IPremiumService _premiumService;
+    private readonly ITelegramService _tegramService;
 
-    public ThreadService(IAppUnitOfWork uow, IMapper mapper, IThreadCommentService threadCommentService, ILawyerServices lawyerServices, IPremiumService premiumService)
+    public ThreadService(IAppUnitOfWork uow, IMapper mapper, IThreadCommentService threadCommentService, ILawyerServices lawyerServices, IPremiumService premiumService,ITelegramService telegramService)
     {
         _uow = uow;
         _mapper = mapper;
         _threadCommentService = threadCommentService;
         _lawyerServices = lawyerServices;
         _premiumService = premiumService;
+        _tegramService = telegramService;
+
     }
 
 
@@ -34,6 +37,7 @@ public class ThreadService : IThreadService
         var anti_spam = new AntiSpamService();
         var result = await anti_spam.IsSpam(threadDto.Description);
         var result2 = await anti_spam.IsSpam(threadDto.Title);
+        var _user = await _uow.UserRepo.FindAsync(userId);
         if (result == "This message is detected as a spam and can not be shown.") 
         {
             throw new BadArgumentException(result);
@@ -57,7 +61,7 @@ public class ThreadService : IThreadService
         var addResult = await _uow.SaveChangesAsync();
         if (addResult <= 0)
             throw new Exception();
-
+        await TelegramService.SendToTelegram($"شما با موفقیت رشته خود درباره را ساختید {threadDto.Title}",_user.Telegram);
         return (await GetThreadWithComments(userId, thread.Id)).Thread;
     }
 
@@ -93,7 +97,7 @@ public class ThreadService : IThreadService
     public async Task<bool> DeleteThread(int userId, int threadId)
     {
         var foundThread = await _uow.ForumThreadRepo.FindAsync(threadId);
-
+        var _user = await _uow.UserRepo.FindAsync(userId);
         if (foundThread == null)
             throw new BadArgumentException("thread not found");
 
@@ -105,6 +109,7 @@ public class ThreadService : IThreadService
         var removeResult = await _uow.SaveChangesAsync();
         if (removeResult <= 0)
             throw new Exception();
+        await TelegramService.SendToTelegram("رشته شما با موفقیت حذف شد", _user.Telegram);
 
         return true;
     }
