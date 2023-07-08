@@ -33,10 +33,15 @@ public class StatisticsService : IStatisticsService
     {
         var lawyersCounts = await appUnitOfWork.LawyerRepo.AsQueryableNoTracking().CountAsync();
         var usersCounts = await appUnitOfWork.UserRepo.AsQueryableNoTracking().CountAsync() - lawyersCounts;
+        var MonthlyVisits = new List<int>();
+        for (int i = 0; i < 12; i++)
+        {
+            MonthlyVisits.Add(await GetVisits(DateTime.Now.AddMonths(-i), DateTime.Now.AddMonths(-i - 1)));
+        }
         var result = new StatisticsDto()
         {
             DailyVisits = await GetVisits(DateTime.Now.AddDays(-1)),
-            MonthlyVisits = await GetVisits(DateTime.Now.AddMonths(-1)),
+            MonthlyVisits = MonthlyVisits,
             YearlyVisits = await GetVisits(DateTime.Now.AddYears(-1)),
             UsersCount = usersCounts,
             LawyersCount = lawyersCounts,
@@ -49,5 +54,9 @@ public class StatisticsService : IStatisticsService
     public async Task<int> GetVisits(DateTime from)
     {
         return await appUnitOfWork.VisitorRepo.AsQueryableNoTracking().Where(v => v.visitTime >= from).CountAsync();
+    }
+    public async Task<int> GetVisits(DateTime from, DateTime to)
+    {
+        return await appUnitOfWork.VisitorRepo.AsQueryableNoTracking().Where(v => v.visitTime >= from && v.visitTime <= to).CountAsync();
     }
 }
