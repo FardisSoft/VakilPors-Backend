@@ -61,7 +61,7 @@ public class ThreadService : IThreadService
         var addResult = await _uow.SaveChangesAsync();
         if (addResult <= 0)
             throw new Exception();
-        await TelegramService.SendToTelegram($"شما با موفقیت رشته خود درباره را ساختید {threadDto.Title}",_user.Telegram);
+        await TelegramService.SendToTelegram($"شما با موفقیت رشته خود درباره را {threadDto.Title} ساختید",_user.Telegram);
         return (await GetThreadWithComments(userId, thread.Id)).Thread;
     }
 

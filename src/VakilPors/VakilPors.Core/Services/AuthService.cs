@@ -71,7 +71,7 @@ public class AuthServices : IAuthServices
         _logger.LogInformation($"Token generated for user with phone number {loginDto.PhoneNumber} | Token: {token}");
         DateTime dateTime = DateTime.Now; PersianCalendar persianCalendar = new PersianCalendar();
         int year = persianCalendar.GetYear(dateTime); int month = persianCalendar.GetMonth(dateTime); int day = persianCalendar.GetDayOfMonth(dateTime); string persianDate = $"{year}/{month}/{day}";
-        await TelegramService.SendToTelegram($"شما در تاریخ به سیستم وکیل پرس وارد شده اید {persianDate}", _user.Telegram);
+        await TelegramService.SendToTelegram($"شما در تاریخ {persianDate} به سیستم وکیل پرس وارد شده اید", _user.Telegram);
         return new LoginResponseDto
         {
             Token = token,
