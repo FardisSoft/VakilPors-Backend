@@ -33,15 +33,15 @@ public class StatisticsService : IStatisticsService
     {
         var lawyersCounts = await appUnitOfWork.LawyerRepo.AsQueryableNoTracking().CountAsync();
         var usersCounts = await appUnitOfWork.UserRepo.AsQueryableNoTracking().CountAsync() - lawyersCounts;
-        var MonthlyVisits = new List<int>();
-        for (int i = 0; i < 12; i++)
-        {
-            MonthlyVisits.Add(await GetVisits(DateTime.Now.AddMonths(-i), DateTime.Now.AddMonths(-i - 1)));
-        }
+        // var MonthlyVisits = new List<int>();
+        // for (int i = 0; i < 12; i++)
+        // {
+        //     MonthlyVisits.Add(await GetVisits(DateTime.Now.AddMonths(-i), DateTime.Now.AddMonths(-i - 1)));
+        // }
         var result = new StatisticsDto()
         {
             DailyVisits = await GetVisits(DateTime.Now.AddDays(-1)),
-            MonthlyVisits = MonthlyVisits,
+            MonthlyVisits = await GetVisits(DateTime.Now.AddMonths(-1)),
             YearlyVisits = await GetVisits(DateTime.Now.AddYears(-1)),
             UsersCount = usersCounts,
             LawyersCount = lawyersCounts,
