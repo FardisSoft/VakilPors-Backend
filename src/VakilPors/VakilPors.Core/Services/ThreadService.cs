@@ -19,8 +19,9 @@ public class ThreadService : IThreadService
     private readonly ILawyerServices _lawyerServices;
     private readonly IPremiumService _premiumService;
     private readonly ITelegramService _tegramService;
+    private readonly IEmailSender emailSender;
 
-    public ThreadService(IAppUnitOfWork uow, IMapper mapper, IThreadCommentService threadCommentService, ILawyerServices lawyerServices, IPremiumService premiumService,ITelegramService telegramService)
+    public ThreadService(IAppUnitOfWork uow, IMapper mapper, IThreadCommentService threadCommentService, ILawyerServices lawyerServices, IPremiumService premiumService, ITelegramService telegramService, IEmailSender emailSender)
     {
         _uow = uow;
         _mapper = mapper;
@@ -28,7 +29,7 @@ public class ThreadService : IThreadService
         _lawyerServices = lawyerServices;
         _premiumService = premiumService;
         _tegramService = telegramService;
-
+        this.emailSender = emailSender;
     }
 
 
@@ -38,7 +39,7 @@ public class ThreadService : IThreadService
         var result = await anti_spam.IsSpam(threadDto.Description);
         var result2 = await anti_spam.IsSpam(threadDto.Title);
         var _user = await _uow.UserRepo.FindAsync(userId);
-        if (result == "This message is detected as a spam and can not be shown.") 
+        if (result == "This message is detected as a spam and can not be shown.")
         {
             throw new BadArgumentException(result);
         }
@@ -55,13 +56,14 @@ public class ThreadService : IThreadService
             CreateDate = DateTime.Now,
             LikeCount = 0
         };
-        
+
         await _uow.ForumThreadRepo.AddAsync(thread);
 
         var addResult = await _uow.SaveChangesAsync();
         if (addResult <= 0)
             throw new Exception();
-        await TelegramService.SendToTelegram($"شما با موفقیت رشته خود درباره را {threadDto.Title} ساختید",_user.Telegram);
+        await emailSender.SendEmailAsync(_user.Email, _user.Name, "ساخت رشته", $"شما با موفقیت رشته خود درباره را {threadDto.Title} ساختید");
+        await TelegramService.SendToTelegram($"شما با موفقیت رشته خود درباره را {threadDto.Title} ساختید", _user.Telegram);
         return (await GetThreadWithComments(userId, thread.Id)).Thread;
     }
 
@@ -109,7 +111,8 @@ public class ThreadService : IThreadService
         var removeResult = await _uow.SaveChangesAsync();
         if (removeResult <= 0)
             throw new Exception();
-        await TelegramService.SendToTelegram("رشته شما با موفقیت حذف شد", _user.Telegram);
+        await emailSender.SendEmailAsync(_user.Email, _user.Name, "حذف رشته", $"رشته شما با عنوان {foundThread.Title} موفقیت حذف شد");
+        await TelegramService.SendToTelegram($"رشته شما با عنوان {foundThread.Title} موفقیت حذف شد", _user.Telegram);
 
         return true;
     }
@@ -132,9 +135,9 @@ public class ThreadService : IThreadService
             .OrderByDescending(x => x.User.IsPremium)
             .ThenByDescending(x => x.LikeCount)
             .ToList();
-                
+
         return threadDtos;
-    } 
+    }
 
     public async Task<ThreadWithCommentsDto> GetThreadWithComments(int userId, int threadId)
     {
@@ -148,7 +151,7 @@ public class ThreadService : IThreadService
             throw new BadArgumentException("thread not found");
 
         var threadDto = await GetThreadDtoFromThread(userId, thread);
-        
+
         return new ThreadWithCommentsDto
         {
             Thread = threadDto,
@@ -171,7 +174,7 @@ public class ThreadService : IThreadService
             return foundThread.LikeCount;
 
         foundThread.LikeCount++;
-        foundThread.UserLikes.Add(new UserThreadLike{ThreadId = threadId, UserId = userId});
+        foundThread.UserLikes.Add(new UserThreadLike { ThreadId = threadId, UserId = userId });
 
         _uow.ForumThreadRepo.Update(foundThread);
 
@@ -219,7 +222,7 @@ public class ThreadService : IThreadService
             CreateDate = thread.CreateDate,
             Description = thread.Description,
             UserId = thread.UserId,
-            LikeCount = thread.LikeCount, 
+            LikeCount = thread.LikeCount,
             AnswerCount = await _threadCommentService.GetThreadAnswerCount(thread.Id),
             HasAnswer = await _threadCommentService.IsThreadHasAnswer(thread.Id),
             IsCurrentUserLikedThread = await IsThreadLikedByUser(userId, thread.Id),
