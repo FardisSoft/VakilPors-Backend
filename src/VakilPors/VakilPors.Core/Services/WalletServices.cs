@@ -66,7 +66,8 @@ namespace VakilPors.Core.Services
             await appUnitOfWork.SaveChangesAsync();
             if (isSuccess)
                 await AddBalance(userId, (isIncome ? amount : -amount));
-            string body = $@"تراکنش شما در تاریخ {DateTime.Now} ثبت شد.مبلغ: {amount} توضیحات: {description} کد تراکنش: {authority}  تراکنش موفقیت آمیز بود: {isSuccess}";
+            string yesorno = isSuccess ? "بود" : "نبود";
+            string body = $@"تراکنش شما در تاریخ {DateTime.Now} ثبت شد.مبلغ: {amount} توضیحات: {description} کد تراکنش: {authority}  تراکنش موفقیت آمیز {yesorno}.";
             //string body = $@"
             //تراکنش شما در تاریخ {DateTime.Now} ثبت شد.
             //مبلغ:{amount}
