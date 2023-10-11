@@ -1,0 +1,40 @@
+name: CICD
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
+      - name: Restore dependencies
+        run: dotnet restore
+        working-directory: ./src/VakilPors
+      - name: Build
+        run: dotnet build --no-restore
+        working-directory: ./src/VakilPors
+      - name: Test
+        run: dotnet test --no-build --verbosity normal
+        working-directory: ./src/VakilPors
+  cd:
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+      - name: update-liara
+        env:
+          LIARA_TOKEN: ${{ secrets.LIARA_API_TOKEN }}
+        run: |
+          npm i -g @liara/cli@4
+          liara deploy --api-token="$LIARA_TOKEN" --detach
