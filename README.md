@@ -1,5 +1,8 @@
 # VakilPors-Backend
 
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/MSPoulaei/20d8309ce4ac8005e22df30d985c6883/raw/code-coverage.json)
+
+
 ## Installation Guide
 
 1. You need to install .NET SDK 6.0 and SQL Server
