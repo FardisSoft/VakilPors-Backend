@@ -30,7 +30,7 @@ jobs:
         with:
           label: Unit Test Coverage
           color: brightgreen
-          path: ./src/VakilPors/VakilPors.Tests/TestResults/coverage.opencover.xml
+          path: ./src/VakilPors/VakilPors.Test/TestResults/coverage.opencover.xml
           gist-filename: code-coverage.json
           gist-id: 20d8309ce4ac8005e22df30d985c6883
           gist-auth-token: ${{ secrets.GIST_AUTH_TOKEN }}

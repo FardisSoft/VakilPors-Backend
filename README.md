@@ -1,7 +1,7 @@
 # VakilPors-Backend
 
 ![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/MSPoulaei/20d8309ce4ac8005e22df30d985c6883/raw/code-coverage.json)
-
+[![CICD](https://github.com/FardisSoft/VakilPors-Backend/actions/workflows/cicd.yaml/badge.svg)](https://github.com/FardisSoft/VakilPors-Backend/actions/workflows/cicd.yaml)
 
 ## Installation Guide
 
