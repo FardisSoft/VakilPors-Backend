@@ -22,7 +22,7 @@ jobs:
         run: dotnet build --no-restore
         working-directory: ./src/VakilPors
       - name: Test
-        run: dotnet test  -p:CollectCoverage=true -p:CoverletOutput=VakilPors.Tests/TestResults/ -p:CoverletOutputFormat=opencover --no-build --verbosity normal VakilPors.Tests/
+        run: dotnet test  -p:CollectCoverage=true -p:CoverletOutput=VakilPors.Test/TestResults/ -p:CoverletOutputFormat=opencover --no-build --verbosity normal VakilPors.Test/
         working-directory: ./src/VakilPors
       - name: Create Test Coverage Badge
         uses: simon-k/dotnet-code-coverage-badge@v1.0.0
@@ -43,11 +43,10 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: "18"
       - name: update-liara
         env:
           LIARA_TOKEN: ${{ secrets.LIARA_API_TOKEN }}
         run: |
-          npm i -g @liara/cli@3
-          liara deploy --api-to
-          ken="$LIARA_TOKEN" --detach
+          npm i -g @liara/cli@5
+          liara deploy --api-token="$LIARA_TOKEN" --detach
