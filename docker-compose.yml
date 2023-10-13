@@ -1,0 +1,50 @@
+﻿services:
+  vakilpors.api:
+    image: vakilpors.api
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "5000:5000"
+    depends_on:
+      vakilpors.db:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://0.0.0.0:5000/
+      - ConnectionString=Host=vakilpors.db;Port=5432;Database=VakilPorsDb;Username=root;Password=toor
+      - RAYGAN_SMS_SENDER_NUMBER=<phonenumber>
+      - RAYGAN_SMS_USERNAME=<username>
+      - RAYGAN_SMS_PASSWORD=<password>
+      - FILE_BUCKET=<diskname>
+      - FILE_API_ENDPOINT=<url>
+      - FILE_ACCESS_KEY=<key>
+      - FILE_SECRET_KEY=<seckey>
+      - EMAIL_NAME=VakilPors
+      - EMAIL_FROM=<email>
+      - EMAIL_HOST=<emailhost>
+      - EMAIL_PORT=587
+      - EMAIL_USERNAME=<username>
+      - EMAIL_PASSWORD=<password>
+      - EMAIL_USESSL=false
+    restart: unless-stopped
+    volumes:
+      - 'app_logs:/tmp/logs/'
+  vakilpors.db:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=VakilPorsDb'
+      - 'POSTGRES_USER=root'
+      - 'POSTGRES_PASSWORD=toor'
+    restart: unless-stopped
+    volumes:
+      - "postgres_data:/var/lib/postgresql/data"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "db_prod" ]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
+volumes:
+  postgres_data:
+  app_logs:
