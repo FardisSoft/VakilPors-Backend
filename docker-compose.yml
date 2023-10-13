@@ -1,18 +1,18 @@
 ﻿services:
-  vakilpors.api:
-    image: vakilpors.api
+  vakilpors_api:
+    image: vakilpors_api.api
     build:
       context: .
       dockerfile: ./Dockerfile
     ports:
       - "5000:5000"
     depends_on:
-      vakilpors.db:
+      vakilpors_db:
         condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://0.0.0.0:5000/
-      - ConnectionString=Host=vakilpors.db;Port=5432;Database=VakilPorsDb;Username=root;Password=toor
+      - ConnectionString=Host=vakilpors_db;Port=5432;Database=VakilPorsDb;Username=root;Password=toor
       - RAYGAN_SMS_SENDER_NUMBER=<phonenumber>
       - RAYGAN_SMS_USERNAME=<username>
       - RAYGAN_SMS_PASSWORD=<password>
@@ -30,7 +30,7 @@
     restart: unless-stopped
     volumes:
       - 'app_logs:/tmp/logs/'
-  vakilpors.db:
+  vakilpors_db:
     image: 'postgres:latest'
     environment:
       - 'POSTGRES_DB=VakilPorsDb'
