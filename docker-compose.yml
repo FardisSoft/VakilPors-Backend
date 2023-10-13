@@ -1,8 +1,8 @@
 ﻿services:
   vakilpors_api:
-    image: vakilpors_api.api
+    image: vakilpors_api
     build:
-      context: .
+      context: ./src/VakilPors
       dockerfile: ./Dockerfile
     ports:
       - "5000:5000"
