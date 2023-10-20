@@ -271,5 +271,25 @@ namespace VakilPors.Core.Services
             return lawyerDto;
         }
 
+        public async Task<List<LawyerDto>> FilteredSearch(LawyerDto lawyerDto)
+        {
+            var rating = lawyerDto.Rating;
+            var title = lawyerDto.Title;
+            var city = lawyerDto.City;
+            var memberof = lawyerDto.MemberOf;
+            var grade = lawyerDto.Grade;
+            var licencenumber = lawyerDto.LicenseNumber;
+            var gender = lawyerDto.Gender;
+            var lawyers = await _appUnitOfWork.LawyerRepo.AsQueryable().Where(x => (x.Rating > rating) && (x.Title == title) 
+            && (x.City == city) && (x.MemberOf == memberof) && (x.Grade == grade) 
+            && (x.LicenseNumber == licencenumber) && (x.Gender == gender)) .ToListAsync();
+            List<LawyerDto>result_dto = new List<LawyerDto>();
+            foreach (var lawyer in lawyers)
+            {
+                var lawyerdto = _mapper.Map<LawyerDto>(lawyer);
+                result_dto.Add(lawyerdto);
+            }
+            return result_dto;
+        }
     }
 }

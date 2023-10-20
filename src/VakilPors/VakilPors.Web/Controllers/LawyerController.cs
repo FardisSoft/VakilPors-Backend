@@ -11,6 +11,7 @@ using VakilPors.Core.Domain.Entities;
 using VakilPors.Shared.Response;
 using VakilPors.Core.Mapper;
 using X.PagedList;
+using VakilPors.Core.Domain.Dtos.Search;
 
 namespace VakilPors.Web.Controllers;
 
@@ -96,5 +97,15 @@ public class LawyerController : MyControllerBase
         var res = all.ToMappedPagination<Lawyer, LawyerDto>(_mapper,pagedParams.PageSize);
         return Ok(new AppResponse<Pagination<LawyerDto>>(res, "success"));
     }
+
+    [HttpGet]
+    public async Task<ActionResult<List<LawyerDto>>> FilteredSearch(SearchDto searchdto)
+    {
+        _logger.LogInformation($"filtered search");
+        var res = await _lawyerServices.FilteredSearch(searchdto);
+        return Ok(res);
+
+    }
+
 
 }
