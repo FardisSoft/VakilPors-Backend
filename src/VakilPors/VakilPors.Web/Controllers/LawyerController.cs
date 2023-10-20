@@ -98,4 +98,14 @@ public class LawyerController : MyControllerBase
         return Ok(new AppResponse<Pagination<LawyerDto>>(res, "success"));
     }
 
+    [HttpGet]
+    public async Task<ActionResult<List<LawyerDto>>> FilteredSearch(SearchDto searchdto)
+    {
+        _logger.LogInformation($"filtered search");
+        var res = await _lawyerServices.FilteredSearch(searchdto);
+        return Ok(res);
+
+    }
+
+
 }

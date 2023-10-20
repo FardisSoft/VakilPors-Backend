@@ -16,9 +16,5 @@ namespace VakilPors.Core.Domain.Dtos.Search
         public string LicenseNumber { get; set; } = string.Empty;
         public string Gender { get; set; } = string.Empty;
 
-
-
-
-
     }
 }
