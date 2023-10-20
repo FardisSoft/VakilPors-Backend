@@ -18,7 +18,7 @@ public class ThreadService : IThreadService
     private readonly IThreadCommentService _threadCommentService;
     private readonly ILawyerServices _lawyerServices;
     private readonly IPremiumService _premiumService;
-    private readonly ITelegramService _tegramService;
+    private readonly ITelegramService _telegramService;
     private readonly IEmailSender emailSender;
 
     public ThreadService(IAppUnitOfWork uow, IMapper mapper, IThreadCommentService threadCommentService, ILawyerServices lawyerServices, IPremiumService premiumService, ITelegramService telegramService, IEmailSender emailSender)
@@ -28,7 +28,7 @@ public class ThreadService : IThreadService
         _threadCommentService = threadCommentService;
         _lawyerServices = lawyerServices;
         _premiumService = premiumService;
-        _tegramService = telegramService;
+        _telegramService = telegramService;
         this.emailSender = emailSender;
     }
 
@@ -63,7 +63,7 @@ public class ThreadService : IThreadService
         if (addResult <= 0)
             throw new Exception();
         await emailSender.SendEmailAsync(_user.Email, _user.Name, "ساخت رشته", $"شما با موفقیت رشته خود درباره را {threadDto.Title} ساختید");
-        await TelegramService.SendToTelegram($"شما با موفقیت رشته خود درباره را {threadDto.Title} ساختید", _user.Telegram);
+        await _telegramService.SendToTelegram($"شما با موفقیت رشته خود درباره را {threadDto.Title} ساختید", _user.Telegram);
         return (await GetThreadWithComments(userId, thread.Id)).Thread;
     }
 
@@ -112,7 +112,7 @@ public class ThreadService : IThreadService
         if (removeResult <= 0)
             throw new Exception();
         await emailSender.SendEmailAsync(_user.Email, _user.Name, "حذف رشته", $"رشته شما با عنوان {foundThread.Title} موفقیت حذف شد");
-        await TelegramService.SendToTelegram($"رشته شما با عنوان {foundThread.Title} موفقیت حذف شد", _user.Telegram);
+        await _telegramService.SendToTelegram($"رشته شما با عنوان {foundThread.Title} موفقیت حذف شد", _user.Telegram);
 
         return true;
     }

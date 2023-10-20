@@ -30,7 +30,7 @@ public class AuthServices : IAuthServices
     private readonly ISMSSender smsSender;
     private readonly IAppUnitOfWork appUnitOfWork;
     private readonly IEmailSender emailSender;
-    private readonly ITelegramService _tegramService;
+    private readonly ITelegramService _telegramService;
     public AuthServices(IMapper mapper, UserManager<User> userManager, IConfiguration configuration, ILogger<AuthServices> logger, ISMSSender smsSender, IAppUnitOfWork appUnitOfWork, IEmailSender emailSender, ITelegramService telegramService)
     {
         this.appUnitOfWork = appUnitOfWork;
@@ -40,7 +40,7 @@ public class AuthServices : IAuthServices
         this._userManager = userManager;
         this._configuration = configuration;
         this._logger = logger;
-        this._tegramService = telegramService;
+        this._telegramService = telegramService;
     }
 
     public async Task<string> CreateRefreshToken()
@@ -71,7 +71,7 @@ public class AuthServices : IAuthServices
         _logger.LogInformation($"Token generated for user with phone number {loginDto.PhoneNumber} | Token: {token}");
         DateTime dateTime = DateTime.Now; PersianCalendar persianCalendar = new PersianCalendar();
         int year = persianCalendar.GetYear(dateTime); int month = persianCalendar.GetMonth(dateTime); int day = persianCalendar.GetDayOfMonth(dateTime); string persianDate = $"{year}/{month}/{day}";
-        await TelegramService.SendToTelegram($"شما در تاریخ {persianDate} به وب سایت وکیل پرس وارد شده اید", _user.Telegram);
+        await _telegramService.SendToTelegram($"شما در تاریخ {persianDate} به وب سایت وکیل پرس وارد شده اید", _user.Telegram);
         await emailSender.SendEmailAsync(_user.Email, _user.Name, "ورود", $"شما در تاریخ {persianDate} به وب سایت وکیل پرس وارد شده اید");
         return new LoginResponseDto
         {
@@ -235,7 +235,7 @@ public class AuthServices : IAuthServices
             await smsSender.SendSmsAsync(forgetPasswordDto.PhoneNumber, $"کد بازیابی رمز عبور شما: {code} است");
         else
             await emailSender.SendEmailAsync(forgetPasswordDto.Email, _user.Name, "فراموشی رمز عبور", $"کد بازیابی رمز عبور شما: {code} است");
-        await TelegramService.SendToTelegram($"کد بازیابی رمز عبور شما: {code} است", _user.Telegram);
+        await _telegramService.SendToTelegram($"کد بازیابی رمز عبور شما: {code} است", _user.Telegram);
     }
 
     public async Task ResetPassword(ResetPasswordDto resetPasswordDto)
