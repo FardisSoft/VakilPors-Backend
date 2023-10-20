@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using VakilPors.Core.Domain.Dtos.Lawyer;
 using VakilPors.Core.Domain.Dtos.Params;
+using VakilPors.Core.Domain.Dtos.Search;
 using VakilPors.Core.Domain.Dtos.User;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Shared.Services;
@@ -23,5 +24,6 @@ namespace VakilPors.Core.Contracts.Services
         Task<bool> TransferToken(int lawyerId);
         Task<bool> VerifyLawyer(int lawyerId);
         Task<bool> IsLawyer(int userId);
+        Task<List<LawyerDto>> FilteredSearch(SearchDto lawyerDto);
     }
 }
