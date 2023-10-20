@@ -12,16 +12,19 @@ namespace VakilPors.Core.Services
     public class SMSSender : ISMSSender
     {
         private readonly ILogger<SMSSender> logger;
+        private readonly HttpClient _httpClient;
         private string _smsSenderNumber;
         private string _smsUsername;
         private string _smsPassword;
+        private readonly string _url="https://RayganSMS.com/SendMessageWithPost.ashx";
 
-        public SMSSender(IConfiguration configuration, ILogger<SMSSender> logger)
+        public SMSSender(IConfiguration configuration, ILogger<SMSSender> logger,HttpClient httpClient)
         {
             _smsSenderNumber = Environment.GetEnvironmentVariable("RAYGAN_SMS_SENDER_NUMBER") ?? Environment.GetEnvironmentVariable("RAYGAN_SMS_SENDER_NUMBER", EnvironmentVariableTarget.User) ?? configuration["RAYGAN_SMS:SENDER_NUMBER"];
             _smsUsername = Environment.GetEnvironmentVariable("RAYGAN_SMS_USERNAME") ?? Environment.GetEnvironmentVariable("RAYGAN_SMS_USERNAME", EnvironmentVariableTarget.User) ?? configuration["RAYGAN_SMS:USERNAME"];
             _smsPassword = Environment.GetEnvironmentVariable("RAYGAN_SMS_PASSWORD") ?? Environment.GetEnvironmentVariable("RAYGAN_SMS_PASSWORD", EnvironmentVariableTarget.User) ?? configuration["RAYGAN_SMS:PASSWORD"];
             this.logger = logger;
+            _httpClient = httpClient;
             logger.LogInformation($"Sender Number is:{_smsSenderNumber}");
         }
 
@@ -34,7 +37,6 @@ namespace VakilPors.Core.Services
         {
             var resultCode = -1;
 
-            var client = new HttpClient();
             var formContent = new FormUrlEncodedContent(new Dictionary<string, string>
             {
                 {"UserName", username},
@@ -45,8 +47,7 @@ namespace VakilPors.Core.Services
                 {"SmsClass", "1"},
             });
 
-            var url = "https://RayganSMS.com/SendMessageWithPost.ashx";
-            var response = client.PostAsync(url, formContent).Result;
+            var response = _httpClient.PostAsync(_url, formContent).Result;
 
             if (response.IsSuccessStatusCode)
             {

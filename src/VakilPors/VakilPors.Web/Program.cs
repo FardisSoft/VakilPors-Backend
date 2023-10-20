@@ -43,7 +43,7 @@ builder.Services.AddSignalR(options =>
     options.EnableDetailedErrors = true;
     // options.MaximumReceiveMessageSize = 102400000;
 });
-
+builder.Services.AddHttpClient();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", builder =>
