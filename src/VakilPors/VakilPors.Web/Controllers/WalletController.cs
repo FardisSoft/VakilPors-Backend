@@ -57,8 +57,8 @@ namespace VakilPors.Web.Controllers
         {
             var phoneNumber = getPhoneNumber();
             _logger.LogInformation($"get transactions for user with phone number:{phoneNumber}");
-            IPagedList<Tranaction> transactions = await _walletServices.GetTransactions(phoneNumber, pagedParams);
-            return transactions.ToMappedPagedList<Tranaction, TranactionDto>(_mapper);
+            IPagedList<Transaction> transactions = await _walletServices.GetTransactions(phoneNumber, pagedParams);
+            return transactions.ToMappedPagedList<Transaction, TranactionDto>(_mapper);
         }
 
         [Authorize(Roles = RoleNames.Vakil)]
@@ -87,8 +87,8 @@ namespace VakilPors.Web.Controllers
         {
             var phoneNumber = getPhoneNumber();
             _logger.LogInformation($"get transactions for user with phone number:{phoneNumber}");
-            IEnumerable<Tranaction> transactions = await _walletServices.GetWithdrawTransactions();
-            IEnumerable<TranactionDto> result = _mapper.Map<IEnumerable<Tranaction>, IEnumerable<TranactionDto>>(transactions);
+            IEnumerable<Transaction> transactions = await _walletServices.GetWithdrawTransactions();
+            IEnumerable<TranactionDto> result = _mapper.Map<IEnumerable<Transaction>, IEnumerable<TranactionDto>>(transactions);
             return Ok(new AppResponse<IEnumerable<TranactionDto>>(result, "Withdrawn Transactions fetched sueccessfully!"));
         }
     }

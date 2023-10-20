@@ -49,7 +49,7 @@ namespace VakilPors.Data.Extensions
                     await DatabaseSeeder.seedUsersAndLawyers(db);
                     // userManager.Dispose();
                 }
-                int numTrans = await db.Set<Tranaction>().CountAsync();
+                int numTrans = await db.Set<Transaction>().CountAsync();
                 if (numTrans < DatabaseSeeder.countTrans)
                 {
                     var trans = DatabaseSeeder.seedTransactions().ToArray();
@@ -64,7 +64,7 @@ namespace VakilPors.Data.Extensions
                 Console.WriteLine("An error occurred while migrating or seeding the database.");
             }
         }
-        private static async Task applyTransactions(IWalletServices walletServices, Tranaction[] tranactions)
+        private static async Task applyTransactions(IWalletServices walletServices, Transaction[] tranactions)
         {
             foreach (var trans in tranactions)
             {

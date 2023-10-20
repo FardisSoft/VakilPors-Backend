@@ -23,7 +23,7 @@ namespace VakilPors.Core.Mapper
             CreateMap<SignUpDto, User>().ReverseMap();
             CreateMap<Lawyer, LawyerDto>();
             CreateMap<User, UserDto>();
-            CreateMap<Tranaction, TranactionDto>();
+            CreateMap<Transaction, TranactionDto>();
             CreateMap<ForumThread, ThreadDto>();
             CreateMap<ThreadComment, ThreadCommentDto>();
             CreateMap<Premium, PremiumDto>().ReverseMap();

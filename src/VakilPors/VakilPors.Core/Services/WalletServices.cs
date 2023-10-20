@@ -51,7 +51,7 @@ namespace VakilPors.Core.Services
 
         public async Task AddTransaction(int userId, decimal amount, string description, string authority, bool isSuccess, bool isIncome, bool isWithdraw = false)
         {
-            var tranaction = new Tranaction()
+            var tranaction = new Transaction()
             {
                 UserId = userId,
                 Amount = amount,
@@ -116,12 +116,12 @@ namespace VakilPors.Core.Services
             var user = await getUser(phoneNumber);
             return user.Balance;
         }
-        public async Task<IPagedList<Tranaction>> GetTransactions(string phoneNumber, PagedParams pagedParams)
+        public async Task<IPagedList<Transaction>> GetTransactions(string phoneNumber, PagedParams pagedParams)
         {
             var tranactions = await appUnitOfWork.UserRepo.AsQueryableNoTracking().Include(u => u.Tranactions).Where(x => x.PhoneNumber == phoneNumber).Select(x => x.Tranactions).ToPagedListAsync(pagedParams.PageNumber, pagedParams.PageSize);
             return tranactions.FirstOrDefault().ToPagedList();
         }
-        public async Task<IEnumerable<Tranaction>> GetWithdrawTransactions()
+        public async Task<IEnumerable<Transaction>> GetWithdrawTransactions()
         {
             var tranactions = appUnitOfWork.TransactionRepo.AsQueryableNoTracking().Where(x => x.IsWithdraw);
             return await tranactions.ToArrayAsync();

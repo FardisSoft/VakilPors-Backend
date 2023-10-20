@@ -17,8 +17,8 @@ namespace VakilPors.Core.Contracts.Services
         Task AddTransaction(int userId, decimal amount, string description, string authority, bool isSuccess, bool isIncome, bool isWithdraw = false);
         Task ApproveTransaction(int tranactionId);
         Task ApplyTransaction(int tranactionId);
-        Task<IPagedList<Tranaction>> GetTransactions(string phoneNumber, PagedParams pagedParams);
-        public Task<IEnumerable<Tranaction>> GetWithdrawTransactions();
+        Task<IPagedList<Transaction>> GetTransactions(string phoneNumber, PagedParams pagedParams);
+        public Task<IEnumerable<Transaction>> GetWithdrawTransactions();
         Task Withdraw(int userId, decimal amount, string cardNo);
         Task PayWithdraw(int tranactionId);
         // Task<bool> HasEnoughBalance(string phoneNumber, decimal amount);
