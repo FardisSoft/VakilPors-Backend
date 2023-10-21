@@ -98,7 +98,8 @@ public class LawyerController : MyControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<LawyerDto>>> FilteredSearch(SearchDto searchdto)
+    [Authorize]
+    public async Task<ActionResult<List<LawyerDto>>> FilteredSearch([FromQuery] SearchDto searchdto)
     {
         _logger.LogInformation($"filtered search");
         var res = await _lawyerServices.FilteredSearch(searchdto);

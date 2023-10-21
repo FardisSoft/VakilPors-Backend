@@ -8,7 +8,7 @@ namespace VakilPors.Core.Domain.Dtos.Search
 {
     public record SearchDto
     {
-        public double Rating { get; set; } = 0d;
+        public double Rating { get; set; } = -1;
         public string Title { get; set; } = string.Empty;
         public string City { get; set; } = string.Empty;
         public string MemberOf { get; set; } = string.Empty;
