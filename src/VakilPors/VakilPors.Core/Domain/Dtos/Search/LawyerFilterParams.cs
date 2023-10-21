@@ -8,7 +8,7 @@ namespace VakilPors.Core.Domain.Dtos.Search
 {
     public record LawyerFilterParams
     {
-        public double Rating { get; set; } = 0d;
+        public double Rating { get; set; } = -1;
         public string Title { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public string City { get; set; } = string.Empty;
