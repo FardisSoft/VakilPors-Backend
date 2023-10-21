@@ -17,6 +17,7 @@ using X.PagedList;
 using VakilPors.Shared.Extensions;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
+using VakilPors.Core.Domain.Dtos.Search;
 
 namespace VakilPors.Core.Services
 {
@@ -271,7 +272,7 @@ namespace VakilPors.Core.Services
             return lawyerDto;
         }
 
-        public async Task<List<LawyerDto>> FilteredSearch(LawyerDto lawyerDto)
+        public async Task<List<LawyerDto>> FilteredSearch(SearchDto lawyerDto)
         {
             var rating = lawyerDto.Rating;
             var title = lawyerDto.Title;
@@ -280,10 +281,34 @@ namespace VakilPors.Core.Services
             var grade = lawyerDto.Grade;
             var licencenumber = lawyerDto.LicenseNumber;
             var gender = lawyerDto.Gender;
-            var lawyers = await _appUnitOfWork.LawyerRepo.AsQueryable().Where(x => (x.Rating > rating) && (x.Title == title) 
-            && (x.City == city) && (x.MemberOf == memberof) && (x.Grade == grade) 
-            && (x.LicenseNumber == licencenumber) && (x.Gender == gender)) .ToListAsync();
-            List<LawyerDto>result_dto = new List<LawyerDto>();
+
+            var query =  _appUnitOfWork.LawyerRepo.AsQueryable();
+            if (rating != -1)
+            {
+                query = query.Where(x => x.Rating >= rating);
+            }
+            if (!string.IsNullOrEmpty(title))
+            {
+                query = query.Where(x => x.Title == title);
+            }
+            if (!string.IsNullOrEmpty(city))
+            {
+                query = query.Where(x => x.City == city);
+            }
+            if (!string.IsNullOrEmpty(memberof))
+            {
+                query = query.Where(x => x.MemberOf == memberof);
+            }
+            if (grade != 0)
+            {
+                query = query.Where(x => x.Grade == grade);
+            }
+            if(!string.IsNullOrEmpty(licencenumber))
+            {
+                query = query.Where(x => x.LicenseNumber == licencenumber);
+            }
+            var lawyers = await query.ToListAsync();
+            List<LawyerDto> result_dto = new List<LawyerDto>();
             foreach (var lawyer in lawyers)
             {
                 var lawyerdto = _mapper.Map<LawyerDto>(lawyer);
