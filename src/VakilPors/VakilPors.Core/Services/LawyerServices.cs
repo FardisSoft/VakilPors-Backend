@@ -282,7 +282,7 @@ namespace VakilPors.Core.Services
             var licencenumber = lawyerDto.LicenseNumber;
             var gender = lawyerDto.Gender;
 
-            var query =  _appUnitOfWork.LawyerRepo.AsQueryable();
+            var query =  _appUnitOfWork.LawyerRepo.AsQueryableNoTracking();
             if (rating != -1)
             {
                 query = query.Where(x => x.Rating >= rating);
@@ -308,12 +308,7 @@ namespace VakilPors.Core.Services
                 query = query.Where(x => x.LicenseNumber == licencenumber);
             }
             var lawyers = await query.ToListAsync();
-            List<LawyerDto> result_dto = new List<LawyerDto>();
-            foreach (var lawyer in lawyers)
-            {
-                var lawyerdto = _mapper.Map<LawyerDto>(lawyer);
-                result_dto.Add(lawyerdto);
-            }
+            var result_dto = _mapper.Map<List<LawyerDto>>(lawyers);
             return result_dto;
         }
     }
