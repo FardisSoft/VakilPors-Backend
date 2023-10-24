@@ -18,7 +18,7 @@ namespace VakilPors.Data.Migrations
                 defaultValue: 0m);
 
             migrationBuilder.CreateTable(
-                name: "Tranaction",
+                name: "Transaction",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -33,9 +33,9 @@ namespace VakilPors.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Tranaction", x => x.Id);
+                    table.PrimaryKey("PK_Transaction", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Tranaction_AspNetUsers_UserId",
+                        name: "FK_Transaction_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -43,15 +43,15 @@ namespace VakilPors.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tranaction_UserId",
-                table: "Tranaction",
+                name: "IX_Transaction_UserId",
+                table: "Transaction",
                 column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Tranaction");
+                name: "Transaction");
 
             migrationBuilder.DropColumn(
                 name: "Balance",

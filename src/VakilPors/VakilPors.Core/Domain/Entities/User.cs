@@ -27,7 +27,7 @@ public class User : IdentityUser<int>
     public string Bio { get; set; }
 
     public string ProfileImageUrl { get; set; }
-    public virtual ICollection<Transaction> Tranactions { get; set; }
+    public virtual ICollection<Transaction> Transactions { get; set; }
     public int? LawyerId { get; set; }
     [ForeignKey(nameof(LawyerId))]
     public virtual Lawyer? Lawyer { get; set; }

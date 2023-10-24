@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos;
+using VakilPors.Core.Domain.Dtos.Params;
 using VakilPors.Shared.Response;
 using VakilPors.Web.Controllers;
 
@@ -52,9 +53,9 @@ namespace VakilPors.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetThreadWithComments(int threadId)
+        public async Task<IActionResult> GetThreadWithComments([FromQuery] int threadId,[FromQuery] PagedParams pagedParams)
         {
-            var result = await _threadService.GetThreadWithComments(getUserId(), threadId);
+            var result = await _threadService.GetThreadWithComments(getUserId(), threadId,pagedParams);
             return Ok(new AppResponse<object>(result, "success"));
         }
 

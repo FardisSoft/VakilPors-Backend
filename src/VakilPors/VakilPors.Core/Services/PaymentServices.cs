@@ -43,8 +43,8 @@ namespace VakilPors.Core.Services
 
         public async Task<VerifyPaymentOutput> VerifyPayment(string authority, string status)
         {
-            var tranaction = appUnitOfWork.TransactionRepo.AsQueryableNoTracking().FirstOrDefault(t => t.Authority == authority);
-            var amount = tranaction.Amount;
+            var transaction = appUnitOfWork.TransactionRepo.AsQueryableNoTracking().FirstOrDefault(t => t.Authority == authority);
+            var amount = transaction.Amount;
             var verificationResult = await _zarinpal.VerifyPaymentAsync(new()
             {
                 Amount = Convert.ToInt64(amount),
@@ -53,7 +53,7 @@ namespace VakilPors.Core.Services
             if (verificationResult.WasSuccessful)
             {
                 // throw new BadArgumentException("خطا در تایید پرداخت");
-                await walletServices.ApproveTransaction(tranaction.Id);
+                await walletServices.ApproveTransaction(transaction.Id);
             }
             return verificationResult;
         }

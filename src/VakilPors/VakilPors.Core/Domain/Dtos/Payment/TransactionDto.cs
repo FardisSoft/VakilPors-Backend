@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace VakilPors.Core.Domain.Dtos.Payment
 {
-    public record TranactionDto
+    public record TransactionDto
     {
         public int Id { get; set; }
         public decimal Amount { get; set; }

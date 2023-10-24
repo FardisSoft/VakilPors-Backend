@@ -22,7 +22,7 @@ namespace VakilPors.Core.Domain.Dtos.Params
             {
                 if (value < 1)
                 {
-                    PageNumber = 1;
+                    _pageNumber = 1;
                 }
                 else
                 {
@@ -40,11 +40,15 @@ namespace VakilPors.Core.Domain.Dtos.Params
             {
                 if (value > MaxPageSize)
                 {
-                    PageSize = MaxPageSize;
+                    _pageSize = MaxPageSize;
                 }
                 else if (value < MinPageSize)
                 {
-                    PageSize = MinPageSize;
+                    _pageSize = MinPageSize;
+                }
+                else
+                {
+                    _pageSize = value;
                 }
             }
         }

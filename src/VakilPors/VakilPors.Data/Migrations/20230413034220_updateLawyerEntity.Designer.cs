@@ -247,7 +247,7 @@ namespace VakilPors.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("VakilPors.Core.Domain.Entities.Tranaction", b =>
+            modelBuilder.Entity("VakilPors.Core.Domain.Entities.Transaction", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -280,7 +280,7 @@ namespace VakilPors.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Tranaction");
+                    b.ToTable("Transaction");
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.User", b =>
@@ -450,10 +450,10 @@ namespace VakilPors.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("VakilPors.Core.Domain.Entities.Tranaction", b =>
+            modelBuilder.Entity("VakilPors.Core.Domain.Entities.Transaction", b =>
                 {
                     b.HasOne("VakilPors.Core.Domain.Entities.User", "User")
-                        .WithMany("Tranactions")
+                        .WithMany("Transactions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -465,7 +465,7 @@ namespace VakilPors.Data.Migrations
                 {
                     b.Navigation("Lawyer");
 
-                    b.Navigation("Tranactions");
+                    b.Navigation("Transactions");
                 });
 #pragma warning restore 612, 618
         }

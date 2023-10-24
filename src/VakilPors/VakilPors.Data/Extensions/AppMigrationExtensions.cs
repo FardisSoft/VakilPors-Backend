@@ -64,9 +64,9 @@ namespace VakilPors.Data.Extensions
                 Console.WriteLine("An error occurred while migrating or seeding the database.");
             }
         }
-        private static async Task applyTransactions(IWalletServices walletServices, Transaction[] tranactions)
+        private static async Task applyTransactions(IWalletServices walletServices, Transaction[] transactions)
         {
-            foreach (var trans in tranactions)
+            foreach (var trans in transactions)
             {
                 await walletServices.ApplyTransaction(trans.Id);
             }
