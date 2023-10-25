@@ -15,7 +15,7 @@ namespace VakilPors.Core.Contracts.Services
 {
     public interface ILawyerServices:IScopedDependency
     {
-        Task<Pagination<Lawyer>> GetLawyers(PagedParams pagedParams, FilterParams filterParams);
+        Task<Pagination<Lawyer>> GetLawyers(PagedParams pagedParams, FilterParams filterParams , SearchDto lawyerDto);
         Task<IPagedList<Lawyer>> GetLawyers2(PagedParams pagedParams, FilterParams filterParams);
 
         Task<LawyerDto> UpdateLawyer(LawyerDto lawyerDto);

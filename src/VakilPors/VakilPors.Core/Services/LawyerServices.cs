@@ -18,6 +18,8 @@ using VakilPors.Shared.Extensions;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
 using VakilPors.Core.Domain.Dtos.Search;
+using Microsoft.AspNetCore.Mvc;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace VakilPors.Core.Services
 {
@@ -44,15 +46,7 @@ namespace VakilPors.Core.Services
             _chatServices = chatServices;
             _walletServices = walletServices;
         }
-        public async Task<Pagination<Lawyer>> GetLawyers(PagedParams pagedParams, FilterParams filterParams)
-        {
-            var lawyers = await _appUnitOfWork.LawyerRepo.AsQueryableNoTracking()
-            .Include(l => l.User)
-            .Where(l => string.IsNullOrEmpty(filterParams.Q) || Fuzz.PartialRatio(l.User.Name, filterParams.Q) > 75 || l.ParvandeNo.Contains(filterParams.Q))
-            .AsPaginationAsync(pagedParams.PageNumber,pagedParams.PageSize,(string.IsNullOrEmpty(filterParams.Sort) ? "Id" : filterParams.Sort),!filterParams.IsAscending);
-
-            return lawyers;
-        }
+        
 
         public async Task<IPagedList<Lawyer>> GetLawyers2(PagedParams pagedParams, FilterParams filterParams)
         {
@@ -272,7 +266,7 @@ namespace VakilPors.Core.Services
             return lawyerDto;
         }
 
-        public async Task<List<LawyerDto>> FilteredSearch(SearchDto lawyerDto)
+        public async Task<Pagination<Lawyer>> GetLawyers(PagedParams pagedParams, FilterParams filterParams , SearchDto lawyerDto)
         {
             var rating = lawyerDto.Rating;
             var title = lawyerDto.Title;
@@ -282,34 +276,40 @@ namespace VakilPors.Core.Services
             var licencenumber = lawyerDto.LicenseNumber;
             var gender = lawyerDto.Gender;
 
-            var query =  _appUnitOfWork.LawyerRepo.AsQueryableNoTracking();
+            var lawyers = _appUnitOfWork.LawyerRepo.AsQueryableNoTracking()
+            .Include(l => l.User)
+            .Where(l => string.IsNullOrEmpty(filterParams.Q) || Fuzz.PartialRatio(l.User.Name, filterParams.Q) > 75 || l.ParvandeNo.Contains(filterParams.Q));
+
             if (rating != -1)
             {
-                query = query.Where(x => x.Rating >= rating);
+                lawyers = lawyers.Where(x => x.Rating >= rating);
             }
             if (!string.IsNullOrEmpty(title))
             {
-                query = query.Where(x => x.Title == title);
+                lawyers = lawyers.Where(x => x.Title == title);
             }
             if (!string.IsNullOrEmpty(city))
             {
-                query = query.Where(x => x.City == city);
+                lawyers = lawyers.Where(x => x.City == city);
             }
             if (!string.IsNullOrEmpty(memberof))
             {
-                query = query.Where(x => x.MemberOf == memberof);
+                lawyers = lawyers.Where(x => x.MemberOf == memberof);
             }
             if (grade != 0)
             {
-                query = query.Where(x => x.Grade == grade);
+                lawyers = lawyers.Where(x => x.Grade == grade);
             }
-            if(!string.IsNullOrEmpty(licencenumber))
+            if (!string.IsNullOrEmpty(licencenumber))
             {
-                query = query.Where(x => x.LicenseNumber == licencenumber);
+                lawyers = lawyers.Where(x => x.LicenseNumber == licencenumber);
             }
-            var lawyers = await query.ToListAsync();
-            var result_dto = _mapper.Map<List<LawyerDto>>(lawyers);
-            return result_dto;
+
+            var new_lawyers = await  lawyers.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize, (string.IsNullOrEmpty(filterParams.Sort) ? "Id" : filterParams.Sort), !filterParams.IsAscending);
+
+            return new_lawyers;
         }
+
+        
     }
 }
