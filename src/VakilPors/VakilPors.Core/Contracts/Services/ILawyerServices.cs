@@ -26,6 +26,6 @@ namespace VakilPors.Core.Contracts.Services
         Task<bool> TransferToken(int lawyerId);
         Task<bool> VerifyLawyer(int lawyerId);
         Task<bool> IsLawyer(int userId);
-        Task<List<LawyerDto>> FilteredSearch(SearchDto lawyerDto);
+        //Task<List<LawyerDto>> FilteredSearch(SearchDto lawyerDto);
     }
 }
