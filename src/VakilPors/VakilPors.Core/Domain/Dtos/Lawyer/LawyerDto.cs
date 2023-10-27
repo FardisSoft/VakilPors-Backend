@@ -14,8 +14,6 @@ namespace VakilPors.Core.Domain.Dtos.Lawyer
     {
         public int Id { get; set; }
         public double Rating { get; set; } = 0d;
-        public string ParvandeNo { get; set; }
-        public bool IsAuthorized { get; set; } = false;
         public string ProfileImageUrl { get; set; }
         public string Title { get; set; }
         public string City { get; set; }
@@ -48,9 +46,8 @@ namespace VakilPors.Core.Domain.Dtos.Lawyer
 
         public string NationalCardImageUrl { get; set; }
 
-        public IFormFile NationalCardImage  { get; set; }
+        public IFormFile NationalCardImage { get; set; }
 
         public int Tokens { get; set; }
-        public List<string> RatesList { get; set; }
     }
 }

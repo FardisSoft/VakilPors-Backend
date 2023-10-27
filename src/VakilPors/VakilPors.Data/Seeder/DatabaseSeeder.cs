@@ -164,8 +164,10 @@ namespace VakilPors.Data.Seeder
                 .RuleFor(l => l.OfficeAddress, f => f.Address.FullAddress())
                 .RuleFor(l => l.Specialties, f => f.Lorem.Sentence())
                 .RuleFor(l => l.MemberOf, f => f.Lorem.Word())
-                .RuleFor(l => l.ProfileImageUrl, (f, l) => $"https://i.pravatar.cc/150?u={l.Title}");
-
+                .RuleFor(l => l.Gender, f => f.Person.Gender==Name.Gender.Male?"مذکر":"مونث")
+                .RuleFor(l => l.ProfileImageUrl, (f, l) => $"https://i.pravatar.cc/150?u={l.UserId}");
+            var fakerPerson = new Faker<Person>("fa")
+                .RuleFor(n => n, f => f.Person);
             var lawyers = fakerLawyer.Generate(countUserslocal);
             await context.Set<Lawyer>().AddRangeAsync(lawyers);
             await context.SaveChangesAsync();
@@ -173,6 +175,12 @@ namespace VakilPors.Data.Seeder
             {
                 var user = await context.Users.FindAsync(lawyer.UserId);
                 user.LawyerId = lawyer.Id;
+                Person person;
+                do
+                {
+                    person = fakerPerson.Generate();
+                } while (!(person.Gender == Name.Gender.Male && lawyer.Gender == "مذکر")&& !(person.Gender == Name.Gender.Female && lawyer.Gender == "مونث"));
+                user.Name = person.FullName;
                 context.Update(user);
             }
             await context.SaveChangesAsync();
