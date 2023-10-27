@@ -154,7 +154,7 @@ namespace VakilPors.Data.Seeder
             int vid_index = 0;
             // int vid = 1001;
             var types =new [] {"جنایی","حقوقی","انتخابی","معاضدتی","سازمانی","تسخیری" };
-            var fakerLawyer = new Faker<Lawyer>()
+            var fakerLawyer = new Faker<Lawyer>("fa")
                 .RuleFor(l => l.UserId, f => ids[vid_index++])
                 .RuleFor(l => l.LicenseNumber, f => f.Random.Int(10000, 99999).ToString())
                 .RuleFor(l => l.City, f => f.Address.City())

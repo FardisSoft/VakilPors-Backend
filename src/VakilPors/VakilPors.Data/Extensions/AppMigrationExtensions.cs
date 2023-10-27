@@ -21,8 +21,8 @@ namespace VakilPors.Data.Extensions
             {
                 await using var scope = app.Services.CreateAsyncScope();
                 using var db = scope.ServiceProvider.GetService<AppDbContext>();
-                await db.Database.MigrateAsync();
                 Console.WriteLine("Migrating database...");
+                await db.Database.MigrateAsync();
                 int adminRoleId = await db.Roles.Where(r => r.Name == RoleNames.Admin).Select(r => r.Id).FirstOrDefaultAsync();
                 bool hasAdmin = await db.UserRoles.AnyAsync(r => r.RoleId == adminRoleId);
                 if (!hasAdmin)
