@@ -11,5 +11,5 @@ public class Visitor : IEntity
     public string UserGUID { get; set; }
     [Required]
     public string IPv4 { get; set; }
-    public DateTime visitTime { get; set; } = DateTime.Now;
+    public DateTime VisitTime { get; set; } = DateTime.Now;
 }

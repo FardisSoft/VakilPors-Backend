@@ -53,10 +53,10 @@ public class StatisticsService : IStatisticsService
 
     public async Task<int> GetVisits(DateTime from)
     {
-        return await appUnitOfWork.VisitorRepo.AsQueryableNoTracking().Where(v => v.visitTime >= from).CountAsync();
+        return await appUnitOfWork.VisitorRepo.AsQueryableNoTracking().Where(v => v.VisitTime >= from).CountAsync();
     }
     public async Task<int> GetVisits(DateTime from, DateTime to)
     {
-        return await appUnitOfWork.VisitorRepo.AsQueryableNoTracking().Where(v => v.visitTime >= from && v.visitTime <= to).CountAsync();
+        return await appUnitOfWork.VisitorRepo.AsQueryableNoTracking().Where(v => v.VisitTime >= from && v.VisitTime <= to).CountAsync();
     }
 }
