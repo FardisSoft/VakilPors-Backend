@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Pagination.EntityFrameworkCore.Extensions;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Params;
@@ -18,19 +19,21 @@ namespace VakilPors.Core.Services
         private readonly UserManager<User> userManager;
         private readonly IAppUnitOfWork appUnitOfWork;
         private readonly IEmailSender emailSender;
-        private readonly ITelegramService _tegramService;
-        public WalletServices(UserManager<User> userManager, IAppUnitOfWork appUnitOfWork, IEmailSender emailSender, ITelegramService telegramService)
+        private readonly ITelegramService _telegramService;
+
+        public WalletServices(UserManager<User> userManager, IAppUnitOfWork appUnitOfWork, IEmailSender emailSender,
+            ITelegramService telegramService)
         {
             this.userManager = userManager;
             this.appUnitOfWork = appUnitOfWork;
             this.emailSender = emailSender;
-            this._tegramService = telegramService;
+            this._telegramService = telegramService;
         }
+
         public async Task AddBalance(string phoneNumber, decimal amount)
         {
             var user = await getUser(phoneNumber);
             await addBalance(user, amount);
-
         }
 
         public async Task AddBalance(int userId, decimal amount)
@@ -38,6 +41,7 @@ namespace VakilPors.Core.Services
             var user = await getUser(userId);
             await addBalance(user, amount);
         }
+
         private async Task addBalance(User user, decimal amount)
         {
             user.Balance += amount;
@@ -49,9 +53,10 @@ namespace VakilPors.Core.Services
         }
 
 
-        public async Task AddTransaction(int userId, decimal amount, string description, string authority, bool isSuccess, bool isIncome, bool isWithdraw = false)
+        public async Task AddTransaction(int userId, decimal amount, string description, string authority,
+            bool isSuccess, bool isIncome, bool isWithdraw = false)
         {
-            var tranaction = new Tranaction()
+            var transaction = new Transaction()
             {
                 UserId = userId,
                 Amount = amount,
@@ -62,12 +67,13 @@ namespace VakilPors.Core.Services
                 IsSuccess = isSuccess,
                 IsWithdraw = isWithdraw,
             };
-            await appUnitOfWork.TransactionRepo.AddAsync(tranaction);
+            await appUnitOfWork.TransactionRepo.AddAsync(transaction);
             await appUnitOfWork.SaveChangesAsync();
             if (isSuccess)
                 await AddBalance(userId, (isIncome ? amount : -amount));
             string yesorno = isSuccess ? "بود" : "نبود";
-            string body = $@"تراکنش شما در تاریخ {DateTime.Now} ثبت شد.مبلغ: {amount} توضیحات: {description} کد تراکنش: {authority}  تراکنش موفقیت آمیز {yesorno}.";
+            string body =
+                $@"تراکنش شما در تاریخ {DateTime.Now} ثبت شد.مبلغ: {amount} توضیحات: {description} کد تراکنش: {authority}  تراکنش موفقیت آمیز {yesorno}.";
             //string body = $@"
             //تراکنش شما در تاریخ {DateTime.Now} ثبت شد.
             //مبلغ:{amount}
@@ -79,31 +85,34 @@ namespace VakilPors.Core.Services
             await emailSender.SendEmailAsync(user.Email, user.Name, "تراکنش", body);
             if (user.Telegram != null)
             {
-                await TelegramService.SendToTelegram(body, user.Telegram);
+                await _telegramService.SendToTelegram(body, user.Telegram);
             }
-
-
         }
-        public async Task ApproveTransaction(int tranactionId)
+
+        public async Task ApproveTransaction(int transactionId)
         {
-            var transaction = await appUnitOfWork.TransactionRepo.FindAsync(tranactionId);
+            var transaction = await appUnitOfWork.TransactionRepo.FindAsync(transactionId);
             if (transaction.IsSuccess)
             {
                 throw new InternalServerException("transaction is already applied");
             }
+
             transaction.IsSuccess = true;
             appUnitOfWork.TransactionRepo.Update(transaction);
             await appUnitOfWork.SaveChangesAsync();
             await AddBalance(transaction.UserId, (transaction.IsIncome ? transaction.Amount : -transaction.Amount));
         }
-        public async Task ApplyTransaction(int tranactionId)
+
+        public async Task ApplyTransaction(int transactionId)
         {
-            var transaction = await appUnitOfWork.TransactionRepo.AsQueryable().Include(t => t.User).FirstOrDefaultAsync(t => t.Id == tranactionId);
+            var transaction = await appUnitOfWork.TransactionRepo.AsQueryable().Include(t => t.User)
+                .FirstOrDefaultAsync(t => t.Id == transactionId);
             var user = transaction.User;
             if (!transaction.IsSuccess || (!transaction.IsIncome && user.Balance < transaction.Amount))
             {
                 return;
             }
+
             var amount = (transaction.IsIncome ? transaction.Amount : -transaction.Amount);
             user.Balance += amount;
             appUnitOfWork.UserRepo.Update(user);
@@ -116,16 +125,23 @@ namespace VakilPors.Core.Services
             var user = await getUser(phoneNumber);
             return user.Balance;
         }
-        public async Task<IPagedList<Tranaction>> GetTransactions(string phoneNumber, PagedParams pagedParams)
+
+        public async Task<Pagination<Transaction>> GetTransactions(string phoneNumber, PagedParams pagedParams)
         {
-            var tranactions = await appUnitOfWork.UserRepo.AsQueryableNoTracking().Include(u => u.Tranactions).Where(x => x.PhoneNumber == phoneNumber).Select(x => x.Tranactions).ToPagedListAsync(pagedParams.PageNumber, pagedParams.PageSize);
-            return tranactions.FirstOrDefault().ToPagedList();
+            var transactions = await appUnitOfWork.UserRepo.AsQueryableNoTracking()
+                .Include(u => u.Transactions)
+                .Where(x => x.PhoneNumber == phoneNumber)
+                .SelectMany(x => x.Transactions)
+                .AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize);
+            return transactions;
         }
-        public async Task<IEnumerable<Tranaction>> GetWithdrawTransactions()
+
+        public async Task<IEnumerable<Transaction>> GetWithdrawTransactions()
         {
-            var tranactions = appUnitOfWork.TransactionRepo.AsQueryableNoTracking().Where(x => x.IsWithdraw);
-            return await tranactions.ToArrayAsync();
+            var transactions = appUnitOfWork.TransactionRepo.AsQueryableNoTracking().Where(x => x.IsWithdraw);
+            return await transactions.ToArrayAsync();
         }
+
         public async Task Withdraw(int userId, decimal amount, string cardNo)
         {
             var user = await getUser(userId);
@@ -133,20 +149,24 @@ namespace VakilPors.Core.Services
             {
                 throw new BadArgumentException("Not enough balance");
             }
+
             await AddTransaction(userId, amount, $"برداشت از کیف پول، شماره کارت:{cardNo}", "", true, false, true);
             await userManager.UpdateAsync(user);
         }
-        public async Task PayWithdraw(int tranactionId)
+
+        public async Task PayWithdraw(int transactionId)
         {
-            var trans = await appUnitOfWork.TransactionRepo.FindAsync(tranactionId);
+            var trans = await appUnitOfWork.TransactionRepo.FindAsync(transactionId);
             if (!trans.IsWithdraw)
             {
                 throw new BadArgumentException("The transaction is not withdraw!");
             }
+
             if (trans.IsPaid)
             {
                 throw new BadArgumentException("The transaction is already paid!");
             }
+
             trans.IsPaid = true;
             appUnitOfWork.TransactionRepo.Update(trans);
             await appUnitOfWork.SaveChangesAsync();
@@ -159,8 +179,10 @@ namespace VakilPors.Core.Services
             {
                 throw new NotFoundException("user not found");
             }
+
             return user;
         }
+
         private async Task<User> getUser(int userId)
         {
             var user = await userManager.FindByIdAsync(userId.ToString());
@@ -168,8 +190,8 @@ namespace VakilPors.Core.Services
             {
                 throw new NotFoundException("user not found");
             }
+
             return user;
         }
-
     }
 }

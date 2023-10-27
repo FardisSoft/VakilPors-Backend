@@ -8,7 +8,7 @@ using VakilPors.Shared.Entities;
 
 namespace VakilPors.Core.Domain.Entities
 {
-    public class Tranaction : IEntity
+    public class Transaction : IEntity
     {
         [Key]
         public int Id { get; set; }

@@ -25,7 +25,7 @@ public class AppUnitOfWork : IAppUnitOfWork
 
     public IGenericRepo<User> UserRepo => _dbContext.GetService<IGenericRepo<User>>();
 
-    public IGenericRepo<Tranaction> TransactionRepo => _dbContext.GetService<IGenericRepo<Tranaction>>();
+    public IGenericRepo<Transaction> TransactionRepo => _dbContext.GetService<IGenericRepo<Transaction>>();
 
     public IGenericRepo<Lawyer> LawyerRepo => _dbContext.GetService<IGenericRepo<Lawyer>>();
 

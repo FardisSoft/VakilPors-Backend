@@ -18,7 +18,7 @@ namespace VakilPors.Core.Services
     {
         private readonly IAppUnitOfWork _appUnitOfWork;
         private readonly IMapper _mapper;
-        public static  ILogger<TelegramService> _logger;
+        public readonly ILogger<TelegramService> _logger;
         public TelegramService(IAppUnitOfWork appUnitOfWork, IMapper mapper, ILogger<TelegramService> logger)
         {
             _appUnitOfWork = appUnitOfWork;
@@ -34,7 +34,7 @@ namespace VakilPors.Core.Services
             await _appUnitOfWork.SaveChangesAsync();
         }
 
-        public async static Task SendToTelegram(string text, string chat_id)
+        public async Task SendToTelegram(string text, string chat_id)
         {
             try
             {

@@ -4,9 +4,11 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using System.Threading;
+using Pagination.EntityFrameworkCore.Extensions;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos;
+using VakilPors.Core.Domain.Dtos.Params;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
 
@@ -131,7 +133,7 @@ public class ThreadCommentService : IThreadCommentService
         return true;
     }
 
-    public async Task<List<ThreadCommentDto>> GetCommentsForThread(int userId, int threadId)
+    public async Task<Pagination<ThreadCommentDto>> GetCommentsForThread(int userId, int threadId,PagedParams pagedParams)
     {
         var comments = await _uow.ThreadCommentRepo
             .AsQueryable()
@@ -147,11 +149,11 @@ public class ThreadCommentService : IThreadCommentService
         }
 
         commentDtoList = commentDtoList
-            .OrderByDescending(x => x.User.IsPremium)
-            .ThenByDescending(x => x.LikeCount)
-            .ToList();
+        .OrderByDescending(x => x.User.IsPremium)
+        .ThenByDescending(x => x.LikeCount)
+        .ToList();
 
-        return commentDtoList;
+        return new Pagination<ThreadCommentDto>(commentDtoList,commentDtoList.Count,pagedParams.PageNumber,pagedParams.PageSize,true);
     }
     
     public async Task<ThreadCommentDto> GetCommentById(int userId, int commentId)

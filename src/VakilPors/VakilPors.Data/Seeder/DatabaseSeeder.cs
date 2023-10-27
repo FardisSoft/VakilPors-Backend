@@ -62,10 +62,10 @@ namespace VakilPors.Data.Seeder
         public const int countUsers = 30;
         public const int countTrans = 200;
         public const int startUserId = 100;
-        public static IEnumerable<Tranaction> seedTransactions()
+        public static IEnumerable<Transaction> seedTransactions()
         {
             Randomizer.Seed = new Random(seed);
-            var fakerTrans = new Faker<Tranaction>()
+            var fakerTrans = new Faker<Transaction>()
             .RuleFor(t => t.Amount, f => f.Random.Decimal() * f.Random.Int(1000, 1000_000))
             .RuleFor(t => t.Description, f => f.Lorem.Paragraph())
             .RuleFor(t => t.IsIncome, f => f.Random.Bool())

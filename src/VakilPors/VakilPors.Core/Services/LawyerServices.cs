@@ -7,6 +7,7 @@ using AutoMapper;
 using FuzzySharp;
 using Microsoft.AspNetCore.Mvc.TagHelpers.Cache;
 using Microsoft.EntityFrameworkCore;
+using Pagination.EntityFrameworkCore.Extensions;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Lawyer;
@@ -42,14 +43,24 @@ namespace VakilPors.Core.Services
             _chatServices = chatServices;
             _walletServices = walletServices;
         }
-        public async Task<IPagedList<Lawyer>> GetLawyers(PagedParams pagedParams, FilterParams filterParams)
+        public async Task<Pagination<Lawyer>> GetLawyers(PagedParams pagedParams, FilterParams filterParams)
         {
             var lawyers = await _appUnitOfWork.LawyerRepo.AsQueryableNoTracking()
             .Include(l => l.User)
             .Where(l => string.IsNullOrEmpty(filterParams.Q) || Fuzz.PartialRatio(l.User.Name, filterParams.Q) > 75 || l.ParvandeNo.Contains(filterParams.Q))
+            .AsPaginationAsync(pagedParams.PageNumber,pagedParams.PageSize,(string.IsNullOrEmpty(filterParams.Sort) ? "Id" : filterParams.Sort),!filterParams.IsAscending);
+
+            return lawyers;
+        }
+
+        public async Task<IPagedList<Lawyer>> GetLawyers2(PagedParams pagedParams, FilterParams filterParams)
+        {
+            var lawyers = await _appUnitOfWork.LawyerRepo.AsQueryableNoTracking()
+                .Include(l => l.User)
+                .Where(l => string.IsNullOrEmpty(filterParams.Q) || Fuzz.PartialRatio(l.User.Name, filterParams.Q) > 75 || l.ParvandeNo.Contains(filterParams.Q))
             .OrderBy((string.IsNullOrEmpty(filterParams.Sort) ? "Id" : filterParams.Sort), filterParams.IsAscending)
             .ToPagedListAsync(pagedParams.PageNumber, pagedParams.PageSize);
-
+            
             return lawyers;
         }
 

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos;
+using VakilPors.Core.Domain.Dtos.Params;
 using VakilPors.Shared.Response;
 using VakilPors.Web.Controllers;
 
@@ -14,7 +15,9 @@ namespace VakilPors.Api.Controllers
     {
         private readonly IThreadCommentService _threadCommentService;
         private readonly ILogger<ThreadCommentController> _logger;
-        public ThreadCommentController(ILogger<ThreadCommentController> logger, IThreadCommentService threadCommnetService)
+
+        public ThreadCommentController(ILogger<ThreadCommentController> logger,
+            IThreadCommentService threadCommnetService)
         {
             _logger = logger;
             _threadCommentService = threadCommnetService;
@@ -45,9 +48,10 @@ namespace VakilPors.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCommentsForThread(int threadId)
+        public async Task<IActionResult> GetCommentsForThread([FromQuery] int threadId,
+            [FromQuery] PagedParams pagedParams)
         {
-            var result = await _threadCommentService.GetCommentsForThread(getUserId(), threadId);
+            var result = await _threadCommentService.GetCommentsForThread(getUserId(), threadId, pagedParams);
             return Ok(new AppResponse<object>(result, "success"));
         }
 
@@ -75,7 +79,7 @@ namespace VakilPors.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> SetAsAnswer(int commentId)
         {
-            var result = await _threadCommentService.SetAsAnswer(getUserId() , commentId);
+            var result = await _threadCommentService.SetAsAnswer(getUserId(), commentId);
             return Ok(new AppResponse<object>(result, "success"));
         }
 
@@ -85,6 +89,5 @@ namespace VakilPors.Api.Controllers
             var result = await _threadCommentService.UndoSetAsAnswer(getUserId(), commentId);
             return Ok(new AppResponse<object>(result, "success"));
         }
-
     }
 }

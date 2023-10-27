@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Pagination.EntityFrameworkCore.Extensions;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Params;
 using VakilPors.Core.Domain.Dtos.Payment;
@@ -53,12 +54,12 @@ namespace VakilPors.Web.Controllers
         }
         //get transactions
         [HttpGet("GetTransactions")]
-        public async Task<IPagedList<TranactionDto>> GetTransactions([FromQuery] PagedParams pagedParams)
+        public async Task<Pagination<TransactionDto>> GetTransactions([FromQuery] PagedParams pagedParams)
         {
             var phoneNumber = getPhoneNumber();
             _logger.LogInformation($"get transactions for user with phone number:{phoneNumber}");
-            IPagedList<Tranaction> transactions = await _walletServices.GetTransactions(phoneNumber, pagedParams);
-            return transactions.ToMappedPagedList<Tranaction, TranactionDto>(_mapper);
+            Pagination<Transaction> transactions = await _walletServices.GetTransactions(phoneNumber, pagedParams);
+            return transactions.ToMappedPagination<Transaction, TransactionDto>(_mapper, pagedParams.PageSize);
         }
 
         [Authorize(Roles = RoleNames.Vakil)]
@@ -87,9 +88,9 @@ namespace VakilPors.Web.Controllers
         {
             var phoneNumber = getPhoneNumber();
             _logger.LogInformation($"get transactions for user with phone number:{phoneNumber}");
-            IEnumerable<Tranaction> transactions = await _walletServices.GetWithdrawTransactions();
-            IEnumerable<TranactionDto> result = _mapper.Map<IEnumerable<Tranaction>, IEnumerable<TranactionDto>>(transactions);
-            return Ok(new AppResponse<IEnumerable<TranactionDto>>(result, "Withdrawn Transactions fetched sueccessfully!"));
+            IEnumerable<Transaction> transactions = await _walletServices.GetWithdrawTransactions();
+            IEnumerable<TransactionDto> result = _mapper.Map<IEnumerable<Transaction>, IEnumerable<TransactionDto>>(transactions);
+            return Ok(new AppResponse<IEnumerable<TransactionDto>>(result, "Withdrawn Transactions fetched sueccessfully!"));
         }
     }
 }

@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Pagination.EntityFrameworkCore.Extensions;
 using VakilPors.Api.Controllers;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Lawyer;
@@ -88,12 +89,12 @@ public class LawyerController : MyControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IPagedList<LawyerDto>>> GetAllPaged([FromQuery] PagedParams pagedParams, [FromQuery] FilterParams filterParams)
+    public async Task<ActionResult> GetAllPaged([FromQuery] PagedParams pagedParams, [FromQuery] FilterParams filterParams)
     {
         _logger.LogInformation($"GET ALL lawyers paged. page no:{pagedParams.PageNumber} page size:{pagedParams.PageSize}, search query:{filterParams.Q}, sort by:{filterParams.Sort}, isAscending:{filterParams.IsAscending}");
         var all = await _lawyerServices.GetLawyers(pagedParams, filterParams);
-        var res = all.ToMappedPagedList<Lawyer, LawyerDto>(_mapper);
-        return Ok(new AppResponse<IPagedList<LawyerDto>>(res, "success"));
+        var res = all.ToMappedPagination<Lawyer, LawyerDto>(_mapper,pagedParams.PageSize);
+        return Ok(new AppResponse<Pagination<LawyerDto>>(res, "success"));
     }
 
 }

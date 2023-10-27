@@ -1,11 +1,9 @@
-﻿using System.ComponentModel;
-using System.Threading;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos;
+using VakilPors.Core.Domain.Dtos.Params;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
 
@@ -18,7 +16,7 @@ public class ThreadService : IThreadService
     private readonly IThreadCommentService _threadCommentService;
     private readonly ILawyerServices _lawyerServices;
     private readonly IPremiumService _premiumService;
-    private readonly ITelegramService _tegramService;
+    private readonly ITelegramService _telegramService;
     private readonly IEmailSender emailSender;
 
     public ThreadService(IAppUnitOfWork uow, IMapper mapper, IThreadCommentService threadCommentService, ILawyerServices lawyerServices, IPremiumService premiumService, ITelegramService telegramService, IEmailSender emailSender)
@@ -28,7 +26,7 @@ public class ThreadService : IThreadService
         _threadCommentService = threadCommentService;
         _lawyerServices = lawyerServices;
         _premiumService = premiumService;
-        _tegramService = telegramService;
+        _telegramService = telegramService;
         this.emailSender = emailSender;
     }
 
@@ -63,8 +61,8 @@ public class ThreadService : IThreadService
         if (addResult <= 0)
             throw new Exception();
         await emailSender.SendEmailAsync(_user.Email, _user.Name, "ساخت رشته", $"شما با موفقیت رشته خود درباره را {threadDto.Title} ساختید");
-        await TelegramService.SendToTelegram($"شما با موفقیت رشته خود درباره را {threadDto.Title} ساختید", _user.Telegram);
-        return (await GetThreadWithComments(userId, thread.Id)).Thread;
+        await _telegramService.SendToTelegram($"شما با موفقیت رشته خود درباره را {threadDto.Title} ساختید", _user.Telegram);
+        return await GetThread(userId, thread.Id);
     }
 
     public async Task<ThreadDto> UpdateThread(int userId, ThreadDto threadDto)
@@ -93,7 +91,7 @@ public class ThreadService : IThreadService
         if (updateResult <= 0)
             throw new Exception();
 
-        return (await GetThreadWithComments(userId, foundThread.Id)).Thread;
+        return await GetThread(userId, foundThread.Id);
     }
 
     public async Task<bool> DeleteThread(int userId, int threadId)
@@ -112,7 +110,7 @@ public class ThreadService : IThreadService
         if (removeResult <= 0)
             throw new Exception();
         await emailSender.SendEmailAsync(_user.Email, _user.Name, "حذف رشته", $"رشته شما با عنوان {foundThread.Title} موفقیت حذف شد");
-        await TelegramService.SendToTelegram($"رشته شما با عنوان {foundThread.Title} موفقیت حذف شد", _user.Telegram);
+        await _telegramService.SendToTelegram($"رشته شما با عنوان {foundThread.Title} موفقیت حذف شد", _user.Telegram);
 
         return true;
     }
@@ -139,7 +137,18 @@ public class ThreadService : IThreadService
         return threadDtos;
     }
 
-    public async Task<ThreadWithCommentsDto> GetThreadWithComments(int userId, int threadId)
+    public async Task<ThreadWithCommentsDto> GetThreadWithComments(int userId, int threadId,PagedParams pagedParams)
+    {
+        var threadDto = await GetThread(userId, threadId);
+
+        return new ThreadWithCommentsDto
+        {
+            Thread = threadDto,
+            Comments = await _threadCommentService.GetCommentsForThread(userId, threadId,pagedParams)
+        };
+    }
+
+    private async Task<ThreadDto> GetThread(int userId, int threadId)
     {
         var thread = await _uow.ForumThreadRepo
             .AsQueryable()
@@ -151,12 +160,7 @@ public class ThreadService : IThreadService
             throw new BadArgumentException("thread not found");
 
         var threadDto = await GetThreadDtoFromThread(userId, thread);
-
-        return new ThreadWithCommentsDto
-        {
-            Thread = threadDto,
-            Comments = await _threadCommentService.GetCommentsForThread(userId, threadId)
-        };
+        return threadDto;
     }
 
     public async Task<int> LikeThread(int userId, int threadId)

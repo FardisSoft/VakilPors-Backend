@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Pagination.EntityFrameworkCore.Extensions;
 using VakilPors.Core.Domain.Dtos.Lawyer;
 using VakilPors.Core.Domain.Dtos.Params;
 using VakilPors.Core.Domain.Dtos.User;
@@ -13,7 +14,8 @@ namespace VakilPors.Core.Contracts.Services
 {
     public interface ILawyerServices:IScopedDependency
     {
-        Task<IPagedList<Lawyer>> GetLawyers(PagedParams pagedParams, FilterParams filterParams);
+        Task<Pagination<Lawyer>> GetLawyers(PagedParams pagedParams, FilterParams filterParams);
+        Task<IPagedList<Lawyer>> GetLawyers2(PagedParams pagedParams, FilterParams filterParams);
 
         Task<LawyerDto> UpdateLawyer(LawyerDto lawyerDto);
         Task<List<LawyerDto>> GetAllLawyers();
