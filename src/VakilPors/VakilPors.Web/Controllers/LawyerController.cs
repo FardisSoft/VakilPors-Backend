@@ -90,21 +90,12 @@ public class LawyerController : MyControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetAllPaged([FromQuery] PagedParams pagedParams, [FromQuery] FilterParams filterParams , [FromQuery] SearchDto searchdto)
+    public async Task<ActionResult> GetAllPaged([FromQuery] PagedParams pagedParams, [FromQuery] SortParams sortParams , [FromQuery] LawyerFilterParams filterParams)
     {
-        _logger.LogInformation($"GET ALL lawyers paged. page no:{pagedParams.PageNumber} page size:{pagedParams.PageSize}, search query:{filterParams.Q}, sort by:{filterParams.Sort}, isAscending:{filterParams.IsAscending}");
-        var all = await _lawyerServices.GetLawyers(pagedParams, filterParams,searchdto);
+        _logger.LogInformation($"GET ALL lawyers paged. page no:{pagedParams.PageNumber} page size:{pagedParams.PageSize}, search query:{filterParams.Name}, sort by:{sortParams.Sort}, isAscending:{sortParams.IsAscending}");
+        var all = await _lawyerServices.GetLawyers(pagedParams, sortParams,filterParams);
         var res = all.ToMappedPagination<Lawyer, LawyerDto>(_mapper,pagedParams.PageSize);
         return Ok(new AppResponse<Pagination<LawyerDto>>(res, "success"));
     }
-
-    //[HttpGet]
-    //public async Task<ActionResult<List<LawyerDto>>> FilteredSearch([FromQuery] SearchDto searchdto)
-    //{
-    //    _logger.LogInformation($"filtered search");
-    //    var res = await _lawyerServices.FilteredSearch(searchdto);
-    //    return Ok(res);
-    //}
-
 
 }

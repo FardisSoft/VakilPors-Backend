@@ -47,18 +47,6 @@ namespace VakilPors.Core.Services
             _walletServices = walletServices;
         }
         
-
-        public async Task<IPagedList<Lawyer>> GetLawyers2(PagedParams pagedParams, FilterParams filterParams)
-        {
-            var lawyers = await _appUnitOfWork.LawyerRepo.AsQueryableNoTracking()
-                .Include(l => l.User)
-                .Where(l => string.IsNullOrEmpty(filterParams.Q) || Fuzz.PartialRatio(l.User.Name, filterParams.Q) > 75 || l.ParvandeNo.Contains(filterParams.Q))
-            .OrderBy((string.IsNullOrEmpty(filterParams.Sort) ? "Id" : filterParams.Sort), filterParams.IsAscending)
-            .ToPagedListAsync(pagedParams.PageNumber, pagedParams.PageSize);
-            
-            return lawyers;
-        }
-
         public async Task<LawyerDto> UpdateLawyer(LawyerDto lawyerDto)
         {
             var foundLawyer = await _appUnitOfWork.LawyerRepo.FindAsync(lawyerDto.Id);
@@ -93,10 +81,8 @@ namespace VakilPors.Core.Services
                     foundLawyer.ResumeLink = resumeKey;
             }
 
-            foundLawyer.ParvandeNo = lawyerDto.ParvandeNo;
             foundLawyer.Title = lawyerDto.Title;
             foundLawyer.City = lawyerDto.City;
-            foundLawyer.Grade = lawyerDto.Grade;
             foundLawyer.LicenseNumber = lawyerDto.LicenseNumber;
             foundLawyer.MemberOf = lawyerDto.MemberOf;
             foundLawyer.YearsOfExperience = lawyerDto.YearsOfExperience;
@@ -266,48 +252,38 @@ namespace VakilPors.Core.Services
             return lawyerDto;
         }
 
-        public async Task<Pagination<Lawyer>> GetLawyers(PagedParams pagedParams, FilterParams filterParams , SearchDto lawyerDto)
+        public async Task<Pagination<Lawyer>> GetLawyers(PagedParams pagedParams, SortParams sortParams , LawyerFilterParams filterParams)
         {
-            var rating = lawyerDto.Rating;
-            var title = lawyerDto.Title;
-            var city = lawyerDto.City;
-            var memberof = lawyerDto.MemberOf;
-            var grade = lawyerDto.Grade;
-            var licencenumber = lawyerDto.LicenseNumber;
-            var gender = lawyerDto.Gender;
-
-            var lawyers = _appUnitOfWork.LawyerRepo.AsQueryableNoTracking()
+            var filteredLawyers = _appUnitOfWork.LawyerRepo.AsQueryableNoTracking()
             .Include(l => l.User)
-            .Where(l => string.IsNullOrEmpty(filterParams.Q) || Fuzz.PartialRatio(l.User.Name, filterParams.Q) > 75 || l.ParvandeNo.Contains(filterParams.Q));
+            .Where(l => string.IsNullOrEmpty(filterParams.Name) || Fuzz.PartialRatio(l.User.Name, filterParams.Name) > 75 );
 
-            if (rating != -1)
+            if (filterParams.Rating != null)
             {
-                lawyers = lawyers.Where(x => x.Rating >= rating);
+                filteredLawyers = filteredLawyers.Where(x => x.Rating >= filterParams.Rating);
             }
-            if (!string.IsNullOrEmpty(title))
+            if (!string.IsNullOrEmpty(filterParams.Title))
             {
-                lawyers = lawyers.Where(x => x.Title == title);
+                filteredLawyers = filteredLawyers.Where(x => x.Title == filterParams.Title);
             }
-            if (!string.IsNullOrEmpty(city))
+            if (!string.IsNullOrEmpty(filterParams.City))
             {
-                lawyers = lawyers.Where(x => x.City == city);
+                filteredLawyers = filteredLawyers.Where(x => x.City == filterParams.City);
             }
-            if (!string.IsNullOrEmpty(memberof))
+            if (!string.IsNullOrEmpty(filterParams.MemberOf))
             {
-                lawyers = lawyers.Where(x => x.MemberOf == memberof);
+                filteredLawyers = filteredLawyers.Where(x => x.MemberOf == filterParams.MemberOf);
             }
-            if (grade != 0)
+            if (!string.IsNullOrEmpty(filterParams.LicenseNumber))
             {
-                lawyers = lawyers.Where(x => x.Grade == grade);
+                filteredLawyers = filteredLawyers.Where(x => x.LicenseNumber == filterParams.LicenseNumber);
             }
-            if (!string.IsNullOrEmpty(licencenumber))
+            if (!string.IsNullOrEmpty(filterParams.Gender))
             {
-                lawyers = lawyers.Where(x => x.LicenseNumber == licencenumber);
+                filteredLawyers = filteredLawyers.Where(x => x.Gender == filterParams.Gender);
             }
 
-            var new_lawyers = await  lawyers.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize, (string.IsNullOrEmpty(filterParams.Sort) ? "Id" : filterParams.Sort), !filterParams.IsAscending);
-
-            return new_lawyers;
+            return await filteredLawyers.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize, (string.IsNullOrEmpty(sortParams.Sort) ? "Id" : sortParams.Sort), !sortParams.IsAscending);
         }
 
         
