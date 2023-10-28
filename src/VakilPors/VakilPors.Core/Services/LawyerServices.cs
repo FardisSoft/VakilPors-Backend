@@ -214,7 +214,7 @@ namespace VakilPors.Core.Services
             return true;
         }
 
-        private async Task<LawyerDto> GetLawyerDtoFormLawyer(Lawyer lawyer)
+        public async Task<LawyerDto> GetLawyerDtoFormLawyer(Lawyer lawyer)
         {
             var lawyerDto = _mapper.Map<LawyerDto>(lawyer);
 
