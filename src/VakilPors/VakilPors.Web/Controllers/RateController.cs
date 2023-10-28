@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using VakilPors.Web.Controllers;
 using VakilPors.Core.Contracts.Services;
 using AutoMapper;
+using Pagination.EntityFrameworkCore.Extensions;
+using VakilPors.Core.Domain.Dtos.Params;
 using VakilPors.Core.Domain.Dtos.Rate;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
@@ -53,11 +55,11 @@ namespace VakilPors.Api.Controllers
             return Ok();
         }
         [HttpGet]
-        [Route("GetAllRates")]
-        public async Task<List<RateUserDto>> GetAllRates([FromQuery] int lawyer_id)
+        [Route("GetRatesPaged")]
+        public async Task<Pagination<RateUserDto>> GetAllRates([FromQuery] int lawyerId,[FromQuery]PagedParams pagedParams)
         {
-            var result = await _RateService.GetAllRatesAsync(lawyer_id);
-            return result;
+            _logger.LogInformation($"user {getPhoneNumber()} get rates of lawyer {lawyerId}.");
+            return await _RateService.GetRatesPagedAsync(lawyerId,pagedParams);
         }
         [HttpPut]
         [Route("UpdateRate")]

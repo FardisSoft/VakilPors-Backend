@@ -5,12 +5,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Pagination.EntityFrameworkCore.Extensions;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
+using VakilPors.Core.Domain.Dtos.Params;
 using VakilPors.Core.Domain.Dtos.Rate;
 using VakilPors.Core.Domain.Dtos.User;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
+using VakilPors.Core.Mapper;
 
 namespace VakilPors.Core.Services
 {
@@ -79,26 +82,14 @@ namespace VakilPors.Core.Services
             await _appUnitOfWork.SaveChangesAsync();
         }
 
-        public async Task<List<RateUserDto>> GetAllRatesAsync(int lawyer_id) 
+        public async Task<Pagination<RateUserDto>> GetRatesPagedAsync(int lawyerId,PagedParams pagedParams) 
         {
-            List<Rate> rates = new List<Rate>();
-            rates = await _appUnitOfWork.RateRepo.AsQueryable().Where(x=> x.LawyerId == lawyer_id).ToListAsync();
-            List<RateUserDto> _rates = new List<RateUserDto>();
-            foreach (var rate in rates) 
-            {
-                RateUserDto r = new RateUserDto();
-                var rate_row = await _appUnitOfWork.RateRepo.FindAsync(rate.Id);
-                var uuser = await _appUnitOfWork.UserRepo.FindAsync(rate_row.UserId);
-                r.user = _mapper.Map<UserDto>(uuser);
-                r.RateNum = rate.RateNum;
-                r.Comment = rate.Comment;
-                _rates.Add(r);  
-            }
-            if (_rates.Count == 0)
-            {
-                throw new BadArgumentException("NO RATES FOUND!");
-            }
-            return _rates;
+            var rates = await _appUnitOfWork.RateRepo.AsQueryableNoTracking()
+                .Include(x => x.User)
+                .Where(x => x.LawyerId == lawyerId)
+                .AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize,nameof(Rate.Id),true);
+            
+            return rates.ToMappedPagination<Rate, RateUserDto>(_mapper,pagedParams.PageSize);;
         }
 
         public async Task<RateDto> GetRateAsync(int user_id, int lawyer_id)
