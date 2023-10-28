@@ -82,14 +82,14 @@ namespace VakilPors.Core.Services
             await _appUnitOfWork.SaveChangesAsync();
         }
 
-        public async Task<Pagination<RateUserDto>> GetRatesPagedAsync(int lawyerId,PagedParams pagedParams) 
+        public async Task<Pagination<Rate>> GetRatesPagedAsync(int lawyerId,PagedParams pagedParams) 
         {
             var rates = await _appUnitOfWork.RateRepo.AsQueryableNoTracking()
                 .Include(x => x.User)
                 .Where(x => x.LawyerId == lawyerId)
                 .AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize,nameof(Rate.Id),true);
-            
-            return rates.ToMappedPagination<Rate, RateUserDto>(_mapper,pagedParams.PageSize);
+
+            return rates;
         }
 
         public async Task<RateDto> GetRateAsync(int user_id, int lawyer_id)

@@ -8,13 +8,14 @@ using VakilPors.Core.Domain.Dtos.Params;
 using VakilPors.Core.Domain.Dtos.Rate;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
+using VakilPors.Core.Mapper;
 
 namespace VakilPors.Api.Controllers
 {
-    // [Authorize]
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
-    public class RateController :MyControllerBase
+    public class RateController : MyControllerBase
     {
         private readonly IRateService _RateService;
         private readonly ILogger<PremiumController> _logger;
@@ -26,47 +27,55 @@ namespace VakilPors.Api.Controllers
             _logger = logger;
             _mapper = mapper;
         }
+
         [HttpGet]
         [Route("GetRate")]
         public async Task<IActionResult> GetRateStatus(int laywer_id)
         {
             int user_id = getUserId();
             var rate = await _RateService.GetRateAsync(user_id, laywer_id);
-            if (rate == null) 
+            if (rate == null)
             {
                 return NotFound("Not found!!");
             }
             else
                 return Ok(rate);
         }
+
         [HttpGet]
         [Route("RateAverage")]
         public async Task<double> GetAverageStatus(int lawyer_id)
         {
-            double avg  = await _RateService.CalculateRatingAsync(lawyer_id);
+            double avg = await _RateService.CalculateRatingAsync(lawyer_id);
             return avg;
         }
+
         [HttpPost]
         [Route("AddRate")]
-        public async Task<IActionResult> AddRate(RateDto rate ,[FromQuery] int laywer_id)
+        public async Task<IActionResult> AddRate(RateDto rate, [FromQuery] int laywer_id)
         {
             var user_id = getUserId();
-            await _RateService.AddRateAsync(rate , user_id , laywer_id);
+            await _RateService.AddRateAsync(rate, user_id, laywer_id);
             return Ok();
         }
+
         [HttpGet]
         [Route("GetRatesPaged")]
-        public async Task<Pagination<RateUserDto>> GetAllRates([FromQuery] int lawyerId,[FromQuery]PagedParams pagedParams)
+        public async Task<Pagination<RateUserDto>> GetAllRates([FromQuery] int lawyerId,
+            [FromQuery] PagedParams pagedParams)
         {
-            _logger.LogInformation($"user 0911 get rates of lawyer {lawyerId}.");
-            return await _RateService.GetRatesPagedAsync(lawyerId,pagedParams);
+            _logger.LogInformation($"user {getPhoneNumber()} get rates of lawyer {lawyerId}.");
+            var rates = await _RateService.GetRatesPagedAsync(lawyerId, pagedParams);
+            var rateUserDtos = rates.ToMappedPagination<Rate, RateUserDto>(_mapper, pagedParams.PageSize);
+            return rateUserDtos;
         }
+
         [HttpPut]
         [Route("UpdateRate")]
-        public async Task<IActionResult> UpdateRate(RateDto rate , [FromQuery] int laywer_id)
+        public async Task<IActionResult> UpdateRate(RateDto rate, [FromQuery] int laywer_id)
         {
-            var user_id =getUserId();
-            await _RateService.UpdateRateAsync(rate, user_id , laywer_id);
+            var user_id = getUserId();
+            await _RateService.UpdateRateAsync(rate, user_id, laywer_id);
             return Ok();
         }
     }

@@ -14,7 +14,7 @@ namespace VakilPors.Core.Contracts.Services
     public interface IRateService :IScopedDependency
     {
         Task<RateDto> GetRateAsync(int user_id , int lawyer_id);
-        Task<Pagination<RateUserDto>> GetRatesPagedAsync(int lawyerId, PagedParams pagedParams); 
+        Task<Pagination<Rate>> GetRatesPagedAsync(int lawyerId, PagedParams pagedParams); 
         Task AddRateAsync(RateDto rate,int user_id , int lawyer_id);
         Task UpdateRateAsync(RateDto rate ,int user_id , int lawyer_id);
         Task DeleteRateAsync(int rate_id);
