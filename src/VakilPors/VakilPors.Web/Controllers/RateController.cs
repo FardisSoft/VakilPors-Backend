@@ -11,7 +11,7 @@ using VakilPors.Core.Exceptions;
 
 namespace VakilPors.Api.Controllers
 {
-    [Authorize]
+    // [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class RateController :MyControllerBase
@@ -58,7 +58,7 @@ namespace VakilPors.Api.Controllers
         [Route("GetRatesPaged")]
         public async Task<Pagination<RateUserDto>> GetAllRates([FromQuery] int lawyerId,[FromQuery]PagedParams pagedParams)
         {
-            _logger.LogInformation($"user {getPhoneNumber()} get rates of lawyer {lawyerId}.");
+            _logger.LogInformation($"user 0911 get rates of lawyer {lawyerId}.");
             return await _RateService.GetRatesPagedAsync(lawyerId,pagedParams);
         }
         [HttpPut]

@@ -31,6 +31,7 @@ namespace VakilPors.Core.Mapper
             CreateMap<SubscribedDto, Subscribed>();
             CreateMap<LegalDocumentDto, LegalDocument>().ReverseMap();
             CreateMap<RateDto, Rate>().ReverseMap();
+            CreateMap<RateUserDto, Rate>().ReverseMap();
         }
     }
 

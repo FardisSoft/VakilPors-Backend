@@ -12,6 +12,6 @@ namespace VakilPors.Core.Domain.Dtos.Rate
         public int Id { get; set; }
         public string Comment { get; set; }
         public double RateNum { get; set; }
-        public virtual UserDto user { get; set; } 
+        public UserDto User { get; set; } 
     }
 }

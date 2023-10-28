@@ -89,7 +89,7 @@ namespace VakilPors.Core.Services
                 .Where(x => x.LawyerId == lawyerId)
                 .AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize,nameof(Rate.Id),true);
             
-            return rates.ToMappedPagination<Rate, RateUserDto>(_mapper,pagedParams.PageSize);;
+            return rates.ToMappedPagination<Rate, RateUserDto>(_mapper,pagedParams.PageSize);
         }
 
         public async Task<RateDto> GetRateAsync(int user_id, int lawyer_id)
