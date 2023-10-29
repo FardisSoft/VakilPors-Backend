@@ -146,6 +146,17 @@ namespace VakilPors.Core.Services
             return await GetLawyerDtoFormLawyer(lawyer);
         }
 
+        public async Task sample (int userId)
+        {
+            var lawyer = await _appUnitOfWork.LawyerRepo
+                .AsQueryable()
+                .Include(x => x.User)
+                .FirstOrDefaultAsync(x => x.UserId == userId);
+
+            if (lawyer == null)
+                throw new BadArgumentException("Lawyer Not Found");
+        }
+
         public async Task<bool> IsLawyer(int userId)
         {
             var lawyer = await _appUnitOfWork.LawyerRepo
@@ -186,7 +197,7 @@ namespace VakilPors.Core.Services
                 throw new Exception();
         }
 
-        private async Task SetTokens(int lawyerId, int tokens)
+        public async Task SetTokens(int lawyerId, int tokens)
         {
             var foundLawyer = await _appUnitOfWork.LawyerRepo.FindAsync(lawyerId);
             if (foundLawyer == null)

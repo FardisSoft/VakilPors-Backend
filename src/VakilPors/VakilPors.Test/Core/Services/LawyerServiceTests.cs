@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Bogus.DataSets;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -8,10 +9,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VakilPors.Contracts.Repositories;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Lawyer;
 using VakilPors.Core.Domain.Entities;
+using VakilPors.Core.Exceptions;
 using VakilPors.Core.Services;
 using VakilPors.Data.UnitOfWork;
 
@@ -102,7 +105,7 @@ namespace VakilPors.Test.Core.Services
         public async Task add_token()
         {
             //Arrange
-            var found_lawyer = new Lawyer { Tokens = 0};
+            var found_lawyer = new Lawyer { Tokens = 10};
             var tokens = 10;
             var id = 1;
             appUnitOfWorkMock.Setup(u => u.LawyerRepo.FindAsync(id)).ReturnsAsync(found_lawyer);
@@ -113,7 +116,46 @@ namespace VakilPors.Test.Core.Services
             await lawyerServices.AddToken(id,tokens);
 
             //Assert 
+            Assert.Equal(20, found_lawyer.Tokens);
+        }
+
+        [Fact]
+        public async Task set_tokens()
+        {
+            //Arrange
+            var found_lawyer = new Lawyer { Tokens = 0 };
+            var tokens = 10;
+            var id = 1;
+            appUnitOfWorkMock.Setup(u => u.LawyerRepo.FindAsync(id)).ReturnsAsync(found_lawyer);
+            appUnitOfWorkMock.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
+            appUnitOfWorkMock.Setup(u => u.LawyerRepo.Update(found_lawyer));
+
+            //Act
+            await lawyerServices.SetTokens(id, tokens);
+
+            //Act 
             Assert.Equal(10, found_lawyer.Tokens);
+
+        }
+        [Fact]
+        public async Task sample()
+        {
+            var id = 1;
+            IEnumerable<Lawyer> _lawyers = new List<Lawyer>()
+            {
+                new Lawyer(),
+                new Lawyer(),
+                new Lawyer()
+            };
+            IQueryable<Lawyer> lawyers = _lawyers.AsQueryable(); 
+            //var mockLawyerRepository = new Mock<IGenericRepo<Lawyer>>();
+            //appUnitOfWorkMock.Setup(u => u.LawyerRepo).Returns(mockLawyerRepository.Object);
+            //mockLawyerRepository.Setup(r => r.AsQueryable()).Returns(lawyers);
+            appUnitOfWorkMock.Setup(x => x.LawyerRepo.AsQueryable()).Returns(lawyers);
+
+            //Act and Assert 
+            await Assert.ThrowsAsync<BadArgumentException>(() => lawyerServices.sample(id));
+
         }
     }
 }
