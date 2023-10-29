@@ -85,6 +85,7 @@ namespace VakilPors.Test.Core.Services
         [Fact]
         public async Task verify_lawyer()
         {
+            //Arrange
             var id = 1;
             var found_lawyer = new Lawyer();
             appUnitOfWorkMock.Setup(u => u.LawyerRepo.FindAsync(id)).ReturnsAsync(found_lawyer);
@@ -96,6 +97,23 @@ namespace VakilPors.Test.Core.Services
 
             //Assert 
             Assert.Equal(true,result);
+        }
+        [Fact]
+        public async Task add_token()
+        {
+            //Arrange
+            var found_lawyer = new Lawyer { Tokens = 0};
+            var tokens = 10;
+            var id = 1;
+            appUnitOfWorkMock.Setup(u => u.LawyerRepo.FindAsync(id)).ReturnsAsync(found_lawyer);
+            appUnitOfWorkMock.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
+            appUnitOfWorkMock.Setup(u => u.LawyerRepo.Update(found_lawyer));
+
+            //Act
+            await lawyerServices.AddToken(id,tokens);
+
+            //Assert 
+            Assert.Equal(10, found_lawyer.Tokens);
         }
     }
 }
