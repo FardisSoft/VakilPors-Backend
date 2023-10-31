@@ -146,7 +146,7 @@ namespace VakilPors.Core.Services
             return await GetLawyerDtoFormLawyer(lawyer);
         }
 
-        public async Task sample (int userId)
+        public async Task<Lawyer> sample (int userId)
         {
             var lawyer = await _appUnitOfWork.LawyerRepo
                 .AsQueryable()
@@ -155,6 +155,7 @@ namespace VakilPors.Core.Services
 
             if (lawyer == null)
                 throw new BadArgumentException("Lawyer Not Found");
+            return lawyer;
         }
 
         public async Task<bool> IsLawyer(int userId)
@@ -245,20 +246,29 @@ namespace VakilPors.Core.Services
                 .Select(x => x.LikeCount)
                 .SumAsync();
 
-            var threadLikes = await _appUnitOfWork.ThreadCommentRepo
-                .AsQueryable()
-                .Where(x => x.UserId == lawyer.UserId)
-                .Include(x => x.Thread)
-                .Select(x => x.Thread)
-                .Distinct()
-                .Select(t => t.LikeCount)
-                .SumAsync();
+            
+            var threadLikes = 0;
+            var query = _appUnitOfWork.ThreadCommentRepo.AsQueryable().Where(x => x.UserId == lawyer.UserId).Include(x=>x.Thread).Select(x => x.Thread).Distinct().Select(t => t.LikeCount);
+            try
+            {
+                threadLikes = await query.SumAsync();
+            }
+            catch (System.Reflection.TargetInvocationException ex)
+            {
+                await Console.Out.WriteLineAsync();
+            }
+
+
+
 
             lawyerDto.NumberOfLikes = commentLikes + threadLikes;
 
 
             var chats = await _chatServices.GetChatsOfUser(lawyer.UserId);
-            lawyerDto.NumberOfConsultations = chats.Count;
+            if (chats != null)
+            {
+                lawyerDto.NumberOfConsultations = chats.Count;
+            }
 
             return lawyerDto;
         }
