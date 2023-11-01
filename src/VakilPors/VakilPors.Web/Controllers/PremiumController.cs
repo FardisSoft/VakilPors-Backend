@@ -1,8 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Pagination.EntityFrameworkCore.Extensions;
 using VakilPors.Core.Contracts.Services;
+using VakilPors.Core.Domain.Dtos.Lawyer;
+using VakilPors.Core.Domain.Dtos.Params;
 using VakilPors.Core.Domain.Dtos.Premium;
+using VakilPors.Core.Domain.Entities;
+using VakilPors.Core.Mapper;
 using VakilPors.Shared.Response;
 
 
@@ -57,6 +62,26 @@ namespace VakilPors.Web.Controllers
             _logger.LogInformation($"deactivating subscriptions for user {user_id}");
             await _PremiumServices.DeactivatePremium(user_id);
         }
+
+        [HttpGet]
+        [Route("GetAllSunbcriptionStatus")]
+        public async Task<IActionResult> GetAllSunbcriptionStatus([FromQuery] PagedParams pagedParams, [FromQuery] SortParams sortParams)
+        {
+            _logger.LogInformation($"GET ALL subscribed paged. page no:{pagedParams.PageNumber} page size:{pagedParams.PageSize}, sort by:{sortParams.Sort}, isAscending:{sortParams.IsAscending}");
+            var all = await _PremiumServices.GetAllSubscriptionStatus(pagedParams, sortParams);
+            var res = all.ToMappedPagination<Subscribed, SubscribedDto>(_mapper, pagedParams.PageSize);
+            return Ok(new AppResponse<Pagination<SubscribedDto>>(res, "success"));
+        }
+
+
+
+
+
+
+
+
+
+
         //[HttpPut]
         //[Route("UpgradeSubscription")]
         //public async Task UpgradePremium(SubscribedDto subscribedDto)
