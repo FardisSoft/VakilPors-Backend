@@ -269,10 +269,10 @@ namespace VakilPors.Core.Services
                 threadLikes = await query3.SumAsync();
             }
 
-            catch (Exception ex)
-            {
-                await Console.Out.WriteLineAsync();
-            }
+            catch (Exception ex) 
+{
+    await Console.Out.WriteLineAsync();
+}
 
             //lawyerDto.NumberOfVerifies = await _appUnitOfWork.ThreadCommentRepo
             //    .AsQueryable()

@@ -14,6 +14,7 @@ using VakilPors.Contracts.Repositories;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Lawyer;
+using VakilPors.Core.Domain.Dtos.User;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
 using VakilPors.Core.Services;
@@ -32,6 +33,7 @@ namespace VakilPors.Test.Core.Services
         private readonly Mock<IChatServices> chatServicesMock;
         private readonly Mock<IWalletServices> walletServicesMock;
         private readonly Mapper mapper;
+        private readonly Mock<UserManager<User>> userManagerMock;
         public LawyerServiceTests()
         {
             appUnitOfWorkMock = new Mock<IAppUnitOfWork>();
@@ -41,7 +43,7 @@ namespace VakilPors.Test.Core.Services
             chatServicesMock = new Mock<IChatServices>();
             walletServicesMock = new Mock<IWalletServices>();
             _lawyerservicesMock = new Mock<LawyerServices>();
-            
+            userManagerMock = new Mock<UserManager<User>>();
 
 
 
@@ -263,7 +265,80 @@ namespace VakilPors.Test.Core.Services
             Assert.Equal(result, _lawyers.First());
         }
 
-        
+        [Fact]
+        public async Task transfer_token()
+        {
+            //Arrange 
+            int id = 1;
+            var user = new User { Id = id};
+            var userd = new UserDto { Id = id };
+            var found_lawyer = new Lawyer();
+            IEnumerable<Lawyer> lawyers = new List<Lawyer>()
+            {
+                new Lawyer{User = user , UserId = id}
+            };
+            IEnumerable<LawyerDto> lawyerdtos = new List<LawyerDto>()
+            {
+                new LawyerDto{User = userd }
+            };
+            IEnumerable<ThreadComment> threadComments = new List<ThreadComment>
+            {
+                new ThreadComment (),
+                new ThreadComment ()
+            };
+            IEnumerable<Chat> chats = new List<Chat>
+            {
+                new Chat(),
+                new Chat ()
+            };
+            IEnumerable<Subscribed> subscribeds = new List<Subscribed>
+            {
+                new Subscribed(),
+                new Subscribed()
+            };
+
+            IQueryable<ThreadComment> threadCommentsQueryable = threadComments.AsQueryable();
+            var mock = threadCommentsQueryable.BuildMock();
+
+            IQueryable<Chat> chatQueryable = chats.AsQueryable();
+            var mock2 = chatQueryable.BuildMock();
+
+            IQueryable<Subscribed> subscribedQueryable = subscribeds.AsQueryable();
+            var mock3 = subscribedQueryable.BuildMock();
+
+            IQueryable<Lawyer> lawyerQuriable = lawyers.AsQueryable();
+            var _mock = lawyerQuriable.BuildMock();
+
+            IQueryable<LawyerDto> lawyerdtosQueriable = lawyerdtos.AsQueryable();
+            var _mock2 = lawyerdtosQueriable.BuildMock();
+
+            var t = new IdentityResult();
+            appUnitOfWorkMock.Setup(u => u.LawyerRepo.AsQueryable()).Returns(_mock);
+            imapperMock.Setup(u => u.Map<LawyerDto>(lawyers.ToList()[0])).Returns(lawyerdtos.ToList()[0]);
+            appUnitOfWorkMock.Setup(u => u.ThreadCommentRepo.AsQueryable()).Returns(mock);
+            appUnitOfWorkMock.Setup(u => u.ChatRepo.AsQueryable()).Returns(mock2);
+            appUnitOfWorkMock.Setup(u => u.SubscribedRepo.AsQueryable()).Returns(mock3);
+            userManagerMock.Setup(u => u.FindByIdAsync(id.ToString())).ReturnsAsync(user);
+            userManagerMock.Setup(u => u.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
+            appUnitOfWorkMock.Setup(u => u.LawyerRepo.FindAsync(It.IsAny<int>())).ReturnsAsync(found_lawyer);
+            appUnitOfWorkMock.Setup(u => u.LawyerRepo.FindAsync(id)).ReturnsAsync(found_lawyer);
+            appUnitOfWorkMock.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
+            appUnitOfWorkMock.Setup(u => u.LawyerRepo.Update(found_lawyer));
+
+
+            //Act
+
+            var result = await lawyerServices.TransferToken(id);
+
+            //Assert
+
+            Assert.True(result);
+
+
+
+        }
+
+
 
     }
 }
