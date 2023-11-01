@@ -31,7 +31,7 @@ namespace VakilPors.Test.Core.Services
         private readonly Mock<IAwsFileService > awsFileServiceMock;
         private readonly Mock<IChatServices> chatServicesMock;
         private readonly Mock<IWalletServices> walletServicesMock;
-
+        private readonly Mapper mapper;
         public LawyerServiceTests()
         {
             appUnitOfWorkMock = new Mock<IAppUnitOfWork>();
@@ -41,7 +41,7 @@ namespace VakilPors.Test.Core.Services
             chatServicesMock = new Mock<IChatServices>();
             walletServicesMock = new Mock<IWalletServices>();
             _lawyerservicesMock = new Mock<LawyerServices>();
-
+            
 
 
 
@@ -105,6 +105,76 @@ namespace VakilPors.Test.Core.Services
 
             //Assert
             Assert.Equal(result, lawyerDto);
+        }
+
+        [Fact]
+        public async Task get_all_lawyers()
+        {
+            //Arrange 
+
+            var lawyerDto = new LawyerDto { Rating = 1, AboutMe = "example", Education = "sample" };
+            var found_lawyer = new Lawyer { Rating = 5 };
+            var found_user = new User();
+            var p = 0;
+            IEnumerable<ThreadComment> threadComments = new List<ThreadComment>
+            {
+                new ThreadComment (),
+                new ThreadComment ()
+            };
+            IEnumerable<Chat> chats = new List<Chat>
+            {
+                new Chat(),
+                new Chat ()
+            };
+            IEnumerable<Subscribed> subscribeds = new List<Subscribed>
+            {
+                new Subscribed(),
+                new Subscribed()
+            };
+            IEnumerable<Lawyer> _lawyers = new List<Lawyer>()
+            {
+                new Lawyer{Id = 1},
+                new Lawyer{Id = 2},
+                new Lawyer{Id = 3}
+            };
+            IEnumerable<LawyerDto> lawyerdtos = new List<LawyerDto>()
+            {
+                new LawyerDto{Id = 1 , NumberOfAnswers = 2},
+                new LawyerDto{Id = 2},
+                new LawyerDto{Id = 3}
+            };
+            IQueryable<ThreadComment> threadCommentsQueryable = threadComments.AsQueryable();
+            var mock = threadCommentsQueryable.BuildMock();
+
+            IQueryable<Chat> chatQueryable = chats.AsQueryable();
+            var mock2 = chatQueryable.BuildMock();
+
+            IQueryable<Subscribed> subscribedQueryable = subscribeds.AsQueryable();
+            var mock3 = subscribedQueryable.BuildMock();
+
+            IQueryable<Lawyer> lawyers = _lawyers.AsQueryable();
+            var _mock = lawyers.BuildMock();
+
+            foreach (var lawyer in _lawyers)
+            {
+                imapperMock.Setup(u => u.Map<LawyerDto>(lawyer)).Returns(lawyerdtos.ToList()[p]);
+                p++;
+            }
+            appUnitOfWorkMock.Setup(u => u.ThreadCommentRepo.AsQueryable()).Returns(mock);            
+            appUnitOfWorkMock.Setup(x => x.LawyerRepo.AsQueryable()).Returns(_mock);
+            appUnitOfWorkMock.Setup(u => u.ChatRepo.AsQueryable()).Returns(mock2);
+            appUnitOfWorkMock.Setup(u => u.SubscribedRepo.AsQueryable()).Returns(mock3);
+
+            
+            //Act
+            var results =await  lawyerServices.GetAllLawyers();
+
+            //Assert
+
+            for (int i = 0; i < 3; i++)
+            {
+                Assert.Equal(lawyerdtos.ToList()[i], results[i]);
+            }
         }
 
         [Fact]
