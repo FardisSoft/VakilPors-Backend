@@ -159,7 +159,7 @@ namespace VakilPors.Core.Services
         }
 
         public async Task<bool> IsLawyer(int userId)
-        {
+        {   
             var lawyer = await _appUnitOfWork.LawyerRepo
                 .AsQueryable()
                 .Include(x => x.User)

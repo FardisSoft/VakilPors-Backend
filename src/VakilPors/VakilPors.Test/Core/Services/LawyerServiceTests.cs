@@ -14,6 +14,8 @@ using VakilPors.Contracts.Repositories;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Lawyer;
+using VakilPors.Core.Domain.Dtos.Params;
+using VakilPors.Core.Domain.Dtos.Search;
 using VakilPors.Core.Domain.Dtos.User;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
@@ -334,11 +336,41 @@ namespace VakilPors.Test.Core.Services
 
             Assert.True(result);
 
-
-
         }
 
+        [Fact]
+        public async Task is_lawyer()
+        {
+            //Arrange 
+            int id = 1;
+            var user = new User { Id = id };
+            var userd = new UserDto { Id = id };
+            var found_lawyer = new Lawyer();
+            IEnumerable<Lawyer> lawyers = new List<Lawyer>()
+            {
+                new Lawyer{User = user , UserId = id}
+            };
+            IQueryable<Lawyer> lawyerQuriable = lawyers.AsQueryable();
+            var _mock = lawyerQuriable.BuildMock();
 
+            appUnitOfWorkMock.Setup(u => u.LawyerRepo.AsQueryable()).Returns(_mock);
 
+            //Act 
+            var result = await lawyerServices.IsLawyer(id);
+
+            //Assert
+
+            Assert.True(result);
+        
+        }
+
+        [Fact]
+        public async Task get_lawyers()
+        {
+            var pagedparams = new PagedParams();
+            var sortparams = new SortParams();
+            var filterparams = new LawyerFilterParams();
+
+        }
     }
 }
