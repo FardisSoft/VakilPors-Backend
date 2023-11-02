@@ -69,26 +69,55 @@ namespace VakilPors.Test.Core.Services
 
         }
 
+        //[Fact]
+        //public async Task transact_user()
+        //{
+        //    //Arrange
+        //    var user = new User { Id = 1 };
+        //    var id = 1;
+        //    walletserviceMock.Setup(u => u.AddTransaction(id, It.IsAny<decimal>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>())).Returns(Task.CompletedTask);
+        //    appUnitOfWorkMock.Setup(u => u.UserRepo.FindAsync(id)).ReturnsAsync(user);
+        //    //Act 
+        //    await premiumService.TransactUser("", id, 4000, "همراه");
+        //    //Assert
+        //    Assert.Equal( 4000, user.Transactions.ToList()[0].Amount);
+        //}
+
         [Fact]
-        public async Task transact_user()
+        public async Task diactivate_premium()
         {
             //Arrange
+            var id = 0;
+            var subscription = new Subscribed();
+            IEnumerable<Subscribed> subscribeds = new List<Subscribed>()
+            {
+                new Subscribed
+                {
+                    PremiumID = 3,
+                    ExpireDate = DateTime.Today.AddDays(5)
 
-            var user = new User { Id = 1 };
-            var id = 1;
-            walletserviceMock.Setup(u => u.AddTransaction(id, It.IsAny<decimal>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>())).Returns(Task.CompletedTask);
-            appUnitOfWorkMock.Setup(u => u.UserRepo.FindAsync(id)).ReturnsAsync(user);
+                }
+            };
+
+            var subqueirable = subscribeds.AsQueryable();
+            var mock = subqueirable.BuildMock();
+
+            appUnitOfWorkMock.Setup(u => u.SubscribedRepo.AsQueryable()).Returns(mock);
+            appUnitOfWorkMock.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
+
 
             //Act 
-            await premiumService.TransactUser("", id, 4000, "همراه");
 
-            //Assert
+            await premiumService.DeactivatePremium(id);
 
-            Assert.Equal( 4000, user.Transactions.ToList()[0].Amount);
+            //Arrange
+
+            Assert.Equal(1, subscribeds.ToList()[0].PremiumID);
+            Assert.Equal(DateTime.MaxValue, subscribeds.ToList()[0].ExpireDate);
+
 
 
         }
-
 
 
     }
