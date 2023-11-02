@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
+using VakilPors.Core.Domain.Dtos.Premium;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Services;
 
@@ -119,6 +120,27 @@ namespace VakilPors.Test.Core.Services
 
         }
 
+
+        [Fact]
+        public async Task update_plan()
+        {
+            //Arrange
+            var subdto = new SubscribedDto { ID = 1 , Premium = new PremiumDto()};
+            subdto.Premium.ServiceType = Plan.Gold;
+            var sub = new Subscribed { Premium = new Premium()};
+            sub.Premium.ServiceType = Plan.Free;
+
+            appUnitOfWorkMock.Setup(u => u.SubscribedRepo.FindAsync(subdto.ID)).ReturnsAsync(sub);
+            appUnitOfWorkMock.Setup(u => u.SubscribedRepo.Update(sub));
+            appUnitOfWorkMock.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
+
+            //Act
+            await premiumService.UpdatePlan(subdto);
+
+            //Assert
+            Assert.Equal(Plan.Gold, sub.Premium.ServiceType);
+          
+        }
 
     }
 }
