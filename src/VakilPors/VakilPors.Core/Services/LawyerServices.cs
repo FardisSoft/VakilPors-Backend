@@ -235,34 +235,38 @@ namespace VakilPors.Core.Services
             var query3 = _appUnitOfWork.ThreadCommentRepo.AsQueryable().Where(x => x.UserId == lawyer.UserId).
             Include(x=>x.Thread).Select(x => x.Thread).Distinct().Select(t => t.LikeCount);
 
-            try
-            {
-                lawyerDto.NumberOfVerifies = await query2.CountAsync();
-            }
-            catch (Exception ex)
-            {
-                await Console.Out.WriteLineAsync();
-            }
-
-            try
-            {
-                lawyerDto.NumberOfAnswers = await query.CountAsync();
-            }
-            catch (Exception ex) 
-            {
-                await Console.Out.WriteLineAsync();
-            }
-
+            //try
+            //{
+            //    lawyerDto.NumberOfVerifies = await query2.CountAsync();
+            //}
+            //catch (Exception ex)
+            //{
+            //    await Console.Out.WriteLineAsync();
+            //}
             var commentLikes = 0;
             var threadLikes = 0;
-            try
-            {
-                commentLikes = await query.Select(x => x.LikeCount).SumAsync();
-            }
-            catch (Exception ex)
-            {
-                await Console.Out.WriteLineAsync();
-            }
+            lawyerDto.NumberOfVerifies = await query2.CountAsync();
+            lawyerDto.NumberOfAnswers = await query.CountAsync();
+            commentLikes = await query.Select(x => x.LikeCount).SumAsync();
+
+            //try
+            //{
+            //    lawyerDto.NumberOfAnswers = await query.CountAsync();
+            //}
+            //catch (Exception ex) 
+            //{
+            //    await Console.Out.WriteLineAsync();
+            //}
+
+            
+            //try
+            //{
+            //    commentLikes = await query.Select(x => x.LikeCount).SumAsync();
+            //}
+            //catch (Exception ex)
+            //{
+            //    await Console.Out.WriteLineAsync();
+            //}
 
             try
             {
@@ -270,9 +274,9 @@ namespace VakilPors.Core.Services
             }
 
             catch (Exception ex) 
-{
-    await Console.Out.WriteLineAsync();
-}
+            {
+                await Console.Out.WriteLineAsync();
+            }
 
             //lawyerDto.NumberOfVerifies = await _appUnitOfWork.ThreadCommentRepo
             //    .AsQueryable()

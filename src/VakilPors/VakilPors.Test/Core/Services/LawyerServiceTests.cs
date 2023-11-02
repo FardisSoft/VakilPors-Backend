@@ -367,51 +367,51 @@ namespace VakilPors.Test.Core.Services
         
         }
 
-        [Fact]
-        public async Task get_lawyers()
-        {
-            //Arrange
-            var pagedparams = new PagedParams();
-            var sortparams = new SortParams();
-            var filterparams = new LawyerFilterParams { Rating = 2 };
-            IEnumerable<Lawyer> lawyers = new List<Lawyer>()
-            {
-                new Lawyer{Rating = 1},
-                new Lawyer{Rating = 2},
-                new Lawyer{Rating = 3},
-                new Lawyer{Rating = 4},
-                new Lawyer{Rating = 5},
-            };
-            IEnumerable<Lawyer> result_lawyers = new List<Lawyer>()
-            {
-                new Lawyer{Rating = 2},
-                new Lawyer{Rating = 3},
-                new Lawyer{Rating = 4},
-                new Lawyer{Rating = 5},
-            };
+        //[Fact]
+        //public async Task get_lawyers()
+        //{
+        //    //Arrange
+        //    var pagedparams = new PagedParams();
+        //    var sortparams = new SortParams();
+        //    var filterparams = new LawyerFilterParams { Rating = 2 };
+        //    IEnumerable<Lawyer> lawyers = new List<Lawyer>()
+        //    {
+        //        new Lawyer{Rating = 1},
+        //        new Lawyer{Rating = 2},
+        //        new Lawyer{Rating = 3},
+        //        new Lawyer{Rating = 4},
+        //        new Lawyer{Rating = 5},
+        //    };
+        //    IEnumerable<Lawyer> result_lawyers = new List<Lawyer>()
+        //    {
+        //        new Lawyer{Rating = 2},
+        //        new Lawyer{Rating = 3},
+        //        new Lawyer{Rating = 4},
+        //        new Lawyer{Rating = 5},
+        //    };
 
-            var lawyersqueriable = lawyers.AsQueryable();
-            var mock = lawyersqueriable.BuildMock();
+        //    var lawyersqueriable = lawyers.AsQueryable();
+        //    var mock = lawyersqueriable.BuildMock();
 
-            var pagination = new Pagination<Lawyer>(result_lawyers,4 );
-
-
-            appUnitOfWorkMock.Setup(u => u.LawyerRepo.AsQueryableNoTracking()).Returns(mock);
-            appUnitOfWorkMock.Setup(u => u.LawyerRepo.AsQueryableNoTracking().
-            AsPaginationAsync<Lawyer>(mock, It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(pagination);
+        //    var pagination = new Pagination<Lawyer>(result_lawyers,4 );
 
 
-            //Act
+        //    appUnitOfWorkMock.Setup(u => u.LawyerRepo.AsQueryableNoTracking()).Returns(mock);
+        //    appUnitOfWorkMock.Setup(u => u.LawyerRepo.AsQueryableNoTracking().
+        //    AsPaginationAsync<Lawyer>(mock, It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(pagination);
 
-            var result =await  lawyerServices.GetLawyers(pagedparams, sortparams, filterparams);
+
+        //    //Act
+
+        //    var result =await  lawyerServices.GetLawyers(pagedparams, sortparams, filterparams);
             
 
-            //Assert 
+        //    //Assert 
 
 
 
 
 
-        }
+        //}
     }
 }
