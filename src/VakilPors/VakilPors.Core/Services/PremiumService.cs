@@ -63,7 +63,7 @@ namespace VakilPors.Core.Services
 
         }
 
-        private async Task TransactUser(string v, int user_id, int amount, string baste)
+        public async Task TransactUser(string v, int user_id, int amount, string baste)
         {
             var user = await _appUnitOfWork.UserRepo.FindAsync(user_id);
             await _walletservice.AddTransaction(user_id, amount, $"خرید بسته {baste}", " ", true, false);
