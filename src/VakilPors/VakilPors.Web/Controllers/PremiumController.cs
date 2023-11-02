@@ -64,7 +64,7 @@ namespace VakilPors.Web.Controllers
         }
 
         [HttpGet]
-        [Route("GetAllSunbcriptionStatus")]
+        [Route("GetAllSubcriptionStatus")]
         public async Task<IActionResult> GetAllSunbcriptionStatus([FromQuery] PagedParams pagedParams, [FromQuery] SortParams sortParams)
         {
             _logger.LogInformation($"GET ALL subscribed paged. page no:{pagedParams.PageNumber} page size:{pagedParams.PageSize}, sort by:{sortParams.Sort}, isAscending:{sortParams.IsAscending}");

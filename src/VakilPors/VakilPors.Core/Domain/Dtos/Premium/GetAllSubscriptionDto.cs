@@ -11,7 +11,7 @@ namespace VakilPors.Core.Domain.Dtos.Premium
     {
         public int Id { get; set; }
         public UserDto User { get; set; }
-        public PremiumDto Premium { get; set; }
+        public string PremiumStatus { get; set; }
 
     }
 }
