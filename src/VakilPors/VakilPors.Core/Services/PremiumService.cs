@@ -110,7 +110,7 @@ namespace VakilPors.Core.Services
         }
         public async Task<Pagination<Subscribed>> GetAllSubscriptionStatus(PagedParams pagedParams, SortParams sortParams)
         {
-            var all_subs = _appUnitOfWork.SubscribedRepo.AsQueryable().Where(x => x.PremiumID > 1);
+            var all_subs = _appUnitOfWork.SubscribedRepo.AsQueryable().Include(x => x.User).Where(x => x.PremiumID > 1);
             return await all_subs.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize);
 
         }
