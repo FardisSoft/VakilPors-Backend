@@ -142,5 +142,31 @@ namespace VakilPors.Test.Core.Services
           
         }
 
+        [Fact]
+        public async Task get_premium_status()
+        {
+            //Assert
+            var id = 1;
+            var subscribed = new Subscribed();
+            var subscribeddto = new SubscribedDto { ID = 2, Premium = new PremiumDto() };
+            IEnumerable<Subscribed> subscribeds = new List<Subscribed>
+            {
+                new Subscribed{ID = 2 , Premium = new Premium() , UserId = id  }
+            };
+
+            var subscribedquriable = subscribeds.AsQueryable();
+            var mock = subscribedquriable.BuildMock();
+
+            appUnitOfWorkMock.Setup(u => u.SubscribedRepo.AsQueryable()).Returns(mock);
+            mapperMock.Setup(u => u.Map<SubscribedDto>(subscribeds.ToList()[0])).Returns(subscribeddto);
+
+            //Act
+            var result = await premiumService.GetPremiumStatus(id);
+
+            //Assert
+            Assert.Equal(2, result.ID);
+
+
+        }
     }
 }
