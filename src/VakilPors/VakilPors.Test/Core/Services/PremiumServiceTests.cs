@@ -145,7 +145,7 @@ namespace VakilPors.Test.Core.Services
         [Fact]
         public async Task get_premium_status()
         {
-            //Assert
+            //Arrange
             var id = 1;
             var subscribed = new Subscribed();
             var subscribeddto = new SubscribedDto { ID = 2, Premium = new PremiumDto() };
@@ -166,6 +166,39 @@ namespace VakilPors.Test.Core.Services
             //Assert
             Assert.Equal(2, result.ID);
 
+
+        }
+
+        [Fact]
+        public async Task does_user_have_subscription()
+        {
+            //Arrange 
+            var id = 1;
+            var subscribed = new Subscribed();
+            var subscribeddto = new SubscribedDto { ID = 2, Premium = new PremiumDto()   };
+            subscribeddto.Premium.ServiceType = Plan.Gold;
+            subscribeddto.IsExpired = false;
+            
+
+
+            IEnumerable<Subscribed> subscribeds = new List<Subscribed>
+            {
+                new Subscribed{ID = 2 , Premium = new Premium() , UserId = id  }
+            };
+
+            var subscribedquriable = subscribeds.AsQueryable();
+            var mock = subscribedquriable.BuildMock();
+
+            appUnitOfWorkMock.Setup(u => u.SubscribedRepo.AsQueryable()).Returns(mock);
+            mapperMock.Setup(u => u.Map<SubscribedDto>(subscribeds.ToList()[0])).Returns(subscribeddto);
+
+            //Act
+
+            var result = await premiumService.DoseUserHaveAnyActiveSubscription(id);
+
+            //Assert 
+
+            Assert.True(result);
 
         }
     }
