@@ -69,6 +69,27 @@ namespace VakilPors.Test.Core.Services
 
         }
 
+        [Fact]
+        public async Task transact_user()
+        {
+            //Arrange
+
+            var user = new User { Id = 1 };
+            var id = 1;
+            walletserviceMock.Setup(u => u.AddTransaction(id, It.IsAny<decimal>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>())).Returns(Task.CompletedTask);
+            appUnitOfWorkMock.Setup(u => u.UserRepo.FindAsync(id)).ReturnsAsync(user);
+
+            //Act 
+            await premiumService.TransactUser("", id, 4000, "همراه");
+
+            //Assert
+
+            Assert.Equal( 4000, user.Transactions.ToList()[0].Amount);
+
+
+        }
+
+
 
     }
 }
