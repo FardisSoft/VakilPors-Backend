@@ -64,7 +64,7 @@ namespace VakilPors.Core.Services
 
         }
 
-        private async Task TransactUser(string v, int user_id, int amount, string baste)
+        public async Task TransactUser(string v, int user_id, int amount, string baste)
         {
             var user = await _appUnitOfWork.UserRepo.FindAsync(user_id);
             await _walletservice.AddTransaction(user_id, amount, $"خرید بسته {baste}", " ", true, false);
@@ -73,10 +73,7 @@ namespace VakilPors.Core.Services
 
         public async Task DeactivatePremium(int user_id)
         {
-            //var subscribed = await _appUnitOfWork.SubscribedRepo.FindAsync(user_id);
-            //subscribed.ExpireDate = DateTime.Now;
-            //_appUnitOfWork.SubscribedRepo.Update(subscribed);
-            //await _appUnitOfWork.SaveChangesAsync();    
+             
             var sub = await _appUnitOfWork.SubscribedRepo.AsQueryable().Where(x => x.UserId == user_id).FirstAsync();
             if (sub == null)
                 throw new BadArgumentException("Subscription Not Found");
