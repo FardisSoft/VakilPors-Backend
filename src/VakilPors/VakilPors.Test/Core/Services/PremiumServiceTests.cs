@@ -177,7 +177,7 @@ namespace VakilPors.Test.Core.Services
             var subscribed = new Subscribed();
             var subscribeddto = new SubscribedDto { ID = 2, Premium = new PremiumDto()   };
             subscribeddto.Premium.ServiceType = Plan.Gold;
-            subscribeddto.IsExpired = false;
+            //subscribeddto.IsExpired = false;
             
 
 
