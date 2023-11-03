@@ -74,13 +74,7 @@ namespace VakilPors.Core.Services
             string yesorno = isSuccess ? "بود" : "نبود";
             string body =
                 $@"تراکنش شما در تاریخ {DateTime.Now} ثبت شد.مبلغ: {amount} توضیحات: {description} کد تراکنش: {authority}  تراکنش موفقیت آمیز {yesorno}.";
-            //string body = $@"
-            //تراکنش شما در تاریخ {DateTime.Now} ثبت شد.
-            //مبلغ:{amount}
-            //توضیحات:{description}
-            //کد تراکنش:{authority}
-            //تراکنش موفقیت آمیز بود:{isSuccess}
-            //";
+            
             var user = await getUser(userId);
             await emailSender.SendEmailAsync(user.Email, user.Name, "تراکنش", body);
             if (user.Telegram != null)
