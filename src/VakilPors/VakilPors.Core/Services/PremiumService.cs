@@ -16,6 +16,7 @@ using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
 using VakilPors.Core.Domain.Dtos.Premium;
 using VakilPors.Core.Services;
+using Pagination.EntityFrameworkCore.Extensions;
 
 namespace VakilPors.Core.Services
 {
@@ -107,5 +108,13 @@ namespace VakilPors.Core.Services
 
             return isPremium;
         }
+        public async Task<Pagination<Subscribed>> GetAllSubscriptionStatus(PagedParams pagedParams, SortParams sortParams)
+        {
+            var all_subs = _appUnitOfWork.SubscribedRepo.AsQueryable().Include(x => x.User).Where(x => x.PremiumID > 1);
+            return await all_subs.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize);
+
+        }
+        
     }
+
 }
