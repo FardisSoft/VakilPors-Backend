@@ -25,5 +25,6 @@ namespace VakilPors.Core.Contracts.Services
         Task<bool> VerifyLawyer(int lawyerId);
         Task<bool> IsLawyer(int userId);
         //Task<List<LawyerDto>> FilteredSearch(SearchDto lawyerDto);
+        public Task<List<LawyerCityCountDto>> GetLawyerCityCounts();
     }
 }

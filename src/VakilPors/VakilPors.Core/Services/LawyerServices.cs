@@ -356,6 +356,14 @@ namespace VakilPors.Core.Services
             return await filteredLawyers.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize, (string.IsNullOrEmpty(sortParams.Sort) ? "Id" : sortParams.Sort), !sortParams.IsAscending);
         }
 
+        public async Task<List<LawyerCityCountDto>> GetLawyerCityCounts()
+        {
+            return await _appUnitOfWork.LawyerRepo.AsQueryableNoTracking().GroupBy(l => l.City).Select(g => new LawyerCityCountDto()
+            {
+                City = g.Key,
+                Count = g.Count()
+            }).ToListAsync();
+        }
         
     }
 }
