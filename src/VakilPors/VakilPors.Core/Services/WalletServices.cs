@@ -166,6 +166,16 @@ namespace VakilPors.Core.Services
             await appUnitOfWork.SaveChangesAsync();
         }
 
+        public async Task<IEnumerable<int>> GetMonthlyTransactions()
+        {
+            var transactionsCounts = new List<int>();
+            for (int i = 0; i < 7; i++)
+            {
+                transactionsCounts.Add(await appUnitOfWork.TransactionRepo.AsQueryableNoTracking().Where(t=>t.Date> DateTime.Now.AddDays(-i - 1)&& t.Date<= DateTime.Now.AddDays(-i)).CountAsync());
+            }
+            return transactionsCounts;
+        }
+
         private async Task<User> getUser(string phoneNumber)
         {
             var user = await userManager.FindByNameAsync(phoneNumber);

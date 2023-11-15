@@ -364,6 +364,14 @@ namespace VakilPors.Core.Services
                 Count = g.Count()
             }).ToListAsync();
         }
-        
+
+        public async Task<List<LawyerTitleCountDto>> GetLawyerTitleCounts()
+        {
+            return await _appUnitOfWork.LawyerRepo.AsQueryableNoTracking().GroupBy(l => l.Title).Select(g => new LawyerTitleCountDto()
+            {
+                Title = g.Key,
+                Count = g.Count()
+            }).ToListAsync();
+        }
     }
 }

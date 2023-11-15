@@ -22,6 +22,7 @@ namespace VakilPors.Core.Contracts.Services
         public Task<IEnumerable<Transaction>> GetWithdrawTransactions();
         Task Withdraw(int userId, decimal amount, string cardNo);
         Task PayWithdraw(int transactionId);
+        public Task<IEnumerable<int>> GetMonthlyTransactions();
         // Task<bool> HasEnoughBalance(string phoneNumber, decimal amount);
         // Task<bool> HasEnoughBalance(string phoneNumber, decimal amount, decimal discount);
     }

@@ -14,4 +14,6 @@ public record StatisticsDto
     public int CasesCount { get; set; }
     public int MessagesCount { get; set; }
     public IEnumerable<LawyerCityCountDto> LawyerCityCount { get; set; }
+    public IEnumerable<LawyerTitleCountDto> LawyerTitleCount { get; set; }
+    public IEnumerable<int> TransactionMonthlyCounts { get; set; }
 }

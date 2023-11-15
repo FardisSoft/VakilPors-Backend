@@ -10,15 +10,20 @@ public class StatisticsService : IStatisticsService
 {
     private readonly IAppUnitOfWork appUnitOfWork;
     private readonly ILawyerServices _lawyerServices;
+    private readonly IWalletServices _walletServices;
 
-    public StatisticsService(IAppUnitOfWork appUnitOfWork,ILawyerServices lawyerServices)
+    public StatisticsService(IAppUnitOfWork appUnitOfWork, ILawyerServices lawyerServices,
+        IWalletServices walletServices)
     {
         this.appUnitOfWork = appUnitOfWork;
         _lawyerServices = lawyerServices;
+        _walletServices = walletServices;
     }
+
     public async Task AddVisit(string userGUID, string IPv4)
     {
-        var visit = await appUnitOfWork.VisitorRepo.AsQueryableNoTracking().FirstOrDefaultAsync(v => v.UserGUID == userGUID);
+        var visit = await appUnitOfWork.VisitorRepo.AsQueryableNoTracking()
+            .FirstOrDefaultAsync(v => v.UserGUID == userGUID);
         if (visit == null)
         {
             visit = new Visitor()
@@ -27,6 +32,7 @@ public class StatisticsService : IStatisticsService
                 IPv4 = IPv4
             };
         }
+
         await appUnitOfWork.VisitorRepo.AddAsync(visit);
         await appUnitOfWork.SaveChangesAsync();
     }
@@ -45,7 +51,9 @@ public class StatisticsService : IStatisticsService
             LawyersCount = lawyersCounts,
             CasesCount = await appUnitOfWork.DocumentRepo.AsQueryableNoTracking().CountAsync(),
             MessagesCount = await appUnitOfWork.ChatMessageRepo.AsQueryableNoTracking().CountAsync(),
-            LawyerCityCount = await _lawyerServices.GetLawyerCityCounts()
+            LawyerCityCount = await _lawyerServices.GetLawyerCityCounts(),
+            LawyerTitleCount = await _lawyerServices.GetLawyerTitleCounts(),
+            TransactionMonthlyCounts = await _walletServices.GetMonthlyTransactions()
         };
         return result;
     }
@@ -57,14 +65,18 @@ public class StatisticsService : IStatisticsService
         {
             dailyVisits.Add(await GetVisits(DateTime.Now.AddDays(-i - 1), DateTime.Now.AddDays(-i)));
         }
+
         return dailyVisits;
     }
+
     public async Task<int> GetVisits(DateTime from)
     {
         return await appUnitOfWork.VisitorRepo.AsQueryableNoTracking().Where(v => v.VisitTime >= from).CountAsync();
     }
+
     public async Task<int> GetVisits(DateTime from, DateTime to)
     {
-        return await appUnitOfWork.VisitorRepo.AsQueryableNoTracking().Where(v => v.VisitTime >= from && v.VisitTime <= to).CountAsync();
+        return await appUnitOfWork.VisitorRepo.AsQueryableNoTracking()
+            .Where(v => v.VisitTime >= from && v.VisitTime <= to).CountAsync();
     }
 }
