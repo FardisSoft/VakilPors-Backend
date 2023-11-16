@@ -17,7 +17,7 @@ namespace VakilPors.Core.Services
 
         public async Task<String> IsSpam(string Text)
         {
-            bool isSpam = SpamCheck(Text);
+            bool isSpam =await  SpamCheck(Text);
             if (isSpam)
             {
                 return "This message is detected as a spam and can not be shown.";
@@ -27,7 +27,7 @@ namespace VakilPors.Core.Services
                 return "ok";
             }
         }
-        public  static bool SpamCheck(string text)
+        public async Task <bool> SpamCheck(string text)
         {
             string pattern = @"(\+98|0)?9(\s?\d){9}"; // Pattern for Iranian phone numbers
             pattern += @"|\@\S*"; // Pattern for IDs starting with "@"
