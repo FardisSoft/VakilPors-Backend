@@ -5,13 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using VakilPors.Core.Domain.Dtos.User;
 
-namespace VakilPors.Core.Domain.Dtos.Rate
+namespace VakilPors.Core.Domain.Dtos.Premium
 {
-    public record RateUserDto
+    public record GetAllSubscriptionDto
     {
         public int Id { get; set; }
-        public string Comment { get; set; }
-        public double RateNum { get; set; }
-        public UserDto User { get; set; } 
+        public UserDto User { get; set; }
+        public string PremiumStatus { get; set; }
+
     }
 }

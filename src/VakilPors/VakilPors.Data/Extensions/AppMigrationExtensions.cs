@@ -21,8 +21,8 @@ namespace VakilPors.Data.Extensions
             {
                 await using var scope = app.Services.CreateAsyncScope();
                 using var db = scope.ServiceProvider.GetService<AppDbContext>();
-                await db.Database.MigrateAsync();
                 Console.WriteLine("Migrating database...");
+                await db.Database.MigrateAsync();
                 int adminRoleId = await db.Roles.Where(r => r.Name == RoleNames.Admin).Select(r => r.Id).FirstOrDefaultAsync();
                 bool hasAdmin = await db.UserRoles.AnyAsync(r => r.RoleId == adminRoleId);
                 if (!hasAdmin)
@@ -59,14 +59,15 @@ namespace VakilPors.Data.Extensions
                     await applyTransactions(walletService, trans);
                 }
             }
-            catch (System.Exception)
+            catch (Exception e)
             {
                 Console.WriteLine("An error occurred while migrating or seeding the database.");
+                Console.WriteLine(e);
             }
         }
-        private static async Task applyTransactions(IWalletServices walletServices, Transaction[] tranactions)
+        private static async Task applyTransactions(IWalletServices walletServices, Transaction[] transactions)
         {
-            foreach (var trans in tranactions)
+            foreach (var trans in transactions)
             {
                 await walletServices.ApplyTransaction(trans.Id);
             }

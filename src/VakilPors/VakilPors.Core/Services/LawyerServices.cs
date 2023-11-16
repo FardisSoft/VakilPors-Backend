@@ -7,6 +7,7 @@ using AutoMapper;
 using FuzzySharp;
 using Microsoft.AspNetCore.Mvc.TagHelpers.Cache;
 using Microsoft.EntityFrameworkCore;
+using Pagination.EntityFrameworkCore.Extensions;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Lawyer;
@@ -16,6 +17,9 @@ using X.PagedList;
 using VakilPors.Shared.Extensions;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
+using VakilPors.Core.Domain.Dtos.Search;
+using Microsoft.AspNetCore.Mvc;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace VakilPors.Core.Services
 {
@@ -42,17 +46,7 @@ namespace VakilPors.Core.Services
             _chatServices = chatServices;
             _walletServices = walletServices;
         }
-        public async Task<IPagedList<Lawyer>> GetLawyers(PagedParams pagedParams, FilterParams filterParams)
-        {
-            var lawyers = await _appUnitOfWork.LawyerRepo.AsQueryableNoTracking()
-            .Include(l => l.User)
-            .Where(l => string.IsNullOrEmpty(filterParams.Q) || Fuzz.PartialRatio(l.User.Name, filterParams.Q) > 75 || l.ParvandeNo.Contains(filterParams.Q))
-            .OrderBy((string.IsNullOrEmpty(filterParams.Sort) ? "Id" : filterParams.Sort), filterParams.IsAscending)
-            .ToPagedListAsync(pagedParams.PageNumber, pagedParams.PageSize);
-
-            return lawyers;
-        }
-
+        
         public async Task<LawyerDto> UpdateLawyer(LawyerDto lawyerDto)
         {
             var foundLawyer = await _appUnitOfWork.LawyerRepo.FindAsync(lawyerDto.Id);
@@ -87,10 +81,8 @@ namespace VakilPors.Core.Services
                     foundLawyer.ResumeLink = resumeKey;
             }
 
-            foundLawyer.ParvandeNo = lawyerDto.ParvandeNo;
             foundLawyer.Title = lawyerDto.Title;
             foundLawyer.City = lawyerDto.City;
-            foundLawyer.Grade = lawyerDto.Grade;
             foundLawyer.LicenseNumber = lawyerDto.LicenseNumber;
             foundLawyer.MemberOf = lawyerDto.MemberOf;
             foundLawyer.YearsOfExperience = lawyerDto.YearsOfExperience;
@@ -154,8 +146,20 @@ namespace VakilPors.Core.Services
             return await GetLawyerDtoFormLawyer(lawyer);
         }
 
-        public async Task<bool> IsLawyer(int userId)
+        public async Task<Lawyer> sample (int userId)
         {
+            var lawyer = await _appUnitOfWork.LawyerRepo
+                .AsQueryable()
+                .Include(x => x.User)
+                .FirstOrDefaultAsync(x => x.UserId == userId);
+
+            if (lawyer == null)
+                throw new BadArgumentException("Lawyer Not Found");
+            return lawyer;
+        }
+
+        public async Task<bool> IsLawyer(int userId)
+        {   
             var lawyer = await _appUnitOfWork.LawyerRepo
                 .AsQueryable()
                 .Include(x => x.User)
@@ -194,7 +198,7 @@ namespace VakilPors.Core.Services
                 throw new Exception();
         }
 
-        private async Task SetTokens(int lawyerId, int tokens)
+        public async Task SetTokens(int lawyerId, int tokens)
         {
             var foundLawyer = await _appUnitOfWork.LawyerRepo.FindAsync(lawyerId);
             if (foundLawyer == null)
@@ -222,43 +226,152 @@ namespace VakilPors.Core.Services
             return true;
         }
 
-        private async Task<LawyerDto> GetLawyerDtoFormLawyer(Lawyer lawyer)
+        public async Task<LawyerDto> GetLawyerDtoFormLawyer(Lawyer lawyer)
         {
             var lawyerDto = _mapper.Map<LawyerDto>(lawyer);
 
-            lawyerDto.NumberOfVerifies = await _appUnitOfWork.ThreadCommentRepo
-                .AsQueryable()
-                .Where(x => x.IsSetAsAnswer == true && x.UserId == lawyer.UserId)
-                .CountAsync();
+            var query = _appUnitOfWork.ThreadCommentRepo.AsQueryable().Where(x => x.UserId == lawyer.UserId);
+            var query2 = _appUnitOfWork.ThreadCommentRepo.AsQueryable().Where(x => x.IsSetAsAnswer == true && x.UserId == lawyer.UserId);
+            var query3 = _appUnitOfWork.ThreadCommentRepo.AsQueryable().Where(x => x.UserId == lawyer.UserId).
+            Include(x=>x.Thread).Select(x => x.Thread).Distinct().Select(t => t.LikeCount);
 
-            lawyerDto.NumberOfAnswers = await _appUnitOfWork.ThreadCommentRepo
-                .AsQueryable()
-                .Where(x => x.UserId == lawyer.UserId)
-                .CountAsync();
+            //try
+            //{
+            //    lawyerDto.NumberOfVerifies = await query2.CountAsync();
+            //}
+            //catch (Exception ex)
+            //{
+            //    await Console.Out.WriteLineAsync();
+            //}
+            var commentLikes = 0;
+            var threadLikes = 0;
+            lawyerDto.NumberOfVerifies = await query2.CountAsync();
+            lawyerDto.NumberOfAnswers = await query.CountAsync();
+            commentLikes = await query.Select(x => x.LikeCount).SumAsync();
 
-            var commentLikes = await _appUnitOfWork.ThreadCommentRepo
-                .AsQueryable()
-                .Where(x => x.UserId == lawyer.UserId)
-                .Select(x => x.LikeCount)
-                .SumAsync();
+            //try
+            //{
+            //    lawyerDto.NumberOfAnswers = await query.CountAsync();
+            //}
+            //catch (Exception ex) 
+            //{
+            //    await Console.Out.WriteLineAsync();
+            //}
 
-            var threadLikes = await _appUnitOfWork.ThreadCommentRepo
-                .AsQueryable()
-                .Where(x => x.UserId == lawyer.UserId)
-                .Include(x => x.Thread)
-                .Select(x => x.Thread)
-                .Distinct()
-                .Select(t => t.LikeCount)
-                .SumAsync();
+            
+            //try
+            //{
+            //    commentLikes = await query.Select(x => x.LikeCount).SumAsync();
+            //}
+            //catch (Exception ex)
+            //{
+            //    await Console.Out.WriteLineAsync();
+            //}
+
+            try
+            {
+                threadLikes = await query3.SumAsync();
+            }
+
+            catch (Exception ex) 
+            {
+                await Console.Out.WriteLineAsync();
+            }
+
+            //lawyerDto.NumberOfVerifies = await _appUnitOfWork.ThreadCommentRepo
+            //    .AsQueryable()
+            //    .Where(x => x.IsSetAsAnswer == true && x.UserId == lawyer.UserId)
+            //    .CountAsync();
+
+            //lawyerDto.NumberOfAnswers = await _appUnitOfWork.ThreadCommentRepo
+            //    .AsQueryable()
+            //    .Where(x => x.UserId == lawyer.UserId)
+            //    .CountAsync();
+
+            //var commentLikes = await _appUnitOfWork.ThreadCommentRepo
+            //    .AsQueryable()
+            //    .Where(x => x.UserId == lawyer.UserId)
+            //    .Select(x => x.LikeCount)
+            //    .SumAsync();
+
+
+            //var threadLikes = 0;
+            //var query = _appUnitOfWork.ThreadCommentRepo.AsQueryable().Where(x => x.UserId == lawyer.UserId).
+            //    Include(x=>x.Thread).Select(x => x.Thread).Distinct().Select(t => t.LikeCount);
+            //try
+            //{
+            //    threadLikes = await query.SumAsync();
+            //}
+            //catch (System.Reflection.TargetInvocationException ex)
+            //{
+            //    await Console.Out.WriteLineAsync();
+            //}
+
+
+
 
             lawyerDto.NumberOfLikes = commentLikes + threadLikes;
 
 
             var chats = await _chatServices.GetChatsOfUser(lawyer.UserId);
-            lawyerDto.NumberOfConsultations = chats.Count;
+            if (chats != null)
+            {
+                lawyerDto.NumberOfConsultations = chats.Count;
+            }
 
             return lawyerDto;
         }
 
+        public async Task<Pagination<Lawyer>> GetLawyers(PagedParams pagedParams, SortParams sortParams , LawyerFilterParams filterParams)
+        {
+            var filteredLawyers = _appUnitOfWork.LawyerRepo.AsQueryableNoTracking()
+            .Include(l => l.User)
+            .Where(l => string.IsNullOrEmpty(filterParams.Name) || Fuzz.PartialRatio(l.User.Name, filterParams.Name) > 75 );
+
+            if (filterParams.Rating != null)
+            {
+                filteredLawyers = filteredLawyers.Where(x => x.Rating >= filterParams.Rating);
+            }
+            if (!string.IsNullOrEmpty(filterParams.Title))
+            {
+                filteredLawyers = filteredLawyers.Where(x => x.Title == filterParams.Title);
+            }
+            if (!string.IsNullOrEmpty(filterParams.City))
+            {
+                filteredLawyers = filteredLawyers.Where(x => x.City == filterParams.City);
+            }
+            if (!string.IsNullOrEmpty(filterParams.MemberOf))
+            {
+                filteredLawyers = filteredLawyers.Where(x => x.MemberOf == filterParams.MemberOf);
+            }
+            if (!string.IsNullOrEmpty(filterParams.LicenseNumber))
+            {
+                filteredLawyers = filteredLawyers.Where(x => x.LicenseNumber == filterParams.LicenseNumber);
+            }
+            if (!string.IsNullOrEmpty(filterParams.Gender))
+            {
+                filteredLawyers = filteredLawyers.Where(x => x.Gender == filterParams.Gender);
+            }
+
+            return await filteredLawyers.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize, (string.IsNullOrEmpty(sortParams.Sort) ? "Id" : sortParams.Sort), !sortParams.IsAscending);
+        }
+
+        public async Task<List<LawyerCityCountDto>> GetLawyerCityCounts()
+        {
+            return await _appUnitOfWork.LawyerRepo.AsQueryableNoTracking().GroupBy(l => l.City).Select(g => new LawyerCityCountDto()
+            {
+                City = g.Key,
+                Count = g.Count()
+            }).ToListAsync();
+        }
+
+        public async Task<List<LawyerTitleCountDto>> GetLawyerTitleCounts()
+        {
+            return await _appUnitOfWork.LawyerRepo.AsQueryableNoTracking().GroupBy(l => l.Title).Select(g => new LawyerTitleCountDto()
+            {
+                Title = g.Key,
+                Count = g.Count()
+            }).ToListAsync();
+        }
     }
 }

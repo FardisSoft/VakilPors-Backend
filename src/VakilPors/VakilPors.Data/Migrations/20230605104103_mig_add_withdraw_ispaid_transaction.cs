@@ -10,14 +10,14 @@ namespace VakilPors.Data.Migrations
         {
             migrationBuilder.AddColumn<bool>(
                 name: "IsPaid",
-                table: "Tranaction",
+                table: "Transaction",
                 type: "boolean",
                 nullable: false,
                 defaultValue: false);
 
             migrationBuilder.AddColumn<bool>(
                 name: "IsWithdraw",
-                table: "Tranaction",
+                table: "Transaction",
                 type: "boolean",
                 nullable: false,
                 defaultValue: false);
@@ -27,11 +27,11 @@ namespace VakilPors.Data.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "IsPaid",
-                table: "Tranaction");
+                table: "Transaction");
 
             migrationBuilder.DropColumn(
                 name: "IsWithdraw",
-                table: "Tranaction");
+                table: "Transaction");
         }
     }
 }

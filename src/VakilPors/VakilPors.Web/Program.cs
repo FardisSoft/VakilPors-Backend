@@ -1,6 +1,5 @@
 
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using Serilog;
 using VakilPors.Business.Extensions;
 using VakilPors.Core.Authentication.Extensions;
@@ -11,12 +10,6 @@ using VakilPors.Data.Context;
 using VakilPors.Data.Extensions;
 using VakilPors.Web.Configuration.Extensions;
 using ZarinSharp.Extensions;
-using Amazon.S3;
-using Amazon;
-using Amazon.Extensions.NETCore.Setup;
-using Amazon.Runtime;
-using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
-using MimeKit.Cryptography;
 using VakilPors.Api.Configuration.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,8 +29,10 @@ builder.Services.AddZarinSharp(op =>
     op.IsSandbox = true;
 });
 builder.Services.AddControllers()
-    .AddNewtonsoftJson(options =>
-        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+    .AddJsonOptions(options =>
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles
+        // options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            );
 builder.Services.AddSignalR(options =>
 {
     options.EnableDetailedErrors = true;
