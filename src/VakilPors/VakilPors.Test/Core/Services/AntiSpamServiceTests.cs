@@ -60,5 +60,20 @@ namespace VakilPors.Test.Core.Services
             Assert.False(result4);
 
         }
+        [Fact]
+        public async Task repeated_sequence()
+        {
+            //Arrange 
+            var input = "alialialialialialialialialialialialialialialialialialialai";
+            var input2 = "ok";
+
+            //Act
+            var result =await  antiSpamService.CheckForRepeatedSequences(input);
+            var result2 = await antiSpamService.CheckForRepeatedSequences(input2);
+
+            //Assert
+            Assert.True(result);
+            Assert.False(result2);
+        }
     }
 }

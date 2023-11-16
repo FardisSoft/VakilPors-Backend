@@ -39,10 +39,10 @@ namespace VakilPors.Core.Services
             pattern += @"|\b021\d{8}\b"; // Pattern for Tehran static numbers starting with "021"
 
             MatchCollection matches = Regex.Matches(text, pattern);
-            bool containsRepeatedSequences = CheckForRepeatedSequences(text);
+            bool containsRepeatedSequences =await CheckForRepeatedSequences(text);
             return (matches.Count > 0) || containsRepeatedSequences;
         }
-        private static bool CheckForRepeatedSequences(string text)
+        public async Task<bool> CheckForRepeatedSequences(string text)
         {
             const int MaxSequenceLength = 10; // Maximum length of repeated sequence to consider as spam
 
@@ -64,3 +64,4 @@ namespace VakilPors.Core.Services
         }
     }
 }
+ 
