@@ -71,10 +71,25 @@ public class UserService : IUserServices
             userDtos.Add(await GetUserDtoFromUser(user));
         }
 
-        userDtos = userDtos.OrderByDescending(x => x.IsPremium).ToList();
+        //userDtos = userDtos.OrderByDescending(x => x.IsPremium).ToList();
+        userDtos = userDtos.OrderBy(x => GetClassOrder(x.PremiumLevel)).ToList();
+
         return userDtos;
     }
-
+    static int GetClassOrder(string className)
+    {
+        switch (className)
+        {
+            case "Gold":
+                return 1;
+            case "Silver":
+                return 2;
+            case "Bronze":
+                return 3;
+            default:
+                return int.MaxValue;
+        }
+    }
     public async Task<UserDto> GetUserById(int userId)
     {
         var user = await _uow.UserRepo
