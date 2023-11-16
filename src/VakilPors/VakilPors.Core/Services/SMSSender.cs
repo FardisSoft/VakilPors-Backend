@@ -18,19 +18,19 @@ namespace VakilPors.Core.Services
         private string _smsPassword;
         private readonly string _url="https://RayganSMS.com/SendMessageWithPost.ashx";
 
-        public SMSSender(IConfiguration configuration, ILogger<SMSSender> logger,HttpClient httpClient)
+        public SMSSender(IConfiguration configuration, ILogger<SMSSender> logger,IHttpClientFactory httpClientFactory)
         {
             _smsSenderNumber = Environment.GetEnvironmentVariable("RAYGAN_SMS_SENDER_NUMBER") ?? Environment.GetEnvironmentVariable("RAYGAN_SMS_SENDER_NUMBER", EnvironmentVariableTarget.User) ?? configuration["RAYGAN_SMS:SENDER_NUMBER"];
             _smsUsername = Environment.GetEnvironmentVariable("RAYGAN_SMS_USERNAME") ?? Environment.GetEnvironmentVariable("RAYGAN_SMS_USERNAME", EnvironmentVariableTarget.User) ?? configuration["RAYGAN_SMS:USERNAME"];
             _smsPassword = Environment.GetEnvironmentVariable("RAYGAN_SMS_PASSWORD") ?? Environment.GetEnvironmentVariable("RAYGAN_SMS_PASSWORD", EnvironmentVariableTarget.User) ?? configuration["RAYGAN_SMS:PASSWORD"];
             this.logger = logger;
-            _httpClient = httpClient;
+            _httpClient = httpClientFactory.CreateClient();
             logger.LogInformation($"Sender Number is:{_smsSenderNumber}");
         }
 
-        public async Task SendSmsAsync(string number, string message)
+        public async Task<int> SendSmsAsync(string number, string message)
         {
-            await SendSmsMessageWithPostMethodAsync(number, message, _smsUsername, _smsPassword, _smsSenderNumber);
+            return await SendSmsMessageWithPostMethodAsync(number, message, _smsUsername, _smsPassword, _smsSenderNumber);
         }
         private async Task<int> SendSmsMessageWithPostMethodAsync(string phone, string message, string username, string password,
             string senderPhoneNumber)

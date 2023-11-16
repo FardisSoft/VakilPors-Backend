@@ -22,6 +22,7 @@ builder.Services.RegisterAppDbContext(connectionString);
 builder.Services.RegisterIdentity<AppDbContext>();
 builder.Services.RegisterAuthentication(configuration);
 builder.Services.AddAutoMapper(typeof(MapperProfile));
+builder.Services.AddHttpClient();
 builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console().ReadFrom.Configuration(ctx.Configuration));
 builder.Services.AddZarinSharp(op =>
 {

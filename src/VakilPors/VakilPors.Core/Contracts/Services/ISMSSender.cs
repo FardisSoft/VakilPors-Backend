@@ -8,6 +8,6 @@ namespace VakilPors.Core.Contracts.Services
 {
     public interface ISMSSender : ISingletonDependency
     {
-        Task SendSmsAsync(string number, string message);
+        Task<int> SendSmsAsync(string number, string message);
     }
 }
