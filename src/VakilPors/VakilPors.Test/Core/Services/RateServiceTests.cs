@@ -112,5 +112,37 @@ namespace VakilPors.Test.Core.Services
             Assert.Equal(3, rates.ToList()[0].RateNum);
 
         }
+
+        [Fact]
+        public async Task update_rate()
+        {
+            //Arrange 
+            RateDto ratedto = new RateDto { Comment = "ok", RateNum = 3 };
+            var lawyerid = 1;
+            var userid = 1;
+            IEnumerable<Rate> rates = new List<Rate>
+            {
+                new Rate{LawyerId = lawyerid , RateNum = 2,UserId = userid, Id = 1},
+            };
+            IEnumerable<Lawyer> lawyers = new List<Lawyer>
+            {
+                new Lawyer { Id = lawyerid , Rating = 0}
+            };
+            var mock2 = lawyers.AsQueryable().BuildMock();
+            var mock = rates.AsQueryable().BuildMock();
+            appUnitOfWorkMock.Setup(x => x.RateRepo.AsQueryable()).Returns(mock);
+            appUnitOfWorkMock.Setup(x => x.RateRepo.Update(It.IsAny<Rate>()));
+            mapperMock.Setup(x => x.Map<RateDto>(It.IsAny<Rate>())).Returns(ratedto);
+            appUnitOfWorkMock.Setup(x => x.LawyerRepo.AsQueryable()).Returns(mock2);
+            appUnitOfWorkMock.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
+
+            //Act 
+            await rateService.UpdateRateAsync(ratedto, lawyerid, userid);
+
+            //Assert
+            Assert.Equal(3, rates.ToList()[0].RateNum);
+
+
+        }
     }
 }
