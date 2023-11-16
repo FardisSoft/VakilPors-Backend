@@ -71,6 +71,7 @@ public class UserService : IUserServices
             userDtos.Add(await GetUserDtoFromUser(user));
         }
 
+        userDtos = userDtos.OrderByDescending(x => x.IsPremium).ToList();
         return userDtos;
     }
 
