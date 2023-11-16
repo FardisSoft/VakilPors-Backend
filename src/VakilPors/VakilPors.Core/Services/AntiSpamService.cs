@@ -45,7 +45,7 @@ namespace VakilPors.Core.Services
         public async Task<bool> CheckForRepeatedSequences(string text)
         {
             const int MaxSequenceLength = 10; // Maximum length of repeated sequence to consider as spam
-
+      
             List<string> sequences = new List<string>();
             for (int i = 0; i < text.Length - MaxSequenceLength + 1; i++)
             {
