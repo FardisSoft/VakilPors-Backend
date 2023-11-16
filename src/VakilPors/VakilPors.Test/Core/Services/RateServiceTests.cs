@@ -65,7 +65,28 @@ namespace VakilPors.Test.Core.Services
             //Assert 
             Assert.Equal(3, lawyers.ToList()[0].Rating);
 
+        }
 
+        [Fact]
+        public async Task calculate_rating()
+        {
+            //Arrange
+            var lawyerid = 1;
+            var avg = 3.5;
+            IEnumerable<Rate> rates = new List<Rate>
+            {
+                new Rate{ LawyerId = lawyerid  , RateNum = 3},
+                new Rate{ LawyerId = lawyerid ,RateNum = 4},
+            };
+            var ratesqueriabe = rates.AsQueryable();
+            var mock = ratesqueriabe.BuildMock();
+            appUnitOfWorkMock.Setup(x => x.RateRepo.AsQueryable()).Returns(mock);
+
+            //Act
+            var result = await rateService.CalculateRatingAsync(lawyerid);
+
+            //Assert
+            Assert.Equal(avg, result);
         }
     }
 }
