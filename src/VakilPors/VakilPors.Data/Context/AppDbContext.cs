@@ -9,6 +9,11 @@ namespace VakilPors.Data.Context;
 
 public class AppDbContext : IdentityDbContext<User, Role, int>
 {
+    static AppDbContext()
+    {
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+    }
+
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
