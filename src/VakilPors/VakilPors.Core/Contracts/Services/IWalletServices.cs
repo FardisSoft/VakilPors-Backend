@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Pagination.EntityFrameworkCore.Extensions;
 using VakilPors.Core.Domain.Dtos.Params;
+using VakilPors.Core.Domain.Dtos.Transaction;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Shared.Services;
 using X.PagedList;
@@ -22,7 +23,7 @@ namespace VakilPors.Core.Contracts.Services
         public Task<IEnumerable<Transaction>> GetWithdrawTransactions();
         Task Withdraw(int userId, decimal amount, string cardNo);
         Task PayWithdraw(int transactionId);
-        public Task<IEnumerable<int>> GetMonthlyTransactions();
+        public IAsyncEnumerable<MonthlyTransactionDto> GetMonthlyTransactions();
         // Task<bool> HasEnoughBalance(string phoneNumber, decimal amount);
         // Task<bool> HasEnoughBalance(string phoneNumber, decimal amount, decimal discount);
     }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -8,6 +9,7 @@ using Pagination.EntityFrameworkCore.Extensions;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Params;
+using VakilPors.Core.Domain.Dtos.Transaction;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
 using X.PagedList;
@@ -166,14 +168,24 @@ namespace VakilPors.Core.Services
             await appUnitOfWork.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<int>> GetMonthlyTransactions()
+        public async IAsyncEnumerable<MonthlyTransactionDto> GetMonthlyTransactions()
         {
-            var transactionsCounts = new List<int>();
-            for (int i = 0; i < 7; i++)
+            for (int i = 0; i < 12; i++)
             {
-                transactionsCounts.Add(await appUnitOfWork.TransactionRepo.AsQueryableNoTracking().Where(t=>t.Date> DateTime.Now.AddDays(-i - 1)&& t.Date<= DateTime.Now.AddDays(-i)).CountAsync());
+                yield return await GetCountTransactionsOfMonth(DateTime.Now.AddMonths(-i));
             }
-            return transactionsCounts;
+        }
+        private async Task<MonthlyTransactionDto> GetCountTransactionsOfMonth(DateTime date)
+        {
+            var firstDayOfMonth = new DateTime(date.Year, date.Month, 1);
+            var lastDayOfMonth = firstDayOfMonth.AddMonths(1);
+            var count = await appUnitOfWork.VisitorRepo.AsQueryableNoTracking()
+                .Where(v => firstDayOfMonth<=v.VisitTime && v.VisitTime <lastDayOfMonth).CountAsync();
+            return new MonthlyTransactionDto()
+            {
+                Month = date.ToString("MMMM", CultureInfo.GetCultureInfo("fa-Ir")),
+                Count = count
+            };
         }
 
         private async Task<User> getUser(string phoneNumber)

@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
@@ -44,7 +45,7 @@ public class StatisticsService : IStatisticsService
         var result = new StatisticsDto()
         {
             DailyVisits = await GetVisits(DateTime.Now.AddDays(-1)),
-            WeekVisits = await GetWeekVisits(),
+            WeekVisits = GetWeekVisits(),
             MonthlyVisits = await GetVisits(DateTime.Now.AddMonths(-1)),
             YearlyVisits = await GetVisits(DateTime.Now.AddYears(-1)),
             UsersCount = usersCounts,
@@ -53,20 +54,17 @@ public class StatisticsService : IStatisticsService
             MessagesCount = await appUnitOfWork.ChatMessageRepo.AsQueryableNoTracking().CountAsync(),
             LawyerCityCount = await _lawyerServices.GetLawyerCityCounts(),
             LawyerTitleCount = await _lawyerServices.GetLawyerTitleCounts(),
-            TransactionMonthlyCounts = await _walletServices.GetMonthlyTransactions()
+            TransactionMonthlyCounts = _walletServices.GetMonthlyTransactions()
         };
         return result;
     }
 
-    private async Task<List<int>> GetWeekVisits()
+    private async IAsyncEnumerable<WeekVisitsDto> GetWeekVisits()
     {
-        var dailyVisits = new List<int>();
         for (int i = 0; i < 7; i++)
         {
-            dailyVisits.Add(await GetVisits(DateTime.Now.AddDays(-i - 1), DateTime.Now.AddDays(-i)));
+            yield return await GetVisitsOfDay(DateTime.Now.AddDays(-i));
         }
-
-        return dailyVisits;
     }
 
     public async Task<int> GetVisits(DateTime from)
@@ -78,5 +76,15 @@ public class StatisticsService : IStatisticsService
     {
         return await appUnitOfWork.VisitorRepo.AsQueryableNoTracking()
             .Where(v => v.VisitTime >= from && v.VisitTime <= to).CountAsync();
+    }
+    private async Task<WeekVisitsDto> GetVisitsOfDay(DateTime day)
+    {
+        var count = await appUnitOfWork.VisitorRepo.AsQueryableNoTracking()
+            .Where(v => day.Date<=v.VisitTime && v.VisitTime <day.Date.AddDays(1)).CountAsync();
+        return new WeekVisitsDto()
+        {
+            Day = day.ToString("ddd", CultureInfo.GetCultureInfo("fa-Ir")),
+            Count = count
+        };
     }
 }

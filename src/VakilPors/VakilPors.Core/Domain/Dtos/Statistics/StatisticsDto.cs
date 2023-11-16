@@ -1,11 +1,12 @@
 using VakilPors.Core.Domain.Dtos.Lawyer;
+using VakilPors.Core.Domain.Dtos.Transaction;
 
 namespace VakilPors.Core.Domain.Dtos.Statistics;
 
 public record StatisticsDto
 {
     public int DailyVisits { get; set; }
-    public IEnumerable<int> WeekVisits { get; set; }
+    public IAsyncEnumerable<WeekVisitsDto> WeekVisits { get; set; }
 
     public int MonthlyVisits { get; set; }
     public int YearlyVisits { get; set; }
@@ -15,5 +16,5 @@ public record StatisticsDto
     public int MessagesCount { get; set; }
     public IEnumerable<LawyerCityCountDto> LawyerCityCount { get; set; }
     public IEnumerable<LawyerTitleCountDto> LawyerTitleCount { get; set; }
-    public IEnumerable<int> TransactionMonthlyCounts { get; set; }
+    public IAsyncEnumerable<MonthlyTransactionDto> TransactionMonthlyCounts { get; set; }
 }
