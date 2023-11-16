@@ -92,6 +92,33 @@ public class UserService : IUserServices
         var userDto = _mapper.Map<UserDto>(user);
 
         userDto.IsPremium = await _premiumService.DoseUserHaveAnyActiveSubscription(user.Id);
+        if (userDto.IsPremium)
+        {
+            var remaindays = user.Subscribed.RemainingDays;
+            string result;
+            if (remaindays > 100)
+            {
+                result = "Free";
+            }
+            else if (remaindays > 60 && remaindays < 90)
+            {
+                result = "Gold";
+            }
+            else if (remaindays > 30 && remaindays < 60)
+            {
+                result = "Silver";
+            }
+            else if (remaindays > 0 && remaindays < 30)
+            {
+                result = "Bronze";
+            }
+            else
+                result = "not found";
+            userDto.PremiumLevel = result;
+            //userDto.PremiumLevel = user.Subscribed.Premium.ServiceType.ToString();
+
+        }
+
 
         return userDto;
     }

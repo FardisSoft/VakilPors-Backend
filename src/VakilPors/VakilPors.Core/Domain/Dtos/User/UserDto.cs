@@ -24,6 +24,7 @@ namespace VakilPors.Core.Domain.Dtos.User
         public string Bio { get; set; }
 
         public bool IsPremium { get; set; }
+        public string PremiumLevel { get; set; }
         public IFormFile ProfileImage { get; set; }
         public string ProfileImageUrl { get; set; }
         public string Telegram { get; set; }
