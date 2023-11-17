@@ -6,8 +6,8 @@ namespace VakilPors.Core.Contracts.Services;
 
 public interface IThreadService : IScopedDependency
 {
-    Task<ThreadDto> CreateThread(int userId, ThreadDto threadDto);
-    Task<ThreadDto> UpdateThread(int userId, ThreadDto threadDto);
+    Task<ThreadDto> CreateThread(int userId, ThreadDto threadDto , IAntiSpam antispam = null);
+    Task<ThreadDto> UpdateThread(int userId, ThreadDto threadDto, IAntiSpam antispam = null);
     Task<bool> DeleteThread(int userId, int threadId);
     Task<List<ThreadDto>> GetThreadList(int userId);
     Task<ThreadWithCommentsDto> GetThreadWithComments(int userId, int threadId);

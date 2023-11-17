@@ -33,9 +33,9 @@ public class ThreadService : IThreadService
     }
 
 
-    public async Task<ThreadDto> CreateThread(int userId, ThreadDto threadDto)
+    public async Task<ThreadDto> CreateThread(int userId, ThreadDto threadDto , IAntiSpam antispam = null)
     {
-        var anti_spam = new AntiSpamService();
+        var anti_spam = antispam ?? new AntiSpamService();
         var result = await anti_spam.IsSpam(threadDto.Description);
         var result2 = await anti_spam.IsSpam(threadDto.Title);
         var _user = await _uow.UserRepo.FindAsync(userId);
@@ -67,9 +67,9 @@ public class ThreadService : IThreadService
         return (await GetThreadWithComments(userId, thread.Id)).Thread;
     }
 
-    public async Task<ThreadDto> UpdateThread(int userId, ThreadDto threadDto)
+    public async Task<ThreadDto> UpdateThread(int userId, ThreadDto threadDto , IAntiSpam antispam=null)
     {
-        var anti_spam = new AntiSpamService();
+        var anti_spam = antispam ?? new AntiSpamService();
         var result = await anti_spam.IsSpam(threadDto.Description);
         if (result == "This message is detected as a spam and can not be shown.")
         {
