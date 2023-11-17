@@ -17,7 +17,7 @@ namespace VakilPors.Core.Services
 
         public async Task<String> IsSpam(string Text)
         {
-            bool isSpam = SpamCheck(Text);
+            bool isSpam =await  SpamCheck(Text);
             if (isSpam)
             {
                 return "This message is detected as a spam and can not be shown.";
@@ -27,7 +27,7 @@ namespace VakilPors.Core.Services
                 return "ok";
             }
         }
-        public  static bool SpamCheck(string text)
+        public async Task <bool> SpamCheck(string text)
         {
             string pattern = @"(\+98|0)?9(\s?\d){9}"; // Pattern for Iranian phone numbers
             pattern += @"|\@\S*"; // Pattern for IDs starting with "@"
@@ -39,13 +39,13 @@ namespace VakilPors.Core.Services
             pattern += @"|\b021\d{8}\b"; // Pattern for Tehran static numbers starting with "021"
 
             MatchCollection matches = Regex.Matches(text, pattern);
-            bool containsRepeatedSequences = CheckForRepeatedSequences(text);
+            bool containsRepeatedSequences =await CheckForRepeatedSequences(text);
             return (matches.Count > 0) || containsRepeatedSequences;
         }
-        private static bool CheckForRepeatedSequences(string text)
+        public async Task<bool> CheckForRepeatedSequences(string text)
         {
             const int MaxSequenceLength = 10; // Maximum length of repeated sequence to consider as spam
-
+      
             List<string> sequences = new List<string>();
             for (int i = 0; i < text.Length - MaxSequenceLength + 1; i++)
             {
@@ -64,3 +64,4 @@ namespace VakilPors.Core.Services
         }
     }
 }
+ 
