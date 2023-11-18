@@ -111,7 +111,7 @@ public class UserService : IUserServices
 
         if (roleId.HasValue)
         {
-            filteredUsers.Where(o => o.r.Id == roleId);
+            filteredUsers.Where(o => o.r.Id == roleId.Value);
         }
 
         return await filteredUsers.Select(o => new UserDto()
