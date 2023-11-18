@@ -15,7 +15,7 @@ using VakilPors.Web.Controllers;
 namespace VakilPors.Api.Controllers;
 [Authorize(Roles = RoleNames.Admin)]
 [ApiController]
-[Route("[controller]")]
+[Route("[controller]/[action]")]
 public class UserController:MyControllerBase
 {
     private readonly IUserServices _userServices;
@@ -29,7 +29,7 @@ public class UserController:MyControllerBase
         _logger = logger;
     }
     [HttpGet]
-    public async Task<ActionResult> GetAllPaged([FromQuery]string query,[FromQuery] PagedParams pagedParams, [FromQuery] SortParams sortParams)
+    public async Task<ActionResult> GetAllPaged([FromQuery]string? query,[FromQuery] PagedParams pagedParams, [FromQuery] SortParams sortParams)
     {
         _logger.LogInformation($"GET ALL users paged by admin with phone number:{getPhoneNumber()}. page no:{pagedParams.PageNumber} page size:{pagedParams.PageSize}, search query:{query}, sort by:{sortParams.Sort}, isAscending:{sortParams.IsAscending}");
         var all = await _userServices.GetUsers(query,pagedParams, sortParams);
