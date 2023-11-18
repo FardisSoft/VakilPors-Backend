@@ -1,10 +1,14 @@
 ﻿
 using AutoMapper;
+using FuzzySharp;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Org.BouncyCastle.Asn1.IsisMtt.X509;
+using Pagination.EntityFrameworkCore.Extensions;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
+using VakilPors.Core.Domain.Dtos.Params;
+using VakilPors.Core.Domain.Dtos.Search;
 using VakilPors.Core.Domain.Dtos.User;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
@@ -87,7 +91,14 @@ public class UserService : IUserServices
 
         return userDto;
     }
+    public async Task<Pagination<User>> GetUsers(string query,PagedParams pagedParams, SortParams sortParams)
+    {
+        var filteredLawyers = _uow.UserRepo.AsQueryableNoTracking()
+            .Where(u => string.IsNullOrEmpty(query) || Fuzz.PartialRatio(u.Name, query) > 75 || Fuzz.PartialRatio(u.PhoneNumber, query) > 75 || Fuzz.PartialRatio(u.Email, query) > 75 );
 
+        return await filteredLawyers.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize, (string.IsNullOrEmpty(sortParams.Sort) ? "Id" : sortParams.Sort), !sortParams.IsAscending);
+    }
+    
     //private UserDto ReplaceImageKeyWithUrl(UserDto userDto)
     //{
     //    if (userDto.ProfileImageUrl != null)
