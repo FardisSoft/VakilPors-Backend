@@ -1,4 +1,5 @@
-﻿using VakilPors.Contracts.Repositories;
+﻿using Microsoft.AspNetCore.Identity;
+using VakilPors.Contracts.Repositories;
 using VakilPors.Core.Domain.Entities;
 using ForumThread = VakilPors.Core.Domain.Entities.ForumThread;
 
@@ -11,6 +12,8 @@ public interface IAppUnitOfWork
     #region Repos
 
     public IGenericRepo<User> UserRepo { get; }
+    public IGenericRepo<IdentityUserRole<int>> UserRolesRepo { get; }
+    public IGenericRepo<Role> RoleRepo { get; }
     public IGenericRepo<Transaction> TransactionRepo { get; }
     public IGenericRepo<Lawyer> LawyerRepo { get; }
     public IGenericRepo<ForumThread> ForumThreadRepo { get; }

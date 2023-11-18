@@ -11,6 +11,5 @@ public interface IUserServices : IScopedDependency
     Task<UserDto> UpdateUser(UserDto userDto);
     Task<List<UserDto>> GetAllUsers();
     Task<UserDto> GetUserById(int userId);
-    Task<Pagination<User>> GetUsers(string query, PagedParams pagedParams, SortParams sortParams);
+    Task<Pagination<UserDto>> GetUsers(string query, int? roleId, PagedParams pagedParams, SortParams sortParams);
 }
-

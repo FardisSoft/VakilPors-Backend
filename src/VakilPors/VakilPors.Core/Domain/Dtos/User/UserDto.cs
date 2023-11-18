@@ -27,6 +27,7 @@ namespace VakilPors.Core.Domain.Dtos.User
         public IFormFile ProfileImage { get; set; }
         public string ProfileImageUrl { get; set; }
         public string Telegram { get; set; }
+        public string RoleName { get; set; }
 
     }
 }

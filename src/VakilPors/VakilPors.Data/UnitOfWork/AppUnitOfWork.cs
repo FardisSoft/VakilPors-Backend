@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using VakilPors.Contracts.Repositories;
 using VakilPors.Contracts.UnitOfWork;
@@ -24,6 +25,8 @@ public class AppUnitOfWork : IAppUnitOfWork
     #region Repos
 
     public IGenericRepo<User> UserRepo => _dbContext.GetService<IGenericRepo<User>>();
+    public IGenericRepo<IdentityUserRole<int>> UserRolesRepo => _dbContext.GetService<IGenericRepo<IdentityUserRole<int>>>();
+    public IGenericRepo<Role> RoleRepo => _dbContext.GetService<IGenericRepo<Role>>();
 
     public IGenericRepo<Transaction> TransactionRepo => _dbContext.GetService<IGenericRepo<Transaction>>();
 

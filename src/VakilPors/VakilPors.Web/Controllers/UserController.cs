@@ -29,11 +29,11 @@ public class UserController:MyControllerBase
         _logger = logger;
     }
     [HttpGet]
-    public async Task<ActionResult> GetAllPaged([FromQuery]string? query,[FromQuery] PagedParams pagedParams, [FromQuery] SortParams sortParams)
+    public async Task<ActionResult> GetAllPaged([FromQuery]string? query,[FromQuery]int? roleId,[FromQuery] PagedParams pagedParams, [FromQuery] SortParams sortParams)
     {
         _logger.LogInformation($"GET ALL users paged by admin with phone number:{getPhoneNumber()}. page no:{pagedParams.PageNumber} page size:{pagedParams.PageSize}, search query:{query}, sort by:{sortParams.Sort}, isAscending:{sortParams.IsAscending}");
-        var all = await _userServices.GetUsers(query,pagedParams, sortParams);
-        var res = all.ToMappedPagination<User, UserDto>(_mapper,pagedParams.PageSize);
-        return Ok(new AppResponse<Pagination<UserDto>>(res, "success"));
+        var all = await _userServices.GetUsers(query,roleId,pagedParams, sortParams);
+        // var res = all.ToMappedPagination<Us, UserDto>(_mapper,pagedParams.PageSize);
+        return Ok(new AppResponse<Pagination<UserDto>>(all, "success"));
     }
 }

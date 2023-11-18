@@ -1,6 +1,6 @@
-﻿
-using AutoMapper;
+﻿using AutoMapper;
 using FuzzySharp;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Org.BouncyCastle.Asn1.IsisMtt.X509;
@@ -21,13 +21,16 @@ public class UserService : IUserServices
     private readonly IMapper _mapper;
     private readonly IAwsFileService _fileService;
     private readonly IPremiumService _premiumService;
+    private readonly UserManager<User> _userManager;
 
-    public UserService(IAppUnitOfWork uow, IMapper mapper, IAwsFileService fileService, IPremiumService premiumService)
+    public UserService(IAppUnitOfWork uow, IMapper mapper, IAwsFileService fileService, IPremiumService premiumService,
+        UserManager<User> userManager)
     {
         _uow = uow;
         _mapper = mapper;
         _fileService = fileService;
         _premiumService = premiumService;
+        _userManager = userManager;
     }
 
     public async Task<UserDto> UpdateUser(UserDto userDto)
@@ -70,12 +73,12 @@ public class UserService : IUserServices
 
         return userDtos;
     }
-    
+
     public async Task<UserDto> GetUserById(int userId)
     {
         var user = await _uow.UserRepo
-                .AsQueryable()
-                .FirstOrDefaultAsync(x => x.Id == userId);
+            .AsQueryable()
+            .FirstOrDefaultAsync(x => x.Id == userId);
 
         if (user == null)
             throw new BadArgumentException("User Not Found");
@@ -91,14 +94,45 @@ public class UserService : IUserServices
 
         return userDto;
     }
-    public async Task<Pagination<User>> GetUsers(string query,PagedParams pagedParams, SortParams sortParams)
-    {
-        var filteredLawyers = _uow.UserRepo.AsQueryableNoTracking()
-            .Where(u => string.IsNullOrEmpty(query) || Fuzz.PartialRatio(u.Name, query) > 75 || Fuzz.PartialRatio(u.PhoneNumber, query) > 75 || Fuzz.PartialRatio(u.Email, query) > 75 );
 
-        return await filteredLawyers.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize, (string.IsNullOrEmpty(sortParams.Sort) ? "Id" : sortParams.Sort), !sortParams.IsAscending);
+    public async Task<Pagination<UserDto>> GetUsers(string query, int? roleId, PagedParams pagedParams,
+        SortParams sortParams)
+    {
+        var filteredUsers = _uow.UserRepo.AsQueryableNoTracking()
+            .Join(_uow.UserRolesRepo.AsQueryableNoTracking(), u => u.Id, ur => ur.UserId, (u, ur) => new { u, ur })
+            .Join(_uow.RoleRepo.AsQueryableNoTracking(), ur => ur.ur.RoleId, r => r.Id,
+                (ur, r) => new { ur.u, ur.ur, r });
+        if (!string.IsNullOrEmpty(query))
+        {
+            filteredUsers.Where(o => Fuzz.PartialRatio(o.u.Name, query) > 75 ||
+                                     Fuzz.PartialRatio(o.u.PhoneNumber, query) > 75 ||
+                                     Fuzz.PartialRatio(o.u.Email, query) > 75);
+        }
+
+        if (roleId.HasValue)
+        {
+            filteredUsers.Where(o => o.r.Id == roleId);
+        }
+
+        return await filteredUsers.Select(o => new UserDto()
+        {
+            Id = o.u.Id,
+            Bio = o.u.Bio,
+            Name = o.u.Name,
+            Job = o.u.Job,
+            Balance = o.u.Balance,
+            Email = o.u.Email,
+            ProfileImageUrl = o.u.ProfileImageUrl,
+            PhoneNumber = o.u.PhoneNumber,
+            Telegram = o.u.Telegram,
+            IsActive = o.u.IsActive,
+            UserName = o.u.UserName,
+            RoleName = o.r.Name,
+            PhoneNumberConfirmed = o.u.PhoneNumberConfirmed
+        }).AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize,
+            (string.IsNullOrEmpty(sortParams.Sort) ? "Id" : sortParams.Sort), !sortParams.IsAscending);
     }
-    
+
     //private UserDto ReplaceImageKeyWithUrl(UserDto userDto)
     //{
     //    if (userDto.ProfileImageUrl != null)
@@ -107,4 +141,3 @@ public class UserService : IUserServices
     //    return userDto;
     //}
 }
-
