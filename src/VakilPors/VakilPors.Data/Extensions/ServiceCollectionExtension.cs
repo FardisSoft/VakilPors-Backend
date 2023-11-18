@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using VakilPors.Contracts.Repositories;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Data.Context;
@@ -16,6 +17,7 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<AppDbContext>((IServiceProvider serviceProvider, DbContextOptionsBuilder options) =>
         {
             options.UseNpgsql(connectionString);
+            options.UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()));
         });
         services.AddScoped(typeof(IGenericRepo<>), typeof(GenericRepo<>));
         services.AddScoped<IAppUnitOfWork, AppUnitOfWork>();
