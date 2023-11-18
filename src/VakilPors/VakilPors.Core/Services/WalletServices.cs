@@ -168,23 +168,50 @@ namespace VakilPors.Core.Services
             await appUnitOfWork.SaveChangesAsync();
         }
 
-        public async IAsyncEnumerable<MonthlyTransactionDto> GetMonthlyTransactions()
+        public async IAsyncEnumerable<MonthlyTransactionCountDto> GetMonthlyTransactionsCount()
         {
             for (int i = 0; i < 12; i++)
             {
                 yield return await GetCountTransactionsOfMonth(DateTime.Now.AddMonths(-i));
             }
         }
-        private async Task<MonthlyTransactionDto> GetCountTransactionsOfMonth(DateTime date)
+
+        public async IAsyncEnumerable<MonthlyTransactionAmountDto> GetMonthlyTransactionsAmount(int userId)
+        {
+            for (int i = 0; i < 12; i++)
+            {
+                yield return await GetAmountTransactionsOfMonth(DateTime.Now.AddMonths(-i),userId);
+            }
+        }
+
+        private async Task<MonthlyTransactionCountDto> GetCountTransactionsOfMonth(DateTime date)
         {
             var firstDayOfMonth = new DateTime(date.Year, date.Month, 1);
             var lastDayOfMonth = firstDayOfMonth.AddMonths(1);
-            var count = await appUnitOfWork.VisitorRepo.AsQueryableNoTracking()
-                .Where(v => firstDayOfMonth<=v.VisitTime && v.VisitTime <lastDayOfMonth).CountAsync();
-            return new MonthlyTransactionDto()
+            var count = await appUnitOfWork.TransactionRepo.AsQueryableNoTracking()
+                .Where(t => firstDayOfMonth<=t.Date && t.Date <lastDayOfMonth).CountAsync();
+            return new MonthlyTransactionCountDto()
             {
                 Month = date.ToString("MMMM", CultureInfo.GetCultureInfo("fa-Ir")),
                 Count = count
+            };
+        }
+        private async Task<MonthlyTransactionAmountDto> GetAmountTransactionsOfMonth(DateTime date,int? userId)
+        {
+            var firstDayOfMonth = new DateTime(date.Year, date.Month, 1);
+            var lastDayOfMonth = firstDayOfMonth.AddMonths(1);
+            var query = appUnitOfWork.TransactionRepo.AsQueryableNoTracking()
+                .Where(t => firstDayOfMonth<=t.Date && t.Date <lastDayOfMonth);
+            if (userId.HasValue)
+            {
+                query.Where(t => t.UserId == userId.Value);
+            }
+
+            var sum = await query.SumAsync(v => v.Amount);
+            return new MonthlyTransactionAmountDto()
+            {
+                Month = date.ToString("MMMM", CultureInfo.GetCultureInfo("fa-Ir")),
+                Amount = sum
             };
         }
 

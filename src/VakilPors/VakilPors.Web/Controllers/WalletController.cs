@@ -14,6 +14,7 @@ using Pagination.EntityFrameworkCore.Extensions;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Params;
 using VakilPors.Core.Domain.Dtos.Payment;
+using VakilPors.Core.Domain.Dtos.Transaction;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
 using VakilPors.Core.Mapper;
@@ -91,6 +92,15 @@ namespace VakilPors.Web.Controllers
             IEnumerable<Transaction> transactions = await _walletServices.GetWithdrawTransactions();
             IEnumerable<TransactionDto> result = _mapper.Map<IEnumerable<Transaction>, IEnumerable<TransactionDto>>(transactions);
             return Ok(new AppResponse<IEnumerable<TransactionDto>>(result, "Withdrawn Transactions fetched sueccessfully!"));
+        }
+        [HttpGet("GetMonthlyTransactionsAmount")]
+        public Task<IActionResult> GetMonthlyTransactionsAmount()
+        {
+            var phoneNumber = getPhoneNumber();
+            var userId = getUserId();
+            _logger.LogInformation($"get monthly transactions amount for user with phone number:{phoneNumber}");
+            IAsyncEnumerable<MonthlyTransactionAmountDto> result = _walletServices.GetMonthlyTransactionsAmount(userId);
+            return Task.FromResult<IActionResult>(Ok(new AppResponse<IAsyncEnumerable<MonthlyTransactionAmountDto>>(result, "Monthly Transactions amount fetched successfully!")));
         }
     }
 }

@@ -54,7 +54,7 @@ public class StatisticsService : IStatisticsService
             MessagesCount = await appUnitOfWork.ChatMessageRepo.AsQueryableNoTracking().CountAsync(),
             LawyerCityCount = await _lawyerServices.GetLawyerCityCounts(),
             LawyerTitleCount = await _lawyerServices.GetLawyerTitleCounts(),
-            TransactionMonthlyCounts = _walletServices.GetMonthlyTransactions()
+            TransactionMonthlyCounts = _walletServices.GetMonthlyTransactionsCount()
         };
         return result;
     }

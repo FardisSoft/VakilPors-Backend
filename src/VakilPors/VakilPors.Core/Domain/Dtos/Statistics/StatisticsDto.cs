@@ -16,5 +16,5 @@ public record StatisticsDto
     public int MessagesCount { get; set; }
     public IEnumerable<LawyerCityCountDto> LawyerCityCount { get; set; }
     public IEnumerable<LawyerTitleCountDto> LawyerTitleCount { get; set; }
-    public IAsyncEnumerable<MonthlyTransactionDto> TransactionMonthlyCounts { get; set; }
+    public IAsyncEnumerable<MonthlyTransactionCountDto> TransactionMonthlyCounts { get; set; }
 }
