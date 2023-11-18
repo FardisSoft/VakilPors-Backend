@@ -104,14 +104,17 @@ public class UserService : IUserServices
                 (ur, r) => new { ur.u, ur.ur, r });
         if (!string.IsNullOrEmpty(query))
         {
-            filteredUsers.Where(o => Fuzz.PartialRatio(o.u.Name, query) > 75 ||
-                                     Fuzz.PartialRatio(o.u.PhoneNumber, query) > 75 ||
-                                     Fuzz.PartialRatio(o.u.Email, query) > 75);
+            // filteredUsers = filteredUsers.Where(o => Fuzz.PartialRatio(o.u.Name, query) > 75 ||
+            //                                          Fuzz.PartialRatio(o.u.PhoneNumber, query) > 75 ||
+            //                                          Fuzz.PartialRatio(o.u.Email, query) > 75);
+            filteredUsers = filteredUsers.Where(o => o.u.Name.Contains(query) ||
+                                                     o.u.PhoneNumber.Contains(query) ||
+                                                     o.u.Email.Contains(query));
         }
 
         if (roleId.HasValue)
         {
-            filteredUsers.Where(o => o.r.Id == roleId.Value);
+            filteredUsers = filteredUsers.Where(o => o.r.Id == roleId.Value);
         }
 
         return await filteredUsers.Select(o => new UserDto()
