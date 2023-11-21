@@ -1,5 +1,7 @@
 using VakilPors.Core.Services;
 using Moq;
+using MockQueryable.Moq;
+
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Contracts.UnitOfWork;
 using AutoMapper;
@@ -186,16 +188,21 @@ public class ThreadServicesTests{
     }
 
     
-    [Fact(Skip ="get null reference error")]
-    // [Fact]
+    // [Fact(Skip ="get null reference error")]
+    [Fact]
     public async void GetThreadList_ReturnNullFromResource_ThrowBadArgumentException(){
-        int threadId_input = 1,userId_input =1;
-        // _uow.Object.ForumThreadRepo = new Froumthred
-        // var mockRepo = new Mock<IForumThreadRepository>();
+        int userId_input =1;// ,threadId_input = 1;
+        Mock<GetThreadDtoFromThread> m = new Mock<GetThreadDtoFromThread>();
+        IEnumerable<ForumThread> forumthread = new List<ForumThread>
+        {
+            new ForumThread{Id =userId_input,Title="title" ,User = new User{Name="name"} }
+        };
+        var mock = forumthread.AsQueryable().BuildMock();
+        _uow.Setup(uow => uow.ForumThreadRepo.AsQueryable()).Returns(mock);
+        
 
-        _uow.Setup(uow => uow.ForumThreadRepo.AsQueryable()).Returns(() => null);
-        // _uow.Setup(uow => uow.ForumThreadRepo.FirstOrDefaultAsync(It.IsAny<Expression<Func<ForumThread, bool>>>())).ReturnsAsync((Expression<Func<ForumThread, bool>> predicate) => null);
-        await Assert.ThrowsAsync<BadArgumentException>(() => threadservice.GetThreadWithComments(userId_input,threadId_input));
+        var result =await threadservice.GetThreadList(userId_input);
+        Assert.Equal(result[0].Id, forumthread.ToList()[0].Id);
     }
 
 }

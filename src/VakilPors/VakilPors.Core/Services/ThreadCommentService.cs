@@ -28,10 +28,10 @@ public class ThreadCommentService : IThreadCommentService
     }
 
 
-    public async Task<ThreadCommentDto> CreateComment(int userId, ThreadCommentDto commentDto)
+    public async Task<ThreadCommentDto> CreateComment(int userId, ThreadCommentDto commentDto,AntiSpamService antispam = null)
     {
         var check_2minutes = await CheckWithin2Minutes(userId, commentDto);
-        var anti_spam = new AntiSpamService();
+        var anti_spam = antispam ?? new AntiSpamService();
         var result = await anti_spam.IsSpam(commentDto.Text);
         if (result == "This message is detected as a spam and can not be shown.")
         {
