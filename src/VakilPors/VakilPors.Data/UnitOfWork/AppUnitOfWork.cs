@@ -46,6 +46,7 @@ public class AppUnitOfWork : IAppUnitOfWork
     public IGenericRepo<LegalDocument> DocumentRepo => _dbContext.GetService<IGenericRepo<LegalDocument>>();
     public IGenericRepo<Rate> RateRepo => _dbContext.GetService<IGenericRepo<Rate>>();
     public IGenericRepo<Visitor> VisitorRepo => _dbContext.GetService<IGenericRepo<Visitor>>();
+    public IGenericRepo<Report> ReportRepo => _dbContext.GetService<IGenericRepo<Report>>();
 
     #endregion
 

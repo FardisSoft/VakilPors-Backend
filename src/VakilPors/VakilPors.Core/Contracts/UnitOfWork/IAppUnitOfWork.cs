@@ -27,6 +27,7 @@ public interface IAppUnitOfWork
     public IGenericRepo<LegalDocument> DocumentRepo { get; }
     public IGenericRepo<Rate> RateRepo { get; }
     public IGenericRepo<Visitor> VisitorRepo { get; }
+    public IGenericRepo<Report> ReportRepo { get; }
 
     #endregion
 }
