@@ -122,13 +122,14 @@ namespace VakilPors.Core.Services
             return user.Balance;
         }
 
-        public async Task<Pagination<Transaction>> GetTransactions(string phoneNumber, PagedParams pagedParams)
+        public async Task<Pagination<Transaction>> GetTransactions(string phoneNumber, PagedParams pagedParams,
+            SortParams sortParams)
         {
             var transactions = await appUnitOfWork.UserRepo.AsQueryableNoTracking()
                 .Include(u => u.Transactions)
                 .Where(x => x.PhoneNumber == phoneNumber)
                 .SelectMany(x => x.Transactions)
-                .AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize);
+                .AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize,(string.IsNullOrEmpty(sortParams.Sort) ? nameof(Transaction.Id) : sortParams.Sort), !sortParams.IsAscending);
             return transactions;
         }
 

@@ -353,7 +353,7 @@ namespace VakilPors.Core.Services
                 filteredLawyers = filteredLawyers.Where(x => x.Gender == filterParams.Gender);
             }
 
-            return await filteredLawyers.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize, (string.IsNullOrEmpty(sortParams.Sort) ? "Id" : sortParams.Sort), !sortParams.IsAscending);
+            return await filteredLawyers.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize, (string.IsNullOrEmpty(sortParams.Sort) ? nameof(Lawyer.Id) : sortParams.Sort), !sortParams.IsAscending);
         }
 
         public async Task<List<LawyerCityCountDto>> GetLawyerCityCounts()
