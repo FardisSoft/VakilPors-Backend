@@ -73,5 +73,12 @@ namespace VakilPors.Api.Controllers
             return Ok(new AppResponse<object>(result, "success"));
         }
 
+        [HttpGet]
+        public async Task<IActionResult> SearchThread([FromQuery] string title, [FromQuery] PagedParams pagedParams, [FromQuery] SortParams sortParams)
+        {
+            var result = await _threadService.SearchThread(title,pagedParams,sortParams);
+            return Ok(new AppResponse<object>(result, "success"));
+        }
+
     }
 }
