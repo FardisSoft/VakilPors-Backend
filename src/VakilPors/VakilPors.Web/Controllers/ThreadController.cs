@@ -77,7 +77,9 @@ namespace VakilPors.Api.Controllers
         public async Task<IActionResult> SearchThread([FromQuery] string title, [FromQuery] PagedParams pagedParams, [FromQuery] SortParams sortParams)
         {
             var result = await _threadService.SearchThread(title,pagedParams,sortParams);
+            _logger.LogInformation($"searching for a thread by title {title}");
             return Ok(new AppResponse<object>(result, "success"));
+            
         }
 
     }
