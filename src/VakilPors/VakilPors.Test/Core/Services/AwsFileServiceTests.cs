@@ -78,5 +78,22 @@ namespace VakilPors.Test.Core.Services
 
 
         }
+
+        [Fact]
+        public async Task GetFileUrl()
+        {
+            //Arrange
+            var key = Guid.NewGuid().ToString();
+            var request = new GetPreSignedUrlRequest { Key = key  , BucketName = _bucketName , Expires = DateTime.Now.AddDays(1) };
+            var sample_output = "https://your-s3-url.com";
+            _s3Client.Setup(u => u.GetPreSignedURL(It.IsAny<GetPreSignedUrlRequest>())).Returns(sample_output);
+
+            //Act 
+            var result = awsFileService.GetFileUrl(key);
+
+            //Assert 
+            Assert.NotNull(result);
+            Assert.Equal(sample_output, result);
+        }
     }
 }
