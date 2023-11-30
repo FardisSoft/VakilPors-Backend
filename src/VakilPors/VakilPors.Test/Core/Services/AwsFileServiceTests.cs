@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Amazon.S3.Model;
 using Amazon.Runtime;
 using Amazon.S3.Internal;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 namespace VakilPors.Test.Core.Services
 {
@@ -57,6 +58,25 @@ namespace VakilPors.Test.Core.Services
             Assert.StartsWith("https://api.fardissoft.ir/File/Download?key=", result);
         }
 
+        [Fact]
+        public async Task DownloadASync()
+        {
+            //Arrange 
+            var key = Guid.NewGuid().ToString();
+            var responsetream = new MemoryStream();
+            var request = new GetObjectRequest { Key = key, BucketName = _bucketName};
+            var response = new GetObjectResponse { ResponseStream = responsetream };
+            _s3Client.Setup(u => u.GetObjectAsync(It.IsAny<GetObjectRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(response);
 
+            //Act 
+            var result = await awsFileService.DownloadAsync(key);
+
+            //Assert 
+
+            Assert.NotNull(result);
+            Assert.Equal(responsetream, result);
+
+
+        }
     }
 }
