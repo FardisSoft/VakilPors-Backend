@@ -139,7 +139,7 @@ namespace VakilPors.Core.Services
             doc.Accesses.Add(new DocumentAccess { DocumentId = doc.Id, LawyerId = lawyer.Id });
 
             _uow.DocumentRepo.Update(doc);
-            
+
             var result = await _uow.SaveChangesAsync();
             if (result <= 0)
                 throw new Exception();
