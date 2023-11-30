@@ -4,6 +4,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using VakilPors.Contracts.UnitOfWork;
@@ -139,8 +140,33 @@ namespace VakilPors.Test.Core.Services
         }
 
         [Fact]
-        public async Task getaccess()
+        public async Task grantaccess()
         {
+            //Arrange 
+            var legaldocumentdto = new LegalDocumentDto { File = null };
+            var legaldocument = new LegalDocument { };
+            var docaccessdto = new DocumentAccessDto();
+            List<DocumentAccess> documentAccesses = new List<DocumentAccess> { new DocumentAccess { } };
+            IEnumerable<LegalDocument> legalDocuments = new List<LegalDocument>
+            { new LegalDocument{Accesses = documentAccesses}, new LegalDocument() , new LegalDocument() ,new LegalDocument() };
+            var mock = legalDocuments.AsQueryable().BuildMock();
+            IEnumerable<Lawyer> lawyers = new List<Lawyer>()
+            {
+                new Lawyer() , new Lawyer()
+            };
+            var mock2 = lawyers.AsQueryable().BuildMock();
+            _appUnitOfWorkMock.Setup(x => x.DocumentRepo.AsQueryable()).Returns(mock);
+            _appUnitOfWorkMock.Setup(x => x.LawyerRepo.AsQueryable()).Returns(mock2 );
+            _appUnitOfWorkMock.Setup(x => x.DocumentRepo.Update(It.IsAny<LegalDocument>()));
+            _appUnitOfWorkMock.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
+            _emailsenderMock.Setup(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>() , It.IsAny<bool>()));
+
+            //Act 
+            var exception = await Assert.ThrowsAsync<BadArgumentException>(() => legalDocumentService.GrantAccessToLawyer(docaccessdto));
+
+            //Assert 
+
+            Assert.Equal("Lawyer already has access to this document", exception.Message);
 
         }
     }
