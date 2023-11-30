@@ -1,32 +1,31 @@
-using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using VakilPors.Core.Contracts.Services;
+using VakilPors.Core.Domain.Dtos.Ocr;
 using VakilPors.Shared.Response;
 using VakilPors.Web.Controllers;
 
 namespace VakilPors.Api.Controllers;
 
 [ApiController]
-[Route("[controller]/[action]")]
+[Route("[controller]")]
 public class OcrController : MyControllerBase
 {
     private readonly IOcrServices _ocrServices;
+    private readonly ILogger<OcrController> _logger;
 
-    public OcrController(IOcrServices ocrServices)
+    public OcrController(IOcrServices ocrServices, ILogger<OcrController> logger)
     {
         _ocrServices = ocrServices;
+        _logger = logger;
     }
-    [HttpPost("perform-ocr")]
+
+    [HttpPost]
     public async Task<ActionResult<AppResponse>> PerformOcr(IFormFile imageFile)
     {
-        try
-        {
-            var ocrResult = await _ocrServices.GetMelliCode(imageFile.OpenReadStream(), imageFile.FileName);
-            return new AppResponse<string>(ocrResult, "ocr done!");
-        }
-        catch (Exception ex)
-        {
-            return new AppResponse(HttpStatusCode.BadRequest, ex.Message);
-        }
+        _logger.LogInformation($"calling ocr api on file:{imageFile.FileName}");
+        using var memoryStream = new MemoryStream();
+        await imageFile.CopyToAsync(memoryStream);
+        var ocrResult = await _ocrServices.GetNationalCode(memoryStream.ToArray(), imageFile.FileName);
+        return new AppResponse<OcrDto>(ocrResult, "ocr done!");
     }
 }
