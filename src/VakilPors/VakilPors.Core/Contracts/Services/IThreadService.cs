@@ -18,6 +18,6 @@ public interface IThreadService : IScopedDependency
     Task<int> LikeThread(int userId, int threadId);
 
     Task<int> UndoLikeThread(int userId, int threadId);
-    Task<Pagination<ForumThread>> SearchThread(string title, PagedParams pagedParams, SortParams sortParam);
+    Task<Pagination<ForumThread>> SearchThread(string title, PagedParams pagedParams, SortParams sortParam, int userid);
 }
 
