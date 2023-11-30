@@ -60,5 +60,42 @@ namespace VakilPors.Test.Core.Services
             //Assert 
             Assert.Equal(userid, reseult.UserId);
         }
+
+        [Fact]
+        public async Task updatedocument()
+        {
+            //Arrange 
+            var userid = 1;
+            var legaldocumentdto = new LegalDocumentDto { File = null };
+            var founddocument = new LegalDocument { };
+            _appUnitOfWorkMock.Setup(x => x.DocumentRepo.FindAsync(It.IsAny<int>())).ReturnsAsync(founddocument);
+            _appUnitOfWorkMock.Setup(x => x.DocumentRepo.Update(founddocument));
+            _appUnitOfWorkMock.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
+            _mappermock.Setup(x => x.Map<LegalDocumentDto>(founddocument)).Returns(legaldocumentdto);
+
+            //Act 
+            var result = await legalDocumentService.UpdateDocument(legaldocumentdto);
+
+            //Assert 
+            Assert.Equal(legaldocumentdto, result);
+        }
+
+        [Fact]
+        public async Task deletedocument()
+        {
+            //Arrange
+            var docid = 1;
+            var founddocument = new LegalDocument { };
+            _appUnitOfWorkMock.Setup(x => x.DocumentRepo.FindAsync(It.IsAny<int>())).ReturnsAsync(founddocument);
+            _appUnitOfWorkMock.Setup(x => x.DocumentRepo.Remove(founddocument));
+            _appUnitOfWorkMock.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
+
+            //Act 
+            var result = await legalDocumentService.DeleteDocument(docid);
+
+            //Assert 
+            Assert.True(result);
+
+        }
     }
 }
