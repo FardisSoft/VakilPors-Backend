@@ -257,6 +257,7 @@ public class ThreadService : IThreadService
     public async Task<Pagination<ForumThread>> SearchThread(string title , PagedParams pagedParams, SortParams sortParam)
     {
         var foundthread = _uow.ForumThreadRepo.AsQueryable().Where(x => x.Title.Contains(title) || x.Description.Contains(title));
+        foundthread = foundthread.OrderByDescending(x => x.LikeCount).ThenByDescending(x => x.CreateDate);
         return await foundthread.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize);
     }
 }
