@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
+using VakilPors.Core.Domain.Dtos.Case;
+using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Services;
 
 namespace VakilPors.Test.Core.Services
@@ -36,6 +38,27 @@ namespace VakilPors.Test.Core.Services
                 (_lawyerServicesMock.Object, _awsFileServiceMock.Object, _appUnitOfWorkMock.Object, _mappermock.Object, _emailsenderMock.Object, _telegramserviceMock.Object, _premiumservice.Object);
                 
                 
+        }
+
+
+        [Fact]
+        public async Task adddocument()
+        {
+            //Arrange 
+            var userid = 1;
+            var legaldocumentdto = new LegalDocumentDto { File = null};
+            var legaldocument = new LegalDocument { };
+            _lawyerServicesMock.Setup(x => x.IsLawyer(It.IsAny<int>())).ReturnsAsync(false);
+            _mappermock.Setup(x => x.Map<LegalDocument>(legaldocumentdto)).Returns(legaldocument);
+            _mappermock.Setup(x => x.Map<LegalDocumentDto>(legaldocument)).Returns(legaldocumentdto);
+            _appUnitOfWorkMock.Setup(x => x.DocumentRepo.AddAsync(legaldocument)).Returns(Task.CompletedTask);
+            _appUnitOfWorkMock.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
+
+            //Act 
+            var reseult = await legalDocumentService.AddDocument(userid, legaldocumentdto);
+
+            //Assert 
+            Assert.Equal(userid, reseult.UserId);
         }
     }
 }
