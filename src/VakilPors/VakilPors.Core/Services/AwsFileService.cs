@@ -32,8 +32,8 @@ namespace VakilPors.Core.Services
                 return null;
 
             var key = Guid.NewGuid().ToString();
-            var stream = file.OpenReadStream();
-
+            var stream = file.OpenReadStream(); 
+            
             var request = new PutObjectRequest
             {
                 BucketName = _bucketName,
@@ -73,6 +73,7 @@ namespace VakilPors.Core.Services
             };
 
             return _s3Client.GetPreSignedURL(request);
+            
         }
     }
 }
