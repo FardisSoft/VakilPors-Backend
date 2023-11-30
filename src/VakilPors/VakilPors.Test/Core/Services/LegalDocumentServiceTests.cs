@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using MockQueryable.Moq;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Case;
 using VakilPors.Core.Domain.Entities;
+using VakilPors.Core.Exceptions;
 using VakilPors.Core.Services;
 
 namespace VakilPors.Test.Core.Services
@@ -95,6 +97,50 @@ namespace VakilPors.Test.Core.Services
 
             //Assert 
             Assert.True(result);
+
+        }
+
+        [Fact]
+        public async Task getdocumentbyid()
+        {
+            //Arrange 
+            var docid = 1;
+            IEnumerable<LegalDocument> legalDocuments = new List<LegalDocument>();
+            var mock = legalDocuments.AsQueryable().BuildMock();
+            var legaldocumentdto = new LegalDocumentDto { File = null };
+            var legaldocument = new LegalDocument { };
+            _appUnitOfWorkMock.Setup(x => x.DocumentRepo.AsQueryable()).Returns(mock);
+            _mappermock.Setup(x => x.Map<LegalDocumentDto>(legaldocument)).Returns(legaldocumentdto);
+
+            //Act and Assert 
+            var exception = await Assert.ThrowsAsync<BadArgumentException>(() => legalDocumentService.GetDocumentById(docid));
+            Assert.Equal("document not found", exception.Message);
+
+        }
+
+        [Fact]
+        public async Task getdocumentbyuserid()
+        {
+            //Arrange 
+            var userid = 1;
+            IEnumerable<LegalDocument> legalDocuments = new List<LegalDocument>();
+            var mock = legalDocuments.AsQueryable().BuildMock();
+            var legaldocumentdto = new LegalDocumentDto { File = null };
+            var legaldocument = new LegalDocument { };
+            _appUnitOfWorkMock.Setup(x => x.DocumentRepo.AsQueryable()).Returns(mock);
+            _mappermock.Setup(x => x.Map<LegalDocumentDto>(legaldocument)).Returns(legaldocumentdto);
+
+            //Act 
+            var result = await legalDocumentService.GetDocumentsByUserId(userid);
+
+            //Assert 
+            Assert.Equal(0,result.Count);
+
+        }
+
+        [Fact]
+        public async Task getaccess()
+        {
 
         }
     }
