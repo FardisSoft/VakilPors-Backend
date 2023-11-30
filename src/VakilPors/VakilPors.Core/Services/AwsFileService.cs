@@ -72,8 +72,8 @@ namespace VakilPors.Core.Services
                 Expires = DateTime.Now.AddDays(1)
             };
 
-            var result = _s3Client.GetPreSignedURL(request);
-            return result;
+            return _s3Client.GetPreSignedURL(request);
+            
         }
     }
 }
