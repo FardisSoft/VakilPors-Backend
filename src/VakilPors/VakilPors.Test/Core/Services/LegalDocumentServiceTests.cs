@@ -239,7 +239,43 @@ namespace VakilPors.Test.Core.Services
 
         }
 
-        
-        
+        [Fact]
+        public async Task GetDocumentsThatLawyerHasAccessToByUserId()
+        {
+            //Arrange 
+            int docid = 1;
+            var legaldocumentdto = new LegalDocumentDto { File = null };
+            var number = 0;
+            var legaldocument = new LegalDocument { };
+            var docaccessdto = new DocumentAccessDto();
+            List<DocumentAccess> documentAccesses = new List<DocumentAccess> { new DocumentAccess { } };
+            IEnumerable<LegalDocument> legalDocuments = new List<LegalDocument>
+            { new LegalDocument{Accesses = documentAccesses}, new LegalDocument() , new LegalDocument() ,new LegalDocument() };
+            var mock = legalDocuments.AsQueryable().BuildMock();
+            IEnumerable<Lawyer> lawyers = new List<Lawyer>()
+            {
+                new Lawyer() , new Lawyer()
+            };
+            var mock2 = lawyers.AsQueryable().BuildMock();
+            var lawyerdto = new LawyerDto();
+            _appUnitOfWorkMock.Setup(x => x.DocumentRepo.AsQueryable()).Returns(mock);
+            _appUnitOfWorkMock.Setup(x => x.LawyerRepo.AsQueryable()).Returns(mock2);
+            _appUnitOfWorkMock.Setup(x => x.DocumentRepo.Update(It.IsAny<LegalDocument>()));
+            _appUnitOfWorkMock.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
+            _emailsenderMock.Setup(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()));
+            _lawyerServicesMock.Setup(x => x.GetLawyerById(It.IsAny<int>())).ReturnsAsync(lawyerdto);
+            _mappermock.Setup(x => x.Map<LegalDocumentDto>(legaldocument)).Returns(legaldocumentdto);
+
+            //Act 
+            var result = await legalDocumentService.GetDocumentsThatLawyerHasAccessToByUserId(new LawyerDocumentAccessDto());
+
+            //Assert 
+
+            Assert.Equal(number, result.Count);
+
+        }
+
+
+
     }
 }
