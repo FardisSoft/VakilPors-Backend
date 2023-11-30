@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Case;
+using VakilPors.Core.Domain.Dtos.Lawyer;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
 using VakilPors.Core.Services;
@@ -169,5 +170,43 @@ namespace VakilPors.Test.Core.Services
             Assert.Equal("Lawyer already has access to this document", exception.Message);
 
         }
+
+        [Fact]
+        public async Task takeaccess()
+        {
+            //Arrange 
+            var legaldocumentdto = new LegalDocumentDto { File = null };
+            var legaldocument = new LegalDocument { };
+            var docaccessdto = new DocumentAccessDto();
+            List<DocumentAccess> documentAccesses = new List<DocumentAccess> { new DocumentAccess { } };
+            IEnumerable<LegalDocument> legalDocuments = new List<LegalDocument>
+            { new LegalDocument{Accesses = documentAccesses}, new LegalDocument() , new LegalDocument() ,new LegalDocument() };
+            var mock = legalDocuments.AsQueryable().BuildMock();
+            IEnumerable<Lawyer> lawyers = new List<Lawyer>()
+            {
+                new Lawyer() , new Lawyer()
+            };
+            var mock2 = lawyers.AsQueryable().BuildMock();
+            var lawyerdto = new LawyerDto();
+            _appUnitOfWorkMock.Setup(x => x.DocumentRepo.AsQueryable()).Returns(mock);
+            _appUnitOfWorkMock.Setup(x => x.LawyerRepo.AsQueryable()).Returns(mock2);
+            _appUnitOfWorkMock.Setup(x => x.DocumentRepo.Update(It.IsAny<LegalDocument>()));
+            _appUnitOfWorkMock.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
+            _emailsenderMock.Setup(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()));
+            _lawyerServicesMock.Setup(x => x.GetLawyerById(docaccessdto.LawyerId)).ReturnsAsync(lawyerdto);
+
+            //Act 
+
+            var result = await legalDocumentService.TakeAccessFromLawyer(docaccessdto);
+
+            //Assert 
+
+            Assert.True(result);
+
+        
+        }
+
+        
+        
     }
 }
