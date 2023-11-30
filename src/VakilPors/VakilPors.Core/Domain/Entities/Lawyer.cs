@@ -20,6 +20,8 @@ namespace VakilPors.Core.Domain.Entities
         public string City { get; set; }
         [StringLength(5)]
         public string LicenseNumber  { get; set; }
+        [StringLength(10)]
+        public string NationalCode  { get; set; }
         public string MemberOf { get; set; }
         public int YearsOfExperience { get; set; }
         public string OfficeAddress { get; set; }

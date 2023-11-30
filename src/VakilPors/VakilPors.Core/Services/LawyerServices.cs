@@ -84,6 +84,7 @@ namespace VakilPors.Core.Services
             foundLawyer.Title = lawyerDto.Title;
             foundLawyer.City = lawyerDto.City;
             foundLawyer.LicenseNumber = lawyerDto.LicenseNumber;
+            foundLawyer.NationalCode = lawyerDto.NationalCode;
             foundLawyer.MemberOf = lawyerDto.MemberOf;
             foundLawyer.YearsOfExperience = lawyerDto.YearsOfExperience;
             foundLawyer.OfficeAddress = lawyerDto.OfficeAddress;
