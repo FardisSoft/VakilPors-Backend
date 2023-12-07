@@ -28,6 +28,7 @@ public interface IAppUnitOfWork
     public IGenericRepo<DocumentAccess> DocumentAccessRepo { get; }
     public IGenericRepo<Rate> RateRepo { get; }
     public IGenericRepo<Visitor> VisitorRepo { get; }
+    public IGenericRepo<Event> EventRepo { get; }
 
     #endregion
 }
