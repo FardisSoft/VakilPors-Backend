@@ -1,6 +1,6 @@
 ﻿namespace VakilPors.Core.Domain.Entities;
 
-public enum DocumentStatus
+public enum Status
 {
     PENDING,
     ACCEPTED,

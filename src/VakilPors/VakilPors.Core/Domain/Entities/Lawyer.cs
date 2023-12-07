@@ -40,5 +40,6 @@ namespace VakilPors.Core.Domain.Entities
         public bool IsVerified { get; set; } = false;
         public string NationalCardImageUrl { get; set; } 
         public virtual ICollection<DocumentAccess> DocumentAccesses { get; set; }
+        public virtual ICollection<Event> Events { get; set; }
     }
 }
