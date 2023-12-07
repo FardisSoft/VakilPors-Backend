@@ -1,14 +1,14 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Event;
-using VakilPors.Core.Domain.Dtos.Ocr;
 using VakilPors.Core.Domain.Entities;
-using VakilPors.Shared.Response;
 using VakilPors.Web.Controllers;
 
 namespace VakilPors.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("[controller]")]
 public class EventController : MyControllerBase
 {
@@ -34,18 +34,32 @@ public class EventController : MyControllerBase
         var meeting = await _eventServices.GetEventAsync(id, getUserId());
         return Ok(meeting);
     }
+    [HttpGet("/google-calendar/{id}")]
+    public async Task<IActionResult> GetGoogleCalendarEventById(int id)
+    {
+        var meeting = await _eventServices.GetGoogleCalendarUrl(id, getUserId());
+        return Ok(meeting);
+    }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] Event meeting)
     {
-        var updatedEvent = await _eventServices.UpdateEventAsync(id, meeting);
+        var updatedEvent = await _eventServices.UpdateEventAsync(id, meeting, getUserId());
+        return Ok(updatedEvent);
+    }
+    [HttpPatch("/status/{id}")]
+    [Authorize(Roles = RoleNames.Vakil)]
+    public async Task<IActionResult> UpdateStatus(int id, Status status)
+    {
+        var updatedEvent = await _eventServices.UpdateEventStatusAsync(id, status, getUserId());
         return Ok(updatedEvent);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        await _eventServices.DeleteEventAsync(id);
+        throw new InvalidOperationException("Not Meant to be done!");
+        await _eventServices.DeleteEventAsync(id, getUserId());
         return NoContent();
     }
 }

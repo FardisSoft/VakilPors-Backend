@@ -25,7 +25,7 @@ namespace VakilPors.Core.Domain.Dtos.Case
         public int MinimumBudget { get; set; }
 
         public int MaximumBudget { get; set; }
-        public DocumentStatus DocumentStatus { get; set; }
+        public Status DocumentStatus { get; set; }
 
         public IFormFile File { get; set; }
     }

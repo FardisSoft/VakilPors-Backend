@@ -11,7 +11,7 @@ public class Event : IEntity
     [Required]
     public string Title { get; set; }
     public string Description { get; set; }
-    public DocumentStatus Status { get; set; } = DocumentStatus.PENDING;
+    public Status Status { get; set; } = Status.PENDING;
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
     public int UserId { get; set; }
