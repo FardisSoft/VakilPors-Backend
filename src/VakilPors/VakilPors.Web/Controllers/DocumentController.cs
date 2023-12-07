@@ -44,9 +44,9 @@ namespace VakilPors.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetDocumentsByUserId(int userId)
+        public async Task<IActionResult> GetDocumentsByUserId(int userId,[FromQuery]DocumentStatus? documentStatus)
         {
-            var result = await _documentService.GetDocumentsByUserId(userId);
+            var result = await _documentService.GetDocumentsByUserId(userId,documentStatus);
             return Ok(new AppResponse<object>(result, "success"));
         }
 
@@ -86,9 +86,9 @@ namespace VakilPors.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetDocumentsThatLawyerHasAccessToByUserId(LawyerDocumentAccessDto lawyerDocumentAccessDto)
+        public async Task<IActionResult> GetDocumentsThatLawyerHasAccessToByUserId(LawyerDocumentAccessDto lawyerDocumentAccessDto,[FromQuery]DocumentStatus? documentStatus)
         {
-            var result = await _documentService.GetDocumentsThatLawyerHasAccessToByUserId(lawyerDocumentAccessDto);
+            var result = await _documentService.GetDocumentsThatLawyerHasAccessToByUserId(lawyerDocumentAccessDto,documentStatus);
             return Ok(new AppResponse<object>(result, "success"));
         }
         [HttpPatch]

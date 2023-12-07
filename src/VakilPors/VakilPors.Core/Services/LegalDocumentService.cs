@@ -106,6 +106,7 @@ namespace VakilPors.Core.Services
             var doc = await _uow.DocumentRepo
                 .AsQueryable()
                 .Include(x=>x.Accesses)
+                .ThenInclude(a=>a.Lawyer)
                 .Where(x => x.Id == documentId)
                 .FirstOrDefaultAsync();
 
@@ -115,13 +116,20 @@ namespace VakilPors.Core.Services
             return doc;
         }
 
-        public async Task<List<LegalDocument>> GetDocumentsByUserId(int userId)
+        public async Task<List<LegalDocument>> GetDocumentsByUserId(int userId,DocumentStatus? status)
         {
             var docs = await _uow.DocumentRepo
                 .AsQueryable()
                 .Where(x => x.UserId == userId)
-                .Include(x=>x.Accesses)
+                .Include(x => x.Accesses)
+                .ThenInclude(a => a.Lawyer)
                 .ToListAsync();
+            if (status.HasValue)
+            {
+                docs = docs.Where(d => 
+                        d.Accesses.Any(a => a.DocumentStatus == status.Value))
+                    .ToList();
+            }
 
             return docs;
         }
@@ -203,14 +211,20 @@ namespace VakilPors.Core.Services
             return users;
         }
 
-        public async Task<List<LegalDocument>> GetDocumentsThatLawyerHasAccessToByUserId(LawyerDocumentAccessDto lawyerDocumentAccessDto)
+        public async Task<List<LegalDocument>> GetDocumentsThatLawyerHasAccessToByUserId(LawyerDocumentAccessDto lawyerDocumentAccessDto,DocumentStatus? status)
         {
             var docs = await _uow.DocumentRepo
                 .AsQueryable()
                 .Include(x => x.Accesses)
+                .ThenInclude(a=>a.Lawyer)
                 .Where(x => x.UserId == lawyerDocumentAccessDto.UserId && x.Accesses.Select(a => a.LawyerId).Contains(lawyerDocumentAccessDto.LawyerId))
                 .ToListAsync();
-
+            if (status.HasValue)
+            {
+                docs = docs.Where(d => 
+                        d.Accesses.Any(a => a.DocumentStatus == status.Value))
+                    .ToList();
+            }
             return docs;
         }
 
@@ -220,13 +234,14 @@ namespace VakilPors.Core.Services
             var doc = await _uow.DocumentRepo
                 .AsQueryable()
                 .Include(x => x.Accesses)
+                .ThenInclude(a=>a.Lawyer)
                 .Include(x => x.User)
                 .Where(x => x.Id == documentId)
                 .FirstOrDefaultAsync();
 
             if (doc == null)
                 throw new BadArgumentException("document not found");
-
+            
             return doc;
         }
 
