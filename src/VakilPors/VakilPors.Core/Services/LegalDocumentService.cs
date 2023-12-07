@@ -116,7 +116,7 @@ namespace VakilPors.Core.Services
             return doc;
         }
 
-        public async Task<List<LegalDocument>> GetDocumentsByUserId(int userId,DocumentStatus? status)
+        public async Task<List<LegalDocument>> GetDocumentsByUserId(int userId,Status? status)
         {
             var docs = await _uow.DocumentRepo
                 .AsQueryable()
@@ -211,7 +211,7 @@ namespace VakilPors.Core.Services
             return users;
         }
 
-        public async Task<List<LegalDocument>> GetDocumentsThatLawyerHasAccessToByUserId(LawyerDocumentAccessDto lawyerDocumentAccessDto,DocumentStatus? status)
+        public async Task<List<LegalDocument>> GetDocumentsThatLawyerHasAccessToByUserId(LawyerDocumentAccessDto lawyerDocumentAccessDto,Status? status)
         {
             var docs = await _uow.DocumentRepo
                 .AsQueryable()

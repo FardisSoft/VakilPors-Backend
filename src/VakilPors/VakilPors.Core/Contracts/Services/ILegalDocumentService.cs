@@ -17,7 +17,7 @@ namespace VakilPors.Core.Contracts.Services
 
         Task<bool> DeleteDocument(int documentId);
 
-        Task<List<LegalDocument>> GetDocumentsByUserId(int userId,DocumentStatus? status);
+        Task<List<LegalDocument>> GetDocumentsByUserId(int userId,Status? status);
 
         Task<LegalDocument> GetDocumentById(int documentId);
 
@@ -30,7 +30,7 @@ namespace VakilPors.Core.Contracts.Services
         Task<List<UserDto>> GetUsersThatLawyerHasAccessToTheirDocuments(int lawyerId);
 
         Task<List<LegalDocument>> GetDocumentsThatLawyerHasAccessToByUserId(
-            LawyerDocumentAccessDto lawyerDocumentAccessDto,DocumentStatus? status);
+            LawyerDocumentAccessDto lawyerDocumentAccessDto,Status? status);
         Task UpdateDocumentStatus(DocumentStatusUpdateDto updateDto, int lawyerUserId);
     }
 }
