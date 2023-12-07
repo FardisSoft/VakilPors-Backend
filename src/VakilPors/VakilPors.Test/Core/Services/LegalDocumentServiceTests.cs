@@ -133,7 +133,7 @@ namespace VakilPors.Test.Core.Services
             _mappermock.Setup(x => x.Map<LegalDocumentDto>(legaldocument)).Returns(legaldocumentdto);
 
             //Act 
-            var result = await legalDocumentService.GetDocumentsByUserId(userid);
+            var result = await legalDocumentService.GetDocumentsByUserId(userid,null);
 
             //Assert 
             Assert.Equal(0,result.Count);
@@ -267,7 +267,7 @@ namespace VakilPors.Test.Core.Services
             _mappermock.Setup(x => x.Map<LegalDocumentDto>(legaldocument)).Returns(legaldocumentdto);
 
             //Act 
-            var exception = await Assert.ThrowsAsync<ArgumentNullException>(() => legalDocumentService.GetDocumentsThatLawyerHasAccessToByUserId(new LawyerDocumentAccessDto()));
+            var exception = await Assert.ThrowsAsync<ArgumentNullException>(() => legalDocumentService.GetDocumentsThatLawyerHasAccessToByUserId(new LawyerDocumentAccessDto(),null));
 
 
         }
