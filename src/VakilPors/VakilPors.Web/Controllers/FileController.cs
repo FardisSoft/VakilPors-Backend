@@ -21,6 +21,11 @@ namespace VakilPors.Api.Controllers
         {
             return Ok(await _fileService.UploadAsync(file));
         }
+        [HttpPost]
+        public async Task<IActionResult> UploadFileMessage(IFormFile file)
+        {
+            return Ok(await _fileService.UploadFileMessageAsync(file));
+        }
 
         [HttpGet]
         public IActionResult GetUrl(string key)

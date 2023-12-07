@@ -25,6 +25,7 @@ public interface IAppUnitOfWork
     public IGenericRepo<Subscribed> SubscribedRepo { get; }
 
     public IGenericRepo<LegalDocument> DocumentRepo { get; }
+    public IGenericRepo<DocumentAccess> DocumentAccessRepo { get; }
     public IGenericRepo<Rate> RateRepo { get; }
     public IGenericRepo<Visitor> VisitorRepo { get; }
 

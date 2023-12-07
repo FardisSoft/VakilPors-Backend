@@ -44,6 +44,7 @@ public class AppUnitOfWork : IAppUnitOfWork
     public IGenericRepo<Subscribed> SubscribedRepo => _dbContext.GetService<IGenericRepo<Subscribed>>();
 
     public IGenericRepo<LegalDocument> DocumentRepo => _dbContext.GetService<IGenericRepo<LegalDocument>>();
+    public IGenericRepo<DocumentAccess> DocumentAccessRepo => _dbContext.GetService<IGenericRepo<DocumentAccess>>();
     public IGenericRepo<Rate> RateRepo => _dbContext.GetService<IGenericRepo<Rate>>();
     public IGenericRepo<Visitor> VisitorRepo => _dbContext.GetService<IGenericRepo<Visitor>>();
 

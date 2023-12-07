@@ -4,6 +4,7 @@ using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Case;
 using VakilPors.Core.Domain.Dtos.Lawyer;
 using VakilPors.Core.Domain.Dtos.User;
+using VakilPors.Core.Domain.Entities;
 using VakilPors.Shared.Response;
 using VakilPors.Web.Controllers;
 
@@ -90,7 +91,14 @@ namespace VakilPors.Api.Controllers
             var result = await _documentService.GetDocumentsThatLawyerHasAccessToByUserId(lawyerDocumentAccessDto);
             return Ok(new AppResponse<object>(result, "success"));
         }
-
+        [HttpPatch]
+        [Authorize(Roles = RoleNames.Vakil)]
+        public async Task<IActionResult> UpdateDocumentStatus([FromBody] DocumentStatusUpdateDto updateDto)
+        {
+            var userId = getUserId();
+            await _documentService.UpdateDocumentStatus(updateDto,userId);
+            return Ok("success");
+        }
 
     }
 }
