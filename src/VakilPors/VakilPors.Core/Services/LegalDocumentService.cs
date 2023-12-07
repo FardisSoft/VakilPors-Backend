@@ -101,12 +101,12 @@ namespace VakilPors.Core.Services
             return true;
         }
 
-        public async Task<LegalDocumentDto> GetDocumentById(int documentId)
+        public async Task<LegalDocument> GetDocumentById(int documentId)
         {
             var doc = await _uow.DocumentRepo
                 .AsQueryable()
+                .Include(x=>x.Accesses)
                 .Where(x => x.Id == documentId)
-                .Select(x => _mapper.Map<LegalDocumentDto>(x))
                 .FirstOrDefaultAsync();
 
             if (doc == null)
@@ -115,12 +115,12 @@ namespace VakilPors.Core.Services
             return doc;
         }
 
-        public async Task<List<LegalDocumentDto>> GetDocumentsByUserId(int userId)
+        public async Task<List<LegalDocument>> GetDocumentsByUserId(int userId)
         {
             var docs = await _uow.DocumentRepo
                 .AsQueryable()
                 .Where(x => x.UserId == userId)
-                .Select(x => _mapper.Map<LegalDocumentDto>(x))
+                .Include(x=>x.Accesses)
                 .ToListAsync();
 
             return docs;
@@ -203,13 +203,12 @@ namespace VakilPors.Core.Services
             return users;
         }
 
-        public async Task<List<LegalDocumentDto>> GetDocumentsThatLawyerHasAccessToByUserId(LawyerDocumentAccessDto lawyerDocumentAccessDto)
+        public async Task<List<LegalDocument>> GetDocumentsThatLawyerHasAccessToByUserId(LawyerDocumentAccessDto lawyerDocumentAccessDto)
         {
             var docs = await _uow.DocumentRepo
                 .AsQueryable()
                 .Include(x => x.Accesses)
                 .Where(x => x.UserId == lawyerDocumentAccessDto.UserId && x.Accesses.Select(a => a.LawyerId).Contains(lawyerDocumentAccessDto.LawyerId))
-                .Select(x => _mapper.Map<LegalDocumentDto>(x))
                 .ToListAsync();
 
             return docs;
@@ -229,6 +228,16 @@ namespace VakilPors.Core.Services
                 throw new BadArgumentException("document not found");
 
             return doc;
+        }
+
+        public async Task UpdateDocumentStatus(DocumentStatusUpdateDto updateDto,int lawyerUserId)
+        {
+            var access = await _uow.DocumentAccessRepo.AsQueryable()
+                .FirstOrDefaultAsync(a => a.Lawyer.UserId == lawyerUserId && a.DocumentId == updateDto.DocumentId);
+            if (access is null)
+                throw new BadArgumentException("document not found");
+            access.DocumentStatus = updateDto.DocumentStatus;
+            await _uow.SaveChangesAsync();
         }
     }
 }

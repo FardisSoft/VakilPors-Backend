@@ -19,6 +19,7 @@ namespace VakilPors.Core.Domain.Entities
         [ForeignKey(nameof(DocumentId))]
         public LegalDocument Document { get; set; }
 
+        public DocumentStatus DocumentStatus { get; set; } = DocumentStatus.PENDING;
         public int LawyerId { get; set; }
 
         [ForeignKey(nameof(LawyerId))]
