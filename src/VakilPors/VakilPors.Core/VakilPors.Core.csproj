@@ -30,4 +30,8 @@
     <ProjectReference Include="..\VakilPors.Shared\VakilPors.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Domain\Dtos\Report\" />
+  </ItemGroup>
+
 </Project>

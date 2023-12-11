@@ -9,6 +9,7 @@ using VakilPors.Core.Domain.Entities;
 using ForumThread = VakilPors.Core.Domain.Entities.ForumThread;
 using VakilPors.Core.Domain.Dtos.Case;
 using VakilPors.Core.Domain.Dtos.Rate;
+using VakilPors.Core.Domain.Dtos.Report;
 
 namespace VakilPors.Core.Mapper
 {
@@ -28,6 +29,7 @@ namespace VakilPors.Core.Mapper
             CreateMap<LegalDocumentDto, LegalDocument>().ReverseMap();
             CreateMap<RateDto, Rate>().ReverseMap();
             CreateMap<RateUserDto, Rate>().ReverseMap();
+            CreateMap<Report , ReportDto>();
         }
     }
 
