@@ -38,15 +38,5 @@ namespace VakilPors.Api.Controllers
         {
             return Ok(await _fileService.DownloadAsync(key));
         }
-        [HttpGet]
-        public IActionResult DownloadSlide()
-        {
-            return Ok("https://docs.google.com/presentation/d/1ykQvtlZxj7leac1wjd7yQa1JoPqwYXUzG2fD5bcmUpU/edit?usp=sharing");
-        }
-        [HttpGet]
-        public IActionResult DownloadSlideData()
-        {
-            return Ok("https://docs.google.com/presentation/d/1IjQkvg982nDWs8aQyKeEc1rmAVCmP_LfppKf_y-Hdaw/edit?usp=sharing");
-        }
     }
 }
