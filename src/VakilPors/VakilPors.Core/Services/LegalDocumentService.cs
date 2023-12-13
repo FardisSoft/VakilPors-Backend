@@ -121,6 +121,7 @@ namespace VakilPors.Core.Services
             var docs = await _uow.DocumentRepo
                 .AsQueryable()
                 .Where(x => x.UserId == userId)
+                .Include(x => x.User)
                 .Include(x => x.Accesses)
                 .ThenInclude(a => a.Lawyer)
                 .ToListAsync();
