@@ -22,15 +22,17 @@ namespace VakilPors.Core.Mapper
             CreateMap<User, UserDto>();
             CreateMap<Transaction, TransactionDto>();
             CreateMap<ForumThread, ThreadDto>();
-            CreateMap<ThreadComment, ThreadCommentDto>();
+            CreateMap<ThreadComment, ThreadCommentDto>().ReverseMap();
             CreateMap<Premium, PremiumDto>().ReverseMap();
             CreateMap<Subscribed, SubscribedDto>();
             CreateMap<SubscribedDto, Subscribed>();
             CreateMap<LegalDocumentDto, LegalDocument>().ReverseMap();
             CreateMap<RateDto, Rate>().ReverseMap();
             CreateMap<RateUserDto, Rate>().ReverseMap();
-            CreateMap<Report , ReportDto>();
+            CreateMap<ForumUserDto,User>().ReverseMap();
+            // CreateMap<Report , ReportDto>();
             CreateMap<ReportDto , Report>().ReverseMap();
+            CreateMap<PostReportDto,Report>().ReverseMap();
         }
     }
 
