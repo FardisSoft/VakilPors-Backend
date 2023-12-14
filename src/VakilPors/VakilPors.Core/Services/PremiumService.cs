@@ -44,29 +44,33 @@ namespace VakilPors.Core.Services
             if(user.LawyerId != 0) { vakilpremium = true; }
             if (row == null)
                 throw new BadArgumentException("Subscription Not Found");
+            var expdate = DateTime.Now;
             switch (premium)
             {
                 case "gold":
                     row.PremiumID = 3;
                     await TransactUser("gold", user_id, 50000, "طلایی");
-                    row.ExpireDate = DateTime.Now.AddDays(90);  
+                    expdate = DateTime.Now.AddDays(90);
+                    row.ExpireDate = expdate;
                     break;
                 case "silver":
                     row.PremiumID = 2;
                     await TransactUser("silver", user_id, 30000, "نقره ای");
-                    row.ExpireDate = DateTime.Now.AddDays(60);
+                    expdate = DateTime.Now.AddDays(60);
+                    row.ExpireDate = expdate;
                     break;
                 case "bronze":
-                    await TransactUser("bronze", user_id, 20000, "برنزی");
-                    row.ExpireDate = DateTime.Now.AddDays(30);
                     row.PremiumID = 1;
+                    await TransactUser("bronze", user_id, 20000, "برنزی");
+                    expdate = DateTime.Now.AddDays(30);
+                    row.ExpireDate = expdate;
                     break;
             }
             if (vakilpremium)
             {
                 var lawyer = _appUnitOfWork.LawyerRepo.AsQueryable().Where(x => x.UserId == user_id).FirstOrDefault();
                 lawyer.PremiumPlan = premium;
-                lawyer.ExpireDate = row.ExpireDate;
+                lawyer.ExpireDate = expdate;
             }
             await _appUnitOfWork.SaveChangesAsync();
             return row;
