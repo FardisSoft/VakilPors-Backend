@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using VakilPors.Data.Context;
@@ -11,9 +12,10 @@ using VakilPors.Data.Context;
 namespace VakilPors.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231207194845_mig_add_event")]
+    partial class mig_add_event
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -496,36 +498,6 @@ namespace VakilPors.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Rate");
-                });
-
-            modelBuilder.Entity("VakilPors.Core.Domain.Entities.Report", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CommentId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CommentId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Report");
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.Role", b =>
@@ -1047,25 +1019,6 @@ namespace VakilPors.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("VakilPors.Core.Domain.Entities.Report", b =>
-                {
-                    b.HasOne("VakilPors.Core.Domain.Entities.ThreadComment", "ThreadComment")
-                        .WithMany()
-                        .HasForeignKey("CommentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("VakilPors.Core.Domain.Entities.User", "User")
-                        .WithMany("reports")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ThreadComment");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.Subscribed", b =>
                 {
                     b.HasOne("VakilPors.Core.Domain.Entities.Premium", "Premium")
@@ -1195,8 +1148,6 @@ namespace VakilPors.Data.Migrations
                     b.Navigation("ThreadLikes");
 
                     b.Navigation("Transactions");
-
-                    b.Navigation("reports");
                 });
 #pragma warning restore 612, 618
         }

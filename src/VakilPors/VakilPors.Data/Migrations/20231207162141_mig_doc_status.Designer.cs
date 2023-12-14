@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using VakilPors.Data.Context;
@@ -11,9 +12,10 @@ using VakilPors.Data.Context;
 namespace VakilPors.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231207162141_mig_doc_status")]
+    partial class mig_doc_status
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -170,9 +172,6 @@ namespace VakilPors.Data.Migrations
                     b.Property<int>("ChatId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("ContentType")
-                        .HasColumnType("text");
-
                     b.Property<bool>("IsCall")
                         .HasColumnType("boolean");
 
@@ -235,45 +234,6 @@ namespace VakilPors.Data.Migrations
                     b.HasIndex("LawyerId");
 
                     b.ToTable("DocumentAccess");
-                });
-
-            modelBuilder.Entity("VakilPors.Core.Domain.Entities.Event", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<int>("LawyerId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LawyerId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Event");
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.ForumThread", b =>
@@ -496,36 +456,6 @@ namespace VakilPors.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Rate");
-                });
-
-            modelBuilder.Entity("VakilPors.Core.Domain.Entities.Report", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CommentId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CommentId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Report");
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.Role", b =>
@@ -976,25 +906,6 @@ namespace VakilPors.Data.Migrations
                     b.Navigation("Lawyer");
                 });
 
-            modelBuilder.Entity("VakilPors.Core.Domain.Entities.Event", b =>
-                {
-                    b.HasOne("VakilPors.Core.Domain.Entities.Lawyer", "Lawyer")
-                        .WithMany("Events")
-                        .HasForeignKey("LawyerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("VakilPors.Core.Domain.Entities.User", "User")
-                        .WithMany("Events")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Lawyer");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.ForumThread", b =>
                 {
                     b.HasOne("VakilPors.Core.Domain.Entities.User", "User")
@@ -1043,25 +954,6 @@ namespace VakilPors.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Lawyer");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("VakilPors.Core.Domain.Entities.Report", b =>
-                {
-                    b.HasOne("VakilPors.Core.Domain.Entities.ThreadComment", "ThreadComment")
-                        .WithMany()
-                        .HasForeignKey("CommentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("VakilPors.Core.Domain.Entities.User", "User")
-                        .WithMany("reports")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ThreadComment");
 
                     b.Navigation("User");
                 });
@@ -1166,8 +1058,6 @@ namespace VakilPors.Data.Migrations
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.Lawyer", b =>
                 {
                     b.Navigation("DocumentAccesses");
-
-                    b.Navigation("Events");
                 });
 
             modelBuilder.Entity("VakilPors.Core.Domain.Entities.LegalDocument", b =>
@@ -1184,8 +1074,6 @@ namespace VakilPors.Data.Migrations
                 {
                     b.Navigation("CommentLikes");
 
-                    b.Navigation("Events");
-
                     b.Navigation("Lawyer");
 
                     b.Navigation("Messages");
@@ -1195,8 +1083,6 @@ namespace VakilPors.Data.Migrations
                     b.Navigation("ThreadLikes");
 
                     b.Navigation("Transactions");
-
-                    b.Navigation("reports");
                 });
 #pragma warning restore 612, 618
         }

@@ -55,11 +55,11 @@ namespace VakilPors.Web.Controllers
         }
         //get transactions
         [HttpGet("GetTransactions")]
-        public async Task<Pagination<TransactionDto>> GetTransactions([FromQuery] PagedParams pagedParams)
+        public async Task<Pagination<TransactionDto>> GetTransactions([FromQuery] PagedParams pagedParams,[FromQuery] SortParams sortParams)
         {
             var phoneNumber = getPhoneNumber();
             _logger.LogInformation($"get transactions for user with phone number:{phoneNumber}");
-            Pagination<Transaction> transactions = await _walletServices.GetTransactions(phoneNumber, pagedParams);
+            Pagination<Transaction> transactions = await _walletServices.GetTransactions(phoneNumber, pagedParams,sortParams);
             return transactions.ToMappedPagination<Transaction, TransactionDto>(_mapper, pagedParams.PageSize);
         }
 

@@ -70,10 +70,31 @@ public class UserService : IUserServices
         {
             userDtos.Add(await GetUserDtoFromUser(user));
         }
+        var classOrder = new Dictionary<string, int>
+        {
+            { "Gold", 1 },
+            { "Silver", 2 },
+            { "Bronze", 3 }
+        };
+        //userDtos = userDtos.OrderBy(x => GetClassOrder(x.PremiumLevel)).ToList();
+        userDtos = userDtos.OrderBy(x => classOrder.TryGetValue(x.PremiumLevel, out var order) ? order : int.MaxValue).ToList();
 
         return userDtos;
     }
-
+    static int GetClassOrder(string className)
+    {
+        switch (className)
+        {
+            case "Gold":
+                return 1;
+            case "Silver":
+                return 2;
+            case "Bronze":
+                return 3;
+            default:
+                return int.MaxValue;
+        }
+    }
     public async Task<UserDto> GetUserById(int userId)
     {
         var user = await _uow.UserRepo
@@ -88,9 +109,56 @@ public class UserService : IUserServices
 
     private async Task<UserDto> GetUserDtoFromUser(User user)
     {
+        string res = "";
+        var row =await  _uow.SubscribedRepo.AsQueryable().Where(x => x.UserId == user.Id).FirstOrDefaultAsync();
+        if (row == null)
+        {
+            res = "NONE";
+        }
+        else if (row.PremiumID == 3)
+        {
+            res = "GOLD";
+        }
+        else if (row.PremiumID == 2)
+        {
+            res = "SILVER";
+        }
+        else if (row.PremiumID == 3)
+        {
+            res = "BRONZE";
+        }
         var userDto = _mapper.Map<UserDto>(user);
+        userDto.PremiumLevel = res;
 
-        userDto.IsPremium = await _premiumService.DoseUserHaveAnyActiveSubscription(user.Id);
+
+        //userDto.IsPremium = await _premiumService.DoseUserHaveAnyActiveSubscription(user.Id);
+        //if (userDto.IsPremium)
+        //{
+        //    var remaindays = user.Subscribed.RemainingDays;
+        //    string result;
+        //    if (remaindays > 100)
+        //    {
+        //        result = "Free";
+        //    }
+        //    else if (remaindays > 60 && remaindays < 90)
+        //    {
+        //        result = "Gold";
+        //    }
+        //    else if (remaindays > 30 && remaindays < 60)
+        //    {
+        //        result = "Silver";
+        //    }
+        //    else if (remaindays > 0 && remaindays < 30)
+        //    {
+        //        result = "Bronze";
+        //    }
+        //    else
+        //        result = "not found";
+            //userDto.PremiumLevel = result;
+            //userDto.PremiumLevel = user.Subscribed.Premium.ServiceType.ToString();
+
+        //}
+
 
         return userDto;
     }

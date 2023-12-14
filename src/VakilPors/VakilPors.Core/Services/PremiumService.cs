@@ -46,7 +46,7 @@ namespace VakilPors.Core.Services
                 case "gold":
                     row.PremiumID = 3;
                     await TransactUser("gold", user_id, 50000, "طلایی");
-                    row.ExpireDate = DateTime.Now.AddDays(90);
+                    row.ExpireDate = DateTime.Now.AddDays(90);  
                     break;
                 case "silver":
                     row.PremiumID = 2;

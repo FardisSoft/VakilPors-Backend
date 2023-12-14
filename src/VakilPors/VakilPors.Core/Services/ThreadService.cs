@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Pagination.EntityFrameworkCore.Extensions;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos;
@@ -251,6 +252,18 @@ public class ThreadService : IThreadService
             .CountAsync();
 
         return likes > 0;
+    }
+
+    public async Task<Pagination<ForumThread>> SearchThread(string title , PagedParams pagedParams, SortParams sortParam, int userid)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            var result =  _uow.ForumThreadRepo.AsQueryable().Include(x => x.User);
+            return await result.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize);
+        }
+        var foundthread = _uow.ForumThreadRepo.AsQueryable().Where(x => x.Title.Contains(title) || x.Description.Contains(title));
+        foundthread = foundthread.OrderByDescending(x => x.LikeCount).ThenByDescending(x => x.CreateDate);
+        return await foundthread.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize);
     }
 }
 

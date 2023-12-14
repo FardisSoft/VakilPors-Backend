@@ -21,6 +21,11 @@ namespace VakilPors.Api.Controllers
         {
             return Ok(await _fileService.UploadAsync(file));
         }
+        [HttpPost]
+        public async Task<IActionResult> UploadFileMessage(IFormFile file)
+        {
+            return Ok(await _fileService.UploadFileMessageAsync(file));
+        }
 
         [HttpGet]
         public IActionResult GetUrl(string key)
@@ -32,11 +37,6 @@ namespace VakilPors.Api.Controllers
         public async Task<IActionResult> Download(string key)
         {
             return Ok(await _fileService.DownloadAsync(key));
-        }
-        [HttpGet]
-        public Task<IActionResult> DownloadSlide()
-        {
-            return Task.FromResult<IActionResult>(Ok("https://docs.google.com/presentation/d/1ykQvtlZxj7leac1wjd7yQa1JoPqwYXUzG2fD5bcmUpU/edit?usp=sharing"));
         }
     }
 }

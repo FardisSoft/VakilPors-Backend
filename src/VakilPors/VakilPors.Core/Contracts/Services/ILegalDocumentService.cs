@@ -17,9 +17,9 @@ namespace VakilPors.Core.Contracts.Services
 
         Task<bool> DeleteDocument(int documentId);
 
-        Task<List<LegalDocumentDto>> GetDocumentsByUserId(int userId);
+        Task<List<LegalDocument>> GetDocumentsByUserId(int userId,Status? status);
 
-        Task<LegalDocumentDto> GetDocumentById(int documentId);
+        Task<LegalDocument> GetDocumentById(int documentId);
 
         Task<bool> GrantAccessToLawyer(DocumentAccessDto documentAccessDto);
 
@@ -29,6 +29,8 @@ namespace VakilPors.Core.Contracts.Services
 
         Task<List<UserDto>> GetUsersThatLawyerHasAccessToTheirDocuments(int lawyerId);
 
-        Task<List<LegalDocumentDto>> GetDocumentsThatLawyerHasAccessToByUserId(LawyerDocumentAccessDto lawyerDocumentAccessDto);
+        Task<List<LegalDocument>> GetDocumentsThatLawyerHasAccessToByUserId(
+            LawyerDocumentAccessDto lawyerDocumentAccessDto,Status? status);
+        Task UpdateDocumentStatus(DocumentStatusUpdateDto updateDto, int lawyerUserId);
     }
 }

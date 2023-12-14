@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
 using VakilPors.Core.Contracts.Services;
+using VakilPors.Core.Domain.Dtos.File;
 
 namespace VakilPors.Core.Services
 {
@@ -32,8 +33,8 @@ namespace VakilPors.Core.Services
                 return null;
 
             var key = Guid.NewGuid().ToString();
-            var stream = file.OpenReadStream();
-
+            var stream = file.OpenReadStream(); 
+            
             var request = new PutObjectRequest
             {
                 BucketName = _bucketName,
@@ -48,6 +49,16 @@ namespace VakilPors.Core.Services
 
             return url + key;
         }
+
+        public async Task<FileDto> UploadFileMessageAsync(IFormFile file)
+        {
+            return new FileDto()
+            {
+                Url = await UploadAsync(file),
+                ContentType = file.ContentType
+            };
+        }
+
         public async Task<Stream> DownloadAsync(string key)
         {
             var request = new GetObjectRequest
@@ -73,6 +84,7 @@ namespace VakilPors.Core.Services
             };
 
             return _s3Client.GetPreSignedURL(request);
+            
         }
     }
 }

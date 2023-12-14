@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos;
+using VakilPors.Core.Domain.Dtos.Lawyer;
 using VakilPors.Core.Domain.Dtos.Params;
+using VakilPors.Core.Domain.Entities;
+using VakilPors.Core.Mapper;
 using VakilPors.Shared.Response;
 using VakilPors.Web.Controllers;
 
@@ -15,6 +19,7 @@ namespace VakilPors.Api.Controllers
     {
         private readonly IThreadService _threadService;
         private readonly ILogger<ThreadController> _logger;
+        private readonly IMapper _mapper;
         public ThreadController(IThreadService threadService, ILogger<ThreadController> logger)
         {
             _threadService = threadService;
@@ -71,6 +76,15 @@ namespace VakilPors.Api.Controllers
         {
             var result = await _threadService.UndoLikeThread(getUserId(), threadId);
             return Ok(new AppResponse<object>(result, "success"));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SearchThread([FromQuery] PagedParams pagedParams, [FromQuery] SortParams sortParams, [FromQuery] string? Title)
+        {
+            _logger.LogInformation($"searching for a thread by title {Title}");
+            var result = await _threadService.SearchThread(Title,pagedParams,sortParams, getUserId());  
+            return Ok(new AppResponse<object>(result, "success"));
+            
         }
 
     }
