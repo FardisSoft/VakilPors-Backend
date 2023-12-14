@@ -41,5 +41,6 @@ namespace VakilPors.Core.Domain.Entities
         public string NationalCardImageUrl { get; set; } 
         public virtual ICollection<DocumentAccess> DocumentAccesses { get; set; }
         public virtual ICollection<Event> Events { get; set; }
+        public string PremiumPlan { get; set; } = "Free";
     }
 }
