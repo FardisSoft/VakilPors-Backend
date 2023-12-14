@@ -45,5 +45,8 @@ namespace VakilPors.Core.Domain.Dtos.Lawyer
         public IFormFile NationalCardImage { get; set; }
 
         public int Tokens { get; set; }
+        public string PremiumPlan { get; set; } = "Free";
+        public DateTime ExpireDate { get; set; } = DateTime.MaxValue;
+        public int PremiumRemainingDays { get { return (ExpireDate - DateTime.Now).Days; } }
     }
 }
