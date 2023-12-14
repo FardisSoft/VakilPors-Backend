@@ -42,5 +42,7 @@ namespace VakilPors.Core.Domain.Entities
         public virtual ICollection<DocumentAccess> DocumentAccesses { get; set; }
         public virtual ICollection<Event> Events { get; set; }
         public string PremiumPlan { get; set; } = "Free";
+        public DateTime ExpireDate { get; set; } = DateTime.MaxValue;
+        public int PremiumRemainingDays { get { return (ExpireDate - DateTime.Now).Days; } }
     }
 }

@@ -66,6 +66,7 @@ namespace VakilPors.Core.Services
             {
                 var lawyer = _appUnitOfWork.LawyerRepo.AsQueryable().Where(x => x.UserId == user_id).FirstOrDefault();
                 lawyer.PremiumPlan = premium;
+                lawyer.ExpireDate = row.ExpireDate;
             }
             await _appUnitOfWork.SaveChangesAsync();
             return row;
@@ -119,9 +120,10 @@ namespace VakilPors.Core.Services
             return await all_subs.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize);
 
         }
-        public async Task<Pagination<Subscribed>> GetAllSubscribedLawyersStatus(PagedParams pagedParams, SortParams sortParams)
+        public async Task<Pagination<Lawyer>> GetAllSubscribedLawyersStatus(PagedParams pagedParams, SortParams sortParams)
         {
-            var all_lawyersubs = _appUnitOfWork.SubscribedRepo.AsQueryable().Include(x => x.User).Where(x => x.PremiumID > 1 && x.User.LawyerId != 0);
+            //var all_lawyersubs = _appUnitOfWork.SubscribedRepo.AsQueryable().Include(x => x.User).Where(x => x.PremiumID > 1 && x.User.LawyerId != 0);
+            var all_lawyersubs = _appUnitOfWork.LawyerRepo.AsQueryable().Where(x => x.PremiumPlan != "Free");
             return await all_lawyersubs.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize);
         }
     }
