@@ -73,7 +73,15 @@ namespace VakilPors.Web.Controllers
             return Ok(new AppResponse<Pagination<SubscribedDto>>(res, "success"));
         }
 
-
+        [HttpGet]
+        [Route("GetAllSubscribedLawyersStatus")]
+        public async Task<IActionResult> GetAllSubscribedLawyersStatus([FromQuery] PagedParams pagedParams, [FromQuery] SortParams sortParams)
+        {
+            _logger.LogInformation($"GET ALL subscribed lawyers paged. page no:{pagedParams.PageNumber} page size:{pagedParams.PageSize}, sort by:{sortParams.Sort}, isAscending:{sortParams.IsAscending}");
+            var all = await _PremiumServices.GetAllSubscribedLawyersStatus(pagedParams, sortParams);
+            var res = all.ToMappedPagination<Subscribed, SubscribedDto>(_mapper, pagedParams.PageSize);
+            return Ok(new AppResponse<Pagination<SubscribedDto>>(res, "success"));
+        }
 
 
 

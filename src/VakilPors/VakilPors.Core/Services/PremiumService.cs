@@ -39,6 +39,9 @@ namespace VakilPors.Core.Services
         public async Task<Subscribed> ActivatePremium(string premium, int user_id)
         {
             var row = _appUnitOfWork.SubscribedRepo.AsQueryable().Where(x => x.UserId == user_id).First();
+            var user = _appUnitOfWork.UserRepo.AsQueryable().Where(x=> x.Id == user_id).First();
+            bool vakilpremium = false;
+            if(user.LawyerId != 0) { vakilpremium = true; }
             if (row == null)
                 throw new BadArgumentException("Subscription Not Found");
             switch (premium)
@@ -58,6 +61,11 @@ namespace VakilPors.Core.Services
                     row.ExpireDate = DateTime.Now.AddDays(30);
                     row.PremiumID = 1;
                     break;
+            }
+            if (vakilpremium)
+            {
+                var lawyer = _appUnitOfWork.LawyerRepo.AsQueryable().Where(x => x.UserId == user_id).FirstOrDefault();
+                lawyer.PremiumPlan = premium;
             }
             await _appUnitOfWork.SaveChangesAsync();
             return row;
@@ -111,7 +119,11 @@ namespace VakilPors.Core.Services
             return await all_subs.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize);
 
         }
-        
+        public async Task<Pagination<Subscribed>> GetAllSubscribedLawyersStatus(PagedParams pagedParams, SortParams sortParams)
+        {
+            var all_lawyersubs = _appUnitOfWork.SubscribedRepo.AsQueryable().Include(x => x.User).Where(x => x.PremiumID > 1 && x.User.LawyerId != 0);
+            return await all_lawyersubs.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize);
+        }
     }
 
 }
