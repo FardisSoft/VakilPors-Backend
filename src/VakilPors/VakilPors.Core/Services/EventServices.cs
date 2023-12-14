@@ -90,7 +90,7 @@ public class EventServices :IEventServices
 
     public async Task<Event> UpdateEventStatusAsync(int id, Status status,int userId)
     {
-        var existingEvent = await _uow.EventRepo.AsQueryableNoTracking()
+        var existingEvent = await _uow.EventRepo.AsQueryable()
             .Include(e=>e.Lawyer)
             .FirstOrDefaultAsync(e=>e.Id==id);
         if (existingEvent == null)
