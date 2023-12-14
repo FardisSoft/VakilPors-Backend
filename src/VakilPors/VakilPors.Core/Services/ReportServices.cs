@@ -20,7 +20,7 @@ namespace VakilPors.Core.Services
             _appUnitOfWork = appUnitOfWork;
             _mapper = mapper;
         }
-        public async Task<List<ReportDto>> GetAllLawyers()
+        public async Task<List<ReportDto>> GetAllReport()
         {
             var reports = await _appUnitOfWork.ReportRepo
                 .AsQueryable()
