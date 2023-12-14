@@ -79,8 +79,8 @@ namespace VakilPors.Web.Controllers
         {
             _logger.LogInformation($"GET ALL subscribed lawyers paged. page no:{pagedParams.PageNumber} page size:{pagedParams.PageSize}, sort by:{sortParams.Sort}, isAscending:{sortParams.IsAscending}");
             var all = await _PremiumServices.GetAllSubscribedLawyersStatus(pagedParams, sortParams);
-            var res = all.ToMappedPagination<Lawyer, LawyerDto>(_mapper, pagedParams.PageSize);
-            return Ok(new AppResponse<Pagination<LawyerDto>>(res, "success"));
+            var res = all.ToMappedPagination<Subscribed, SubscribedDto>(_mapper, pagedParams.PageSize);
+            return Ok(new AppResponse<Pagination<SubscribedDto>>(res, "success"));
         }
 
 
