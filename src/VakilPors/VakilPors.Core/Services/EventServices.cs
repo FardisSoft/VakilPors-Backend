@@ -32,6 +32,13 @@ public class EventServices :IEventServices
 
         return @event;
     }
+    public async Task<List<Event>> GetEventsAsync(int userId)
+    {
+        return await _uow.EventRepo.AsQueryableNoTracking()
+            .Include(e=>e.Lawyer)
+            .Where(e=>e.UserId==userId || e.Lawyer.UserId==userId)
+            .ToListAsync();
+    }
     public async Task<Event> GetEventAsync(int eventId,int userId)
     {
         var @event = await _uow.EventRepo.AsQueryableNoTracking()
