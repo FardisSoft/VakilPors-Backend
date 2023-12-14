@@ -20,7 +20,7 @@ public class ReportController : MyControllerBase
     public async Task<IActionResult> GetAll()
     {
         // _logger.LogInformation($"get all lawyers");
-        var result = await _reportservice.GetAllLawyers();
+        var result = await _reportservice.GetAllReport();
         return Ok(new AppResponse<object>(result, "success"));
     }
     [HttpPost]
