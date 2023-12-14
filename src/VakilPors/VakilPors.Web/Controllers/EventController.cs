@@ -28,6 +28,12 @@ public class EventController : MyControllerBase
         return CreatedAtAction(nameof(GetById), new { id = createdEvent.Id }, createdEvent);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var events = await _eventServices.GetEventsAsync(getUserId());
+        return Ok(events);
+    }
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {

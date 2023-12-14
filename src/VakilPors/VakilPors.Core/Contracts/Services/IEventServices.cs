@@ -12,4 +12,5 @@ public interface IEventServices:IScopedDependency
     Task DeleteEventAsync(int id, int userId);
     Task<Event> GetEventAsync(int eventId,int userId);
     Task<string> GetGoogleCalendarUrl(int id,int userId);
+    Task<List<Event>> GetEventsAsync(int userId);
 }
