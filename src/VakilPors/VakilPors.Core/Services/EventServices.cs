@@ -27,6 +27,7 @@ public class EventServices :IEventServices
         }
 
         var @event = _mapper.Map<Event>(createEventDto);
+        @event.UserId = userId;
         await _uow.EventRepo.AddAsync(@event);
         await _uow.SaveChangesAsync();
 
