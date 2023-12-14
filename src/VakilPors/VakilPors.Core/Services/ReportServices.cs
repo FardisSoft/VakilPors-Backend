@@ -23,16 +23,15 @@ namespace VakilPors.Core.Services
         {
             var reports = await _appUnitOfWork.ReportRepo
                 .AsQueryable()
+                .Include(x  => x.User)
                 .Include(x=>x.ThreadComment)//.ThenInclude(u=>u.User)
-                // .Include(x => x.User)
                 .ToListAsync();
 
-            var ReportDtos = new List<ReportDto>();
-            ReportDtos =new List<ReportDto>();
+            var ReportDtos =new List<ReportDto>();
             foreach (var report in reports)
                 ReportDtos.Add(_mapper.Map<ReportDto>(report));
                 // ReportDtos.Add(await GetReportDtoFormReport(report));
-            // var lawyerDto = _mapper.Map<ReportDto>(report);
+            
 
             return ReportDtos;
         }

@@ -30,6 +30,7 @@ namespace VakilPors.Core.Mapper
             CreateMap<RateDto, Rate>().ReverseMap();
             CreateMap<RateUserDto, Rate>().ReverseMap();
             CreateMap<Report , ReportDto>();
+            CreateMap<ReportDto , Report>().ReverseMap();
         }
     }
 
