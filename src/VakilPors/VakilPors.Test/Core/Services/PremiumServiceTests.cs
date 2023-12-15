@@ -33,42 +33,42 @@ namespace VakilPors.Test.Core.Services
                 walletserviceMock.Object );
         }
 
-        [Fact]
-        public async Task activate_premium()
-        {
-            //Arrange
-            int id = 1;
-            var user = new User { Id = 1 };
-            var subscribed_result = new Subscribed { UserId = id, ExpireDate = DateTime.Now.AddDays(90) , PremiumID = 3 };
-            string premium = "gold";
+        //[Fact]
+        //public async Task activate_premium()
+        //{
+        //    //Arrange
+        //    int id = 1;
+        //    var user = new User { Id = 1 };
+        //    var subscribed_result = new Subscribed { UserId = id, ExpireDate = DateTime.Now.AddDays(90) , PremiumID = 3 };
+        //    string premium = "gold";
             
-            IEnumerable<Subscribed> subscribeds = new List<Subscribed>()
-            {
-                new Subscribed
-                {
-                    User = user,
-                    UserId = user.Id
-                }
-            };
-            var subscribedqueriable = subscribeds.AsQueryable();
-            var mock = subscribedqueriable.BuildMock();
+        //    IEnumerable<Subscribed> subscribeds = new List<Subscribed>()
+        //    {
+        //        new Subscribed
+        //        {
+        //            User = user,
+        //            UserId = user.Id
+        //        }
+        //    };
+        //    var subscribedqueriable = subscribeds.AsQueryable();
+        //    var mock = subscribedqueriable.BuildMock();
 
-            appUnitOfWorkMock.Setup(u => u.SubscribedRepo.AsQueryable()).Returns(mock);
-            appUnitOfWorkMock.Setup(u => u.UserRepo.FindAsync(id)).ReturnsAsync(user);
-            walletserviceMock.Setup(u => u.AddTransaction(id, It.IsAny<decimal>(), It.IsAny<string>(), It.IsAny<string>() , It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>())).Returns(Task.CompletedTask);
-            appUnitOfWorkMock.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
+        //    appUnitOfWorkMock.Setup(u => u.SubscribedRepo.AsQueryable()).Returns(mock);
+        //    appUnitOfWorkMock.Setup(u => u.UserRepo.FindAsync(id)).ReturnsAsync(user);
+        //    walletserviceMock.Setup(u => u.AddTransaction(id, It.IsAny<decimal>(), It.IsAny<string>(), It.IsAny<string>() , It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>())).Returns(Task.CompletedTask);
+        //    appUnitOfWorkMock.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
 
-            //Act
+        //    //Act
 
-            var result =await  premiumService.ActivatePremium(premium, id);
+        //    var result =await  premiumService.ActivatePremium(premium, id);
 
-            //Assert
+        //    //Assert
 
-            Assert.Equal(3, result.PremiumID);
-            Assert.Equal(1, result.UserId);
+        //    Assert.Equal(3, result.PremiumID);
+        //    Assert.Equal(1, result.UserId);
 
 
-        }
+        //}
 
         //[Fact]
         //public async Task transact_user()

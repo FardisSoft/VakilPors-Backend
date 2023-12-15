@@ -20,6 +20,7 @@ namespace VakilPors.Core.Contracts.Services
 
         Task<bool> DoseUserHaveAnyActiveSubscription(int userId);
         Task<Pagination<Subscribed>> GetAllSubscriptionStatus(PagedParams pagedParams, SortParams sortParams);
+        Task<Pagination<Lawyer>> GetAllSubscribedLawyersStatus(PagedParams pagedParams, SortParams sortParams);
 
     }
 }

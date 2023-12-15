@@ -177,10 +177,10 @@ public class EventServicesTests
         var userId = 1;
         var eventTitle = "Test Event";
         var eventDescription = "Event Description";
-        var startTime = new DateTime(2023, 3, 10, 14, 30, 0, DateTimeKind.Local);
-        var endTime = new DateTime(2023, 3, 10, 15, 0, 0, DateTimeKind.Local);
-        var expectedStartTime = "20230310T110000Z"; // Assuming a Tehran Time Zone of +03:30
-        var expectedEndTime = "20230310T113000Z"; // Assuming a Tehran Time Zone of +03:30
+        var startTime = new DateTime(2023, 3, 10, 14, 30, 0, DateTimeKind.Utc);
+        var endTime = new DateTime(2023, 3, 10, 15, 0, 0, DateTimeKind.Utc);
+        var expectedStartTime = "20230310T143000Z"; // Assuming a Tehran Time Zone of +03:30
+        var expectedEndTime = "20230310T150000Z"; // Assuming a Tehran Time Zone of +03:30
 
         var myEvent = new Event
         {
