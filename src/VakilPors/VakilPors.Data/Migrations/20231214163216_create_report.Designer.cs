@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using VakilPors.Data.Context;
@@ -11,9 +12,10 @@ using VakilPors.Data.Context;
 namespace VakilPors.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231214163216_create_report")]
+    partial class create_report
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -330,9 +332,6 @@ namespace VakilPors.Data.Migrations
                     b.Property<string>("Education")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("ExpireDate")
-                        .HasColumnType("timestamp without time zone");
-
                     b.Property<string>("Gender")
                         .HasColumnType("text");
 
@@ -357,9 +356,6 @@ namespace VakilPors.Data.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("OfficeAddress")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PremiumPlan")
                         .HasColumnType("text");
 
                     b.Property<string>("ProfileBackgroundPictureUrl")
