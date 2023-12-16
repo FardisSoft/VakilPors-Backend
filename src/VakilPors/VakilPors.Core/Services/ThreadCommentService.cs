@@ -167,7 +167,7 @@ public class ThreadCommentService : IThreadCommentService
             throw new BadArgumentException("comment not found");
 
         return await GetCommentDtoFromComment(userId, comment);
-
+            
     }
 
     public async Task<int> GetCommentCountForThread(int threadId)
