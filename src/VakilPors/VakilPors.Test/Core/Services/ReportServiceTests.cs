@@ -8,6 +8,7 @@ using VakilPors.Core.Contracts.Services;
 using VakilPors.Contracts.Repositories;
 using VakilPors.Core.Services;
 using Org.BouncyCastle.Crypto.Parameters;
+using VakilPors.Core.Exceptions;
 
 
 public class ReportServiceTests{
@@ -36,14 +37,7 @@ public class ReportServiceTests{
                 {
                     Id = 101,
                 },
-                ThreadComment = new ThreadComment
-                {
-                    Id = 201,
-                    User = new User
-                    {
-                        Id = 301,
-                    }
-                }
+                
             },
             // Add more test data as needed
         };
@@ -102,5 +96,106 @@ public class ReportServiceTests{
         // _uow.Verify(x => x.AsQueryable(), Times.Once);
         // Add more verifications as needed
     }
+    [Fact]
+    public async void PostReport_Successful_ReturnTrue(){
+
+// Arrange
+        var reportDto = new PostReportDto{
+        Description = "Test Description",
+        UserId = 1,
+        CommentId = 1
+        
+        };
+            
+        var report = new List<Report>(){
+            new Report{
+                Description = reportDto.Description,
+                CommentId = reportDto.CommentId,
+
+                UserId = reportDto.UserId,
+            },
+        
+        };
+        
+        var reportmock = report.BuildMock();
+        var reportRepositorymock = new Mock<IGenericRepo<Report>>();
+
+        _mapper.Setup(m => 
+            m.Map<PostReportDto, Report>(It.IsAny<PostReportDto>()))
+            .Returns(report[0]);
+
+        _uow.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
+        _uow.Setup(x => x.ReportRepo)
+            .Returns(reportRepositorymock.Object);
+        reportRepositorymock.Setup(x=>x.AddAsync(report[0]));
+
+        // Act
+        var result = await reportService.PostReport(reportDto);
+            
+        // Assert
+        Assert.True(result);
+            
+        // Verify 
+        _mapper.Verify(m => 
+            m.Map<PostReportDto, Report>(reportDto), Times.Once());
+
+        _uow.Verify(uow => 
+            uow.ReportRepo.AddAsync(report[0]), Times.Once());
+
+        _uow.Verify(uow => 
+            uow.SaveChangesAsync(), Times.Once());    }
     
+    [Fact]
+    public async void DeleteReport_CantFindReport_ReturnFalse(){
+
+        // var reportmock = report.BuildMock();
+        var reportRepositorymock = new Mock<IGenericRepo<Report>>();
+        _uow.Setup(x => x.ReportRepo)
+            .Returns(reportRepositorymock.Object);
+        reportRepositorymock.Setup(x=>x.AsQueryable()).Returns((IQueryable<Report>)null);
+
+        var result = await reportService.DeleteReport(It.IsAny<int>());
+
+        Assert.False(result);
+        _uow.Verify(uow => 
+            uow.SaveChangesAsync(), Times.Never());
+    }
+    [Fact]
+    public async void DeleteReport_Successful_ReturnTrue(){
+        var report = new List<Report>(){
+            new Report{
+                Description = "Test Description",
+                UserId = 1,
+            },
+        
+        };
+        var reportmock = report.BuildMock();
+        var reportRepositorymock = new Mock<IGenericRepo<Report>>();
+        _uow.Setup(x => x.ReportRepo)
+            .Returns(reportRepositorymock.Object);
+        reportRepositorymock.Setup(x=>x.AsQueryable()).Returns(reportmock);
+
+        var result = await reportService.DeleteReport(It.IsAny<int>());
+
+        Assert.True(result);
+        _uow.Verify(uow => 
+            uow.SaveChangesAsync(), Times.Once());
+        reportRepositorymock.Verify(uow => 
+            uow.Remove(report[0]), Times.Once());
+    }
+    [Fact]
+    public async void DeleteReport_AsQueryableThrowException_ThrowException(){
+
+        // var reportmock = report.BuildMock();
+        var reportRepositorymock = new Mock<IGenericRepo<Report>>();
+        _uow.Setup(x => x.ReportRepo)
+            .Returns(reportRepositorymock.Object);
+        reportRepositorymock.Setup(x=>x.AsQueryable()). Throws(new Exception());//.Returns((IQueryable<Report>)null);
+
+        var result = await reportService.DeleteReport(It.IsAny<int>());
+
+        Assert.False(result);
+        // _uow.Verify(uow => 
+        //     uow.SaveChangesAsync(), Times.Never());
+    }
 }
