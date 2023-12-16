@@ -220,5 +220,39 @@ namespace VakilPors.Test.Core.Services
             Assert.True(result);
 
         }
+
+        [Fact]
+        public async Task undosetasanswer()
+        {
+            //Arrange
+            var userid = 1;
+            var commentid = 1;
+            var threadcommentdto = new ThreadCommentDto();
+            IEnumerable<ThreadComment> threadComments = new List<ThreadComment>()
+            {
+                new ThreadComment {UserLikes = new List<UserCommentLike>(){ new UserCommentLike() { UserId = 1 , CommentId = 1} } , Id = 1 , Thread = new ForumThread(){UserId = 1 }  , UserId = 10}
+
+            };
+            var mock = threadComments.BuildMock();
+
+            IEnumerable<Lawyer> lawyers = new List<Lawyer>()
+            {
+                new Lawyer(){UserId =10 }
+            };
+            var mock2 = lawyers.BuildMock();
+
+
+            appUnitOfWorkmock.Setup(u => u.ThreadCommentRepo.AsQueryable()).Returns(mock);
+            appUnitOfWorkmock.Setup(u => u.ThreadCommentRepo.Update(It.IsAny<ThreadComment>()));
+            appUnitOfWorkmock.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
+            appUnitOfWorkmock.Setup(u => u.LawyerRepo.AsQueryable()).Returns(mock2);
+            lawyerservicesmock.Setup(u => u.AddToken(It.IsAny<int>(), It.IsAny<int>()));
+
+            //Act 
+            var result = await threadCommentService.UndoSetAsAnswer(userid, commentid);
+
+            //Assert 
+            Assert.True(result);
+        }
     }
 }
