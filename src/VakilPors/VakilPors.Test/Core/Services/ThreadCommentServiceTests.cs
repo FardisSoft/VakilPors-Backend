@@ -105,5 +105,19 @@ namespace VakilPors.Test.Core.Services
             var exception = await Assert.ThrowsAsync<BadArgumentException>(() => threadCommentService.UpdateComment(userid, threadcommentdto));
             Assert.Equal("This message is detected as a spam and can not be shown.", exception.Message);
         }
+
+        [Fact]
+        public async Task deletecomment()
+        {
+            //Arrange 
+            var userid = 1;
+            var commentid = 1;
+            var threadcommentdto = new ThreadCommentDto() { Text = "@alireza" };
+            ThreadComment threadComment = new ThreadComment { UserId = 2 };
+            appUnitOfWorkmock.Setup(u => u.ThreadCommentRepo.FindAsync(commentid)).ReturnsAsync(threadComment);
+            //Act & Assert
+            var exception = await Assert.ThrowsAsync<AccessViolationException>(() => threadCommentService.DeleteComment(userid, commentid));
+            Assert.Equal("You do not have permission to perform this action", exception.Message);
+        }
     }
 }
