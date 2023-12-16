@@ -92,6 +92,18 @@ namespace VakilPors.Test.Core.Services
 
         }
 
-        
+        [Fact]
+        public async Task updatecomment()
+        {
+            //Arrange 
+            var userid = 1;
+            var threadcommentdto = new ThreadCommentDto() { Text = "@alireza" };
+            antispammock = new Mock<IAntiSpam>();
+            antispammock.Setup(u => u.IsSpam(threadcommentdto.Text)).ReturnsAsync("This message is detected as a spam and can not be shown.");
+
+            //Act & Assert
+            var exception = await Assert.ThrowsAsync<BadArgumentException>(() => threadCommentService.UpdateComment(userid, threadcommentdto));
+            Assert.Equal("This message is detected as a spam and can not be shown.", exception.Message);
+        }
     }
 }
