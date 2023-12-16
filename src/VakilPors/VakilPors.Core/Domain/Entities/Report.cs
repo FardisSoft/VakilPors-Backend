@@ -14,8 +14,8 @@ public class Report :IEntity
     public int UserId { get; set; }
     [ForeignKey(nameof(UserId))]
     public virtual User User { get; set; }
-    public int CommentId { get; set; }
-    [ForeignKey(nameof(CommentId))]
-    public virtual ThreadComment ThreadComment { get; set; }
+    public int ThreadId { get; set; }
+    [ForeignKey(nameof(ThreadId))]
+    public virtual ForumThread Thread { get; set; }
     //TODO: create enum(install extension)
 }

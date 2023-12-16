@@ -12,7 +12,7 @@ namespace VakilPors.Core.Domain.Dtos.Report
     public int Id{get;set;}
     public string Description { get; set; }
     public UserDto User { get; set; }
-    public ThreadCommentDto ThreadComment { get; set; }
+    public ThreadDto Thread { get; set; }
 
         
     }

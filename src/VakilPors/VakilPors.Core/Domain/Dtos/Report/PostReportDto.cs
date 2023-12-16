@@ -9,6 +9,6 @@ namespace VakilPors.Core.Domain.Dtos.Report
         [Required]
         public int UserId { get; set; }
         [Required]
-        public int CommentId { get; set; }
+        public int ThreadId { get; set; }
     }
 }
