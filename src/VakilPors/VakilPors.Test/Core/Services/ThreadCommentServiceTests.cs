@@ -71,5 +71,27 @@ namespace VakilPors.Test.Core.Services
 
         }
 
+        [Fact]
+        public async Task checkwithin2minutes()
+        {
+            //Arrange
+            var userid = 1; 
+            var threadcommentdto = new ThreadCommentDto();
+            IEnumerable<ThreadComment> threadComments = new List<ThreadComment>()
+            {
+                new ThreadComment {UserLikes = new List<UserCommentLike>(){ new UserCommentLike() { UserId = 1 , CommentId = 1} } , Id = 1}
+            };
+            var mock = threadComments.BuildMock();
+            appUnitOfWorkmock.Setup(u => u.ThreadCommentRepo.AsQueryable()).Returns(mock);
+
+            //Act 
+            var result = await threadCommentService.CheckWithin2Minutes(userid, threadcommentdto);
+
+            //Assert 
+            Assert.Equal("ok", result);
+
+        }
+
+        
     }
 }
