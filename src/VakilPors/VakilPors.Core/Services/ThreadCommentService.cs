@@ -165,7 +165,7 @@ public class ThreadCommentService : IThreadCommentService
 
         if (comment == null)
             throw new BadArgumentException("comment not found");
-
+            
         return await GetCommentDtoFromComment(userId, comment);
             
     }

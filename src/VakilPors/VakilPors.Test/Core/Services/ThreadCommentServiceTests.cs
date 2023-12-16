@@ -119,5 +119,26 @@ namespace VakilPors.Test.Core.Services
             var exception = await Assert.ThrowsAsync<AccessViolationException>(() => threadCommentService.DeleteComment(userid, commentid));
             Assert.Equal("You do not have permission to perform this action", exception.Message);
         }
+
+        [Fact]
+        public async Task getcommentbyid()
+        {
+            //Arrange 
+            var userid = 1;
+            var commentid = 1;
+            var threadcommentdto = new ThreadCommentDto() { Text = "@alireza" };
+            IEnumerable<ThreadComment> threadComments = new List<ThreadComment>()
+            {
+                
+            };
+            var mock = threadComments.BuildMock();
+            appUnitOfWorkmock.Setup(u => u.ThreadCommentRepo.AsQueryable()).Returns(mock);
+            //Act & Assert
+            var exception = await Assert.ThrowsAsync<BadArgumentException>(() => threadCommentService.GetCommentById(userid, commentid));
+            Assert.Equal("comment not found", exception.Message);
+
+        }
+
+
     }
 }
