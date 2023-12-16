@@ -1,6 +1,4 @@
-﻿
-
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using System.Threading;
@@ -167,9 +165,9 @@ public class ThreadCommentService : IThreadCommentService
 
         if (comment == null)
             throw new BadArgumentException("comment not found");
-
+            
         return await GetCommentDtoFromComment(userId, comment);
-
+            
     }
 
     public async Task<int> GetCommentCountForThread(int threadId)

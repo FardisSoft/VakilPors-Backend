@@ -27,5 +27,6 @@ namespace VakilPors.Core.Contracts.Services
         //Task<List<LawyerDto>> FilteredSearch(SearchDto lawyerDto);
         public Task<List<LawyerCityCountDto>> GetLawyerCityCounts();
         public Task<List<LawyerTitleCountDto>> GetLawyerTitleCounts();
+        public Task<Pagination<Lawyer>> GetAllUnverfiedLawyers(PagedParams pagedParams, SortParams sortParams);
     }
 }

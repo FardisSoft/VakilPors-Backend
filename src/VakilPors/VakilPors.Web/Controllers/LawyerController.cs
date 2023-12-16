@@ -97,5 +97,14 @@ public class LawyerController : MyControllerBase
         var res = all.ToMappedPagination<Lawyer, LawyerDto>(_mapper,pagedParams.PageSize);
         return Ok(new AppResponse<Pagination<LawyerDto>>(res, "success"));
     }
+    [HttpGet]
+    public async Task<IActionResult> GetAllUnverfiedLawyers([FromQuery] PagedParams pagedParams, [FromQuery] SortParams sortParams)
+    {
+        _logger.LogInformation($"Get all unverified lawyers. page no:{pagedParams.PageNumber} page size:{pagedParams.PageSize} ");
+        var all = await _lawyerServices.GetAllUnverfiedLawyers(pagedParams,sortParams);
+        var res = all.ToMappedPagination<Lawyer, LawyerDto>(_mapper, pagedParams.PageSize);
+        return Ok(new AppResponse<Pagination<LawyerDto>>(res, "success"));
+
+    }
 
 }

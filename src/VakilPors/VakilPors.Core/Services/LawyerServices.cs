@@ -374,5 +374,11 @@ namespace VakilPors.Core.Services
                 Count = g.Count()
             }).ToListAsync();
         }
+
+        public async Task<Pagination<Lawyer>> GetAllUnverfiedLawyers(PagedParams pagedParams, SortParams sortParams)
+        {
+            var res = _appUnitOfWork.LawyerRepo.AsQueryable().Where(x => x.IsVerified == false);
+            return await res.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize);
+        }
     }
 }
