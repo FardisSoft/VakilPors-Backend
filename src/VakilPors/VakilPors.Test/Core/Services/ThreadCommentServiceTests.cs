@@ -139,6 +139,28 @@ namespace VakilPors.Test.Core.Services
 
         }
 
+        [Fact]
+        public async Task likecomment()
+        {
+            //Arrange
+            var userid = 1;
+            var commentid = 1;
+            var threadcommentdto = new ThreadCommentDto();
+            IEnumerable<ThreadComment> threadComments = new List<ThreadComment>()
+            {
+                new ThreadComment {UserLikes = new List<UserCommentLike>(){ new UserCommentLike() { UserId = 1 , CommentId = 1} } , Id = 1}
 
+            };
+            var mock = threadComments.BuildMock();
+            appUnitOfWorkmock.Setup(u => u.ThreadCommentRepo.AsQueryable()).Returns(mock);
+            appUnitOfWorkmock.Setup(u => u.ThreadCommentRepo.Update(It.IsAny<ThreadComment>()));
+            appUnitOfWorkmock.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
+
+            //Act 
+            var result = await threadCommentService.LikeComment(userid, commentid);
+
+            //Assert 
+            Assert.Equal(0, result);
+        }
     }
 }
