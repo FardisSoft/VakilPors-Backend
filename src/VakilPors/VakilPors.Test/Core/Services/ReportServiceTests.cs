@@ -147,12 +147,12 @@ public class ReportServiceTests{
     
     [Fact]
     public async void DeleteReport_CantFindReport_ReturnFalse(){
-
-        // var reportmock = report.BuildMock();
+        List<Report> report = new List<Report>();
+        var reportmock = report.BuildMock();
         var reportRepositorymock = new Mock<IGenericRepo<Report>>();
         _uow.Setup(x => x.ReportRepo)
             .Returns(reportRepositorymock.Object);
-        reportRepositorymock.Setup(x=>x.AsQueryable()).Returns((IQueryable<Report>)null);
+        reportRepositorymock.Setup(x=>x.AsQueryable()).Returns(reportmock);
 
         var result = await reportService.DeleteReport(It.IsAny<int>());
 
