@@ -31,7 +31,7 @@ public class AuthServices : IAuthServices
     private readonly IAppUnitOfWork appUnitOfWork;
     private readonly IEmailSender emailSender;
     private readonly ITelegramService _telegramService;
-    public AuthServices(IMapper mapper, UserManager<User> userManager, IConfiguration configuration, ILogger<AuthServices> logger, ISMSSender smsSender, IAppUnitOfWork appUnitOfWork, IEmailSender emailSender, ITelegramService telegramService)
+    public AuthServices(IMapper mapper, UserManager<User> userManager, IConfiguration configuration, ILogger<AuthServices> logger, ISMSSender smsSender, IAppUnitOfWork appUnitOfWork, IEmailSender emailSender, ITelegramService telegramService, User user = null)
     {
         this.appUnitOfWork = appUnitOfWork;
         this.emailSender = emailSender;
@@ -41,6 +41,7 @@ public class AuthServices : IAuthServices
         this._configuration = configuration;
         this._logger = logger;
         this._telegramService = telegramService;
+        this._user = user ?? null;
     }
 
     public async Task<string> CreateRefreshToken()
