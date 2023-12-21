@@ -27,10 +27,18 @@ public class EventServices :IEventServices
         }
 
         var @event = _mapper.Map<Event>(createEventDto);
+        @event.UserId = userId;
         await _uow.EventRepo.AddAsync(@event);
         await _uow.SaveChangesAsync();
 
         return @event;
+    }
+    public async Task<List<Event>> GetEventsAsync(int userId)
+    {
+        return await _uow.EventRepo.AsQueryableNoTracking()
+            .Include(e=>e.Lawyer)
+            .Where(e=>e.UserId==userId || e.Lawyer.UserId==userId)
+            .ToListAsync();
     }
     public async Task<Event> GetEventAsync(int eventId,int userId)
     {
@@ -82,7 +90,7 @@ public class EventServices :IEventServices
 
     public async Task<Event> UpdateEventStatusAsync(int id, Status status,int userId)
     {
-        var existingEvent = await _uow.EventRepo.AsQueryableNoTracking()
+        var existingEvent = await _uow.EventRepo.AsQueryable()
             .Include(e=>e.Lawyer)
             .FirstOrDefaultAsync(e=>e.Id==id);
         if (existingEvent == null)

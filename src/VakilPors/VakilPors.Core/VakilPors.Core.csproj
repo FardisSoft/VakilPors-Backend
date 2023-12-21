@@ -29,5 +29,4 @@
   <ItemGroup>
     <ProjectReference Include="..\VakilPors.Shared\VakilPors.Shared.csproj" />
   </ItemGroup>
-
 </Project>

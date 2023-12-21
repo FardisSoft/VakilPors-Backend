@@ -4,6 +4,7 @@ using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using VakilPors.Core.Domain.Dtos.Lawyer;
 using VakilPors.Core.Domain.Dtos.Payment;
 using VakilPors.Core.Domain.Dtos.Premium;
 using VakilPors.Core.Domain.Entities;

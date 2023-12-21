@@ -123,6 +123,7 @@ namespace VakilPors.Core.Services
                 .Where(x => x.UserId == userId)
                 .Include(x => x.Accesses)
                 .ThenInclude(a => a.Lawyer)
+                .ThenInclude(l=>l.User)
                 .ToListAsync();
             if (status.HasValue)
             {
