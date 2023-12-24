@@ -6,10 +6,12 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Pagination.EntityFrameworkCore.Extensions;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Case;
 using VakilPors.Core.Domain.Dtos.Lawyer;
+using VakilPors.Core.Domain.Dtos.Params;
 using VakilPors.Core.Domain.Dtos.User;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
@@ -116,23 +118,22 @@ namespace VakilPors.Core.Services
             return doc;
         }
 
-        public async Task<List<LegalDocument>> GetDocumentsByUserId(int userId,Status? status)
+        public async Task<Pagination<LegalDocument>> GetDocumentsByUserId(int userId, Status? status, PagedParams pagedParams)
         {
-            var docs = await _uow.DocumentRepo
+            var docs = _uow.DocumentRepo
                 .AsQueryable()
-                .Where(x => x.UserId == userId)
-                .Include(x => x.Accesses)
-                .ThenInclude(a => a.Lawyer)
-                .ThenInclude(l=>l.User)
-                .ToListAsync();
+                .Where(x => x.UserId == userId);
             if (status.HasValue)
             {
-                docs = docs.Where(d => 
-                        d.Accesses.Any(a => a.DocumentStatus == status.Value))
-                    .ToList();
+                docs = docs.Where(d =>
+                    d.Accesses.Any(a => a.DocumentStatus == status.Value));
             }
+            docs=docs
+                .Include(x => x.Accesses)
+                .ThenInclude(a => a.Lawyer)
+                .ThenInclude(l => l.User);
 
-            return docs;
+            return await docs.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize);;
         }
 
         public async Task<bool> GrantAccessToLawyer(DocumentAccessDto documentAccessDto)

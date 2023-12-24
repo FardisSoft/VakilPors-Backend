@@ -1,16 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Payment;
-using VakilPors.Core.Exceptions;
-using ZarinSharp.OutputTypes;
 
-namespace VakilPors.Web.Controllers
+namespace VakilPors.Api.Controllers
 {
     [Authorize]
     [ApiController]
@@ -26,10 +19,10 @@ namespace VakilPors.Web.Controllers
         [HttpPost("request")]
         public async Task<IActionResult> RequestPayment([FromBody] RequestPaymentDto requestPaymentDto)
         {
-            var baseRoute = getBaseRoute();
+            var baseRoute = GetBaseRoute();
             var Route = Url.Action(nameof(VerifyPayment)) ?? "/payment/verify";
             var callbackUrl = baseRoute + Route;
-            var userId = getUserId();
+            var userId = GetUserId();
             return Ok(await paymentServices.RequestPayment(userId, requestPaymentDto.Amount, requestPaymentDto.Description, callbackUrl));
         }
 
@@ -39,11 +32,10 @@ namespace VakilPors.Web.Controllers
         public async Task<IActionResult> VerifyPayment(string authority, string status)
         {
             var res = await paymentServices.VerifyPayment(authority, status);
-            var baseRoute = getBaseRoute().Replace("api.", "");
-            //Todo: change this to react route in production
+            var baseRoute = GetBaseRoute().Replace("api.", "");
             var Route = "/payment/verify";
             var url = baseRoute + Route;
-            return Redirect($"{url}?{getQueryString(res)}");
+            return Redirect($"{url}?{GetQueryString(res)}");
         }
 
     }

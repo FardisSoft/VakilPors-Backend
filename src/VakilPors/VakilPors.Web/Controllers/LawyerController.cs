@@ -2,18 +2,15 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Pagination.EntityFrameworkCore.Extensions;
-using VakilPors.Api.Controllers;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Lawyer;
 using VakilPors.Core.Domain.Dtos.Params;
-using VakilPors.Core.Domain.Dtos.User;
-using VakilPors.Core.Domain.Entities;
-using VakilPors.Shared.Response;
-using VakilPors.Core.Mapper;
-using X.PagedList;
 using VakilPors.Core.Domain.Dtos.Search;
+using VakilPors.Core.Domain.Entities;
+using VakilPors.Core.Mapper;
+using VakilPors.Shared.Response;
 
-namespace VakilPors.Web.Controllers;
+namespace VakilPors.Api.Controllers;
 
 [ApiController]
 [Route("[controller]/[action]")]
@@ -66,7 +63,7 @@ public class LawyerController : MyControllerBase
     public async Task<IActionResult> GetCurrentLawyer()
     {
         _logger.LogInformation($"get current lawyer data");
-        var result = await _lawyerServices.GetLawyerByUserId(getUserId());
+        var result = await _lawyerServices.GetLawyerByUserId(GetUserId());
         return Ok(new AppResponse<object>(result, "success"));
     }
 
@@ -85,7 +82,7 @@ public class LawyerController : MyControllerBase
     public async Task<IActionResult> TransferToken()
     {
         _logger.LogInformation($"transfer tokens");
-        var result = await _lawyerServices.TransferToken(getUserId());
+        var result = await _lawyerServices.TransferToken(GetUserId());
         return Ok(new AppResponse<object>(result, "success"));
     }
 
