@@ -157,6 +157,7 @@ public class ThreadService : IThreadService
             Thread = threadDto,
             Comments = await _threadCommentService.GetCommentsForThread(userId, threadId)
         };
+        // return (ThreadWithCommentsDto)null;
     }
 
     public async Task<int> LikeThread(int userId, int threadId)
