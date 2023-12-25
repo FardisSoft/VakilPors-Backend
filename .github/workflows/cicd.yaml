@@ -30,6 +30,9 @@ jobs:
         run: subfolder=$(ls ./VakilPors.Test/TestResults | head -n 1)
             echo "subfolder=${subfolder%/}" >> $GITHUB_ENV
         working-directory: ./src/VakilPors
+      - name: Print subfolder
+        run: echo "$(ls ./VakilPors.Test/TestResults)"
+        working-directory: ./src/VakilPors
       - name: Create Test Coverage Badge
         uses: simon-k/dotnet-code-coverage-badge@v1.0.0
         id: create_coverage_badge
