@@ -27,7 +27,7 @@ jobs:
         working-directory: ./src/VakilPors
       - name: Find first subfolder
         id: subfolder
-        run: subfolder=$(ls -d ./VakilPors.Test/TestResults head -n 1)
+        run: subfolder=$(ls ./VakilPors.Test/TestResults | head -n 1)
             echo "subfolder=${subfolder%/}" >> $GITHUB_ENV
         working-directory: ./src/VakilPors
       - name: Create Test Coverage Badge
