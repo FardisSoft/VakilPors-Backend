@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - main
-      - features/fix-ci
   pull_request:
     branches:
       - main
@@ -29,9 +28,6 @@ jobs:
         id: subfolder
         run: echo "subfolder=$(ls ./VakilPors.Test/TestResults | head -n 1)" >> $GITHUB_OUTPUT
         working-directory: ./src/VakilPors
-#      - name: Print subfolder
-#        run: echo "$(ls ./VakilPors.Test/TestResults)"
-#        working-directory: ./src/VakilPors
       - name: Create Test Coverage Badge
         uses: simon-k/dotnet-code-coverage-badge@v1.0.0
         id: create_coverage_badge
@@ -44,17 +40,17 @@ jobs:
           gist-auth-token: ${{ secrets.GIST_AUTH_TOKEN }}
       - name: Print code coverage
         run: echo "Code coverage percentage ${{steps.create_coverage_badge.outputs.percentage}}%"
-#  cd:
-#    needs: ci
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v3
-#      - uses: actions/setup-node@v3
-#        with:
-#          node-version: "18"
-#      - name: update-liara
-#        env:
-#          LIARA_TOKEN: ${{ secrets.LIARA_API_TOKEN }}
-#        run: |
-#          npm i -g @liara/cli@5
-#          liara deploy --api-token="$LIARA_TOKEN" --detach
+  cd:
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+      - name: update-liara
+        env:
+          LIARA_TOKEN: ${{ secrets.LIARA_API_TOKEN }}
+        run: |
+          npm i -g @liara/cli@5
+          liara deploy --api-token="$LIARA_TOKEN" --detach
