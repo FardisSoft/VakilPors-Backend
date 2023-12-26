@@ -26,12 +26,11 @@ public class AuthServices : IAuthServices
     private readonly UserManager<User> _userManager;
     private readonly IConfiguration _configuration;
     private readonly ILogger<AuthServices> _logger;
-    private User _user;
     private readonly ISMSSender smsSender;
     private readonly IAppUnitOfWork appUnitOfWork;
     private readonly IEmailSender emailSender;
     private readonly ITelegramService _telegramService;
-    public AuthServices(IMapper mapper, UserManager<User> userManager, IConfiguration configuration, ILogger<AuthServices> logger, ISMSSender smsSender, IAppUnitOfWork appUnitOfWork, IEmailSender emailSender, ITelegramService telegramService, User user = null)
+    public AuthServices(IMapper mapper, UserManager<User> userManager, IConfiguration configuration, ILogger<AuthServices> logger, ISMSSender smsSender, IAppUnitOfWork appUnitOfWork, IEmailSender emailSender, ITelegramService telegramService)
     {
         this.appUnitOfWork = appUnitOfWork;
         this.emailSender = emailSender;
@@ -41,10 +40,9 @@ public class AuthServices : IAuthServices
         this._configuration = configuration;
         this._logger = logger;
         this._telegramService = telegramService;
-        this._user = user ?? null;
     }
 
-    public async Task<string> CreateRefreshToken()
+    public async Task<string> CreateRefreshToken(User _user)
     {
         var newRefreshToken = Guid.NewGuid().ToString().Replace("-", "");
         _user.RefreshToken = newRefreshToken;
@@ -56,7 +54,7 @@ public class AuthServices : IAuthServices
     public async Task<LoginResponseDto> Login(LoginDto loginDto)
     {
         _logger.LogInformation($"Looking for user with phone number {loginDto.PhoneNumber}");
-        _user = await _userManager.FindByNameAsync(loginDto.PhoneNumber);
+        var _user = await _userManager.FindByNameAsync(loginDto.PhoneNumber);
         if (_user == null)
         {
             _logger.LogWarning($"User with phone number {loginDto.PhoneNumber} was not found");
@@ -68,7 +66,7 @@ public class AuthServices : IAuthServices
             _logger.LogWarning($"User with phone number {loginDto.PhoneNumber} entered wrong password");
             throw new BadArgumentException("incorrect credtials");
         }
-        var token = await GenerateToken();
+        var token = await GenerateToken(_user);
         _logger.LogInformation($"Token generated for user with phone number {loginDto.PhoneNumber} | Token: {token}");
         DateTime dateTime = DateTime.Now; PersianCalendar persianCalendar = new PersianCalendar();
         int year = persianCalendar.GetYear(dateTime); int month = persianCalendar.GetMonth(dateTime); int day = persianCalendar.GetDayOfMonth(dateTime); string persianDate = $"{year}/{month}/{day}";
@@ -77,13 +75,13 @@ public class AuthServices : IAuthServices
         return new LoginResponseDto
         {
             Token = token,
-            RefreshToken = await CreateRefreshToken()
+            RefreshToken = await CreateRefreshToken(_user)
         };
     }
 
     public async Task<IEnumerable<IdentityError>> Register(SignUpDto userDto)
     {
-        _user = _mapper.Map<User>(userDto);
+        var _user = _mapper.Map<User>(userDto);
         _user.UserName = userDto.PhoneNumber;
 
         var result = await _userManager.CreateAsync(_user, userDto.Password);
@@ -150,7 +148,7 @@ public class AuthServices : IAuthServices
         }
         var username = tokenContent.Claims.ToList().FirstOrDefault(q => q.Type == JwtRegisteredClaimNames.Sub)?.Value;
 
-        _user = await _userManager.FindByNameAsync(username);
+        var _user = await _userManager.FindByNameAsync(username);
 
         if (_user == null)
         {
@@ -162,12 +160,12 @@ public class AuthServices : IAuthServices
 
         if (isValidRefreshToken)
         {
-            var token = await GenerateToken();
+            var token = await GenerateToken(_user);
             _logger.LogInformation($"token refreshed for {username}");
             return new LoginResponseDto
             {
                 Token = token,
-                RefreshToken = await CreateRefreshToken()
+                RefreshToken = await CreateRefreshToken(_user)
             };
         }
 
@@ -176,7 +174,7 @@ public class AuthServices : IAuthServices
         throw new BadArgumentException("Invalid Refresh Token");
     }
 
-    private async Task<string> GenerateToken()
+    private async Task<string> GenerateToken(User _user)
     {
         var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]));
 

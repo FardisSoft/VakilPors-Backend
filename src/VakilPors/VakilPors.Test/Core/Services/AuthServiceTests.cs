@@ -65,7 +65,7 @@ public class AuthServicesTests{
         _appUnitOfWork = new Mock<IAppUnitOfWork>();
         _emailSender = new Mock<IEmailSender>();
         _telegramService = new Mock<ITelegramService>();
-        _authServices = new AuthServices(_mapper.Object, _userManager.Object, _configuration.Object, _logger.Object, _smsSender.Object, _appUnitOfWork.Object, _emailSender.Object, _telegramService.Object,_user);
+        _authServices = new AuthServices(_mapper.Object, _userManager.Object, _configuration.Object, _logger.Object, _smsSender.Object, _appUnitOfWork.Object, _emailSender.Object, _telegramService.Object);
         _appUnitOfWork.Setup(uow => uow.LawyerRepo).Returns(_lawyerRepMock.Object);
         _appUnitOfWork.Setup(uow => uow.UserRepo).Returns(_userRepMock.Object);
         _appUnitOfWork.Setup(uow => uow.SubscribedRepo).Returns(_subscribedRepMock.Object);
@@ -79,7 +79,7 @@ public class AuthServicesTests{
 
         
         // Act
-        var newToken = await _authServices.CreateRefreshToken();
+        var newToken = await _authServices.CreateRefreshToken(_user);
 
         // Assert 
         Assert.NotNull(newToken);
@@ -221,7 +221,7 @@ public class AuthServicesTests{
         _smsSender.Setup(x => x.SendSmsAsync(phoneNumber, It.IsAny<string>()));
         
         SignUpDto sud =new SignUpDto{PhoneNumber = _user.PhoneNumber , Email=_user.Email , IsVakil = true,Name=_user.Name};// fixture.Create<SignUpDto>();
-        sud.IsVakil = true;
+        sud.IsVakil = false;
         // var errorDescription = "Error creating user";
         // var identityError = new IdentityError { Code = "ErrorCode", Description = errorDescription };
         _userManager.Setup(x => x.CreateAsync(_user,sud.Password))
@@ -229,7 +229,7 @@ public class AuthServicesTests{
         _mapper.Setup(x => x.Map<User>(It.IsAny<SignUpDto>()))
                        .Returns(_user);
 
-        _appUnitOfWork.Setup(um => um.SaveChangesAsync()).ReturnsAsync(1);
+        _appUnitOfWork.Setup(um => um.SaveChangesAsync()).ThrowsAsync(new Exception());
         _lawyerRepMock.Setup(lrm =>lrm.AddAsync(It.IsAny<Lawyer>()));
         _userRepMock.Setup(urm => urm.Update(It.IsAny<User>()));
 
@@ -246,7 +246,7 @@ public class AuthServicesTests{
     }
 
 
-     [Fact]
+    [Fact]
     public async Task SendActivationCode_Successful()
     {
         // Arrange
@@ -267,6 +267,33 @@ public class AuthServicesTests{
 
         // Assert
         // Add assertions based on your specific requirements
+        _userManager.Verify(x => x.FindByNameAsync(phoneNumber), Times.Once);
+        _userManager.Verify(x => x.UpdateAsync(It.IsAny<User>()), Times.Once);
+        _smsSender.Verify(x => x.SendSmsAsync(phoneNumber, It.IsAny<string>()), Times.Once);
+        // loggerMock.Verify(x => x.LogInformation($"activation code:{activationCode} generated for user with phone number:{phoneNumber}"), Times.Once);
+    }
+    [Fact]
+    public async Task SendActivationCode_SendSmsAsyncFailed_ThrowInternalServerException()
+    {
+        // Arrange
+        var phoneNumber = "1234567890"; // Replace with a valid phone number
+        var activationCode = "123456";   // Replace with a generated activation code
+
+        _userManager.Setup(x => x.FindByNameAsync(phoneNumber))
+            .ReturnsAsync(new User { IsActive = false }); // Assuming user is not yet activated
+
+        _userManager.Setup(x => x.UpdateAsync(It.IsAny<User>()))
+            .ReturnsAsync(IdentityResult.Success);
+
+        _smsSender.Setup(x => x.SendSmsAsync(phoneNumber, It.IsAny<string>())).ThrowsAsync(new Exception());
+            // .ReturnsAsync(Task.CompletedTask); // Assuming successful SMS sending
+
+        // Act
+        // await _authServices.SendActivationCode(phoneNumber);
+        await Assert.ThrowsAsync<InternalServerException>(() => _authServices.SendActivationCode(phoneNumber));
+
+
+        // Assert
         _userManager.Verify(x => x.FindByNameAsync(phoneNumber), Times.Once);
         _userManager.Verify(x => x.UpdateAsync(It.IsAny<User>()), Times.Once);
         _smsSender.Verify(x => x.SendSmsAsync(phoneNumber, It.IsAny<string>()), Times.Once);
