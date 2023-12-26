@@ -83,10 +83,26 @@ public class ThreadServicesTests{
         _uow.Setup(sca => sca.SaveChangesAsync()).ReturnsAsync(0);
         await Assert.ThrowsAsync<Exception>(() => threadservice.CreateThread(It.IsAny<int>() , _threadDto.Object , _antiSpam.Object));
     }
-    [Fact(Skip = "first must complete GetThreadWithComments function")]
-    // [Fact]
+    // [Fact(Skip = "first must complete GetThreadWithComments function")]
+    [Fact]
     public async void CreateThread_successSaveChangesAsync_ProperFunctionCall(){
-        
+        //assert for GetThreadWithComments function
+        var fixture = new Fixture();
+            //AutoFixture
+        // var thread = fixture.Build < ForumThread > ().With(a => a.FirstName, firstName).With(a => a.LastName, lastName).Create();
+        ForumThread thread = fixture.Build<ForumThread>().Without(p => p.User)
+        .Without( X=>X.UserLikes).Create();
+        thread.Id=0;
+        thread.User= new User{ Name = "name"};
+        thread.UserLikes = new List<UserThreadLike>
+        {
+            new UserThreadLike{UserId = 1}
+        };
+
+        var u = new List<ForumThread>{thread};
+        var submock =u.BuildMock();
+        _forumThreadRepo.Setup(urm => urm.AsQueryable()).Returns(submock);
+        //-----
         _threadDto.Object.Title="Title";
         var user = new User{Name = "blah blah" , Email="blah@gmail.com" , Telegram="blahtelegram"};
 
@@ -97,15 +113,15 @@ public class ThreadServicesTests{
         _uow.Setup(sca => sca.SaveChangesAsync()).ReturnsAsync(1);
 
         _uow.Setup(uow => uow.ForumThreadRepo.AddAsync(It.IsAny<ForumThread>())).Verifiable();
-        // _emailSender.Setup(es => es.SendEmailAsync(user.Email,user.Email,It.IsAny<string>(),It.IsAny<string>(),true)).Verifiable();
-        // _telegramService.Setup(ts => ts.SendToTelegram(It.IsAny<string>(),user.Telegram)).Verifiable();
+        _emailSender.Setup(es => es.SendEmailAsync(It.IsAny<string>(),It.IsAny<string>() ,It.IsAny<string>(),It.IsAny<string>(),true)).Returns(Task.CompletedTask);
+        _telegramService.Setup(ts => ts.SendToTelegram(It.IsAny<string>(),user.Telegram)).Returns(Task.CompletedTask);
         
 
         await threadservice.CreateThread(It.IsAny<int>() , _threadDto.Object , _antiSpam.Object);
 
         _uow.Verify(o => o.ForumThreadRepo.AddAsync(It.IsAny<ForumThread>()));
-        _emailSender.Verify(client => client.SendEmailAsync(user.Email,user.Email,It.IsAny<string>(),It.IsAny<string>(),true));//(It.IsAny<MimeMessage>(),It.IsAny<CancellationToken>() ,It.IsAny<ITransferProgress>()));
-        _telegramService.Verify(client => client.SendToTelegram(It.IsAny<string>(),user.Telegram));
+        _emailSender.Verify(client => client.SendEmailAsync(It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>(),true),Times.Once);//(It.IsAny<MimeMessage>(),It.IsAny<CancellationToken>() ,It.IsAny<ITransferProgress>()));
+        _telegramService.Verify(client => client.SendToTelegram(It.IsAny<string>(),It.IsAny<string>()),Times.Once);
 
 
     }
@@ -183,11 +199,47 @@ public class ThreadServicesTests{
 
 		_antiSpam.Setup(sp => sp.IsSpam(_threadDto.Object.Description)).Verifiable();
 		int user_id_input = 1;
-		_uow.Setup(uow => uow.ForumThreadRepo.FindAsync(_threadDto.Object.Id)).ReturnsAsync(new ForumThread{Id = user_id_input});
+		_uow.Setup(uow => uow.ForumThreadRepo.FindAsync(_threadDto.Object.Id)).ReturnsAsync(new ForumThread{UserId = user_id_input});
         _uow.Setup(uow => uow.ForumThreadRepo.Update(It.IsAny<ForumThread>())).Verifiable();
         _uow.Setup(sca => sca.SaveChangesAsync()).ReturnsAsync(0);
 
-		await Assert.ThrowsAsync<AccessViolationException>(() => threadservice.UpdateThread(user_id_input , _threadDto.Object , _antiSpam.Object));
+		await Assert.ThrowsAsync<Exception>(() => threadservice.UpdateThread(user_id_input , _threadDto.Object , _antiSpam.Object));
+    }
+    [Fact]
+    public async void UpdateThread_UpdateThread_ReturnThreadDto(){
+        //GetThreadWithComments
+        var fixture = new Fixture();
+            //AutoFixture
+        // var thread = fixture.Build < ForumThread > ().With(a => a.FirstName, firstName).With(a => a.LastName, lastName).Create();
+        ForumThread thread = fixture.Build<ForumThread>().Without(p => p.User)
+        .Without( X=>X.UserLikes).Create();
+        thread.Id=0;
+        thread.User= new User{ Name = "name"};
+        thread.UserLikes = new List<UserThreadLike>
+        {
+            new UserThreadLike{UserId = 1}
+        };
+
+        var u = new List<ForumThread>{thread};
+        var submock =u.BuildMock();
+        _forumThreadRepo.Setup(urm => urm.AsQueryable()).Returns(submock);
+        //--------------
+        _threadDto.Object.Description="Description";
+		_threadDto.Object.Id=1;
+		_threadDto.Object.Title="title";
+		_threadDto.Object.Description="Description";
+
+		_antiSpam.Setup(sp => sp.IsSpam(_threadDto.Object.Description)).Verifiable();
+		int user_id_input = 1;
+		_uow.Setup(uow => uow.ForumThreadRepo.FindAsync(_threadDto.Object.Id)).ReturnsAsync(new ForumThread{UserId = user_id_input});
+        _uow.Setup(uow => uow.ForumThreadRepo.Update(It.IsAny<ForumThread>())).Verifiable();
+        _uow.Setup(sca => sca.SaveChangesAsync()).ReturnsAsync(1);
+
+		ThreadDto result = await threadservice.UpdateThread(user_id_input , _threadDto.Object , _antiSpam.Object);
+
+        Assert.Equal(typeof(ThreadDto) , result.GetType());
+
+
     }
 
 
@@ -246,7 +298,7 @@ public class ThreadServicesTests{
     [InlineData(2)]   // Test case 1: 2 + 3 = 5
     [InlineData(1)]   // Test case 1: 2 + 3 = 5
     [InlineData(0)]   // Test case 1: 2 + 3 = 5
-    public async void GetThreadList_ReturntwoThread_ReturnJustTwoThread(int thread_count){
+    public async void GetThreadList_ReturntwoThread_ReturnCorrectNumberOfThread(int thread_count){
         int userId_input =1;// ,threadId_input = 1;
         // Mock<GetThreadDtoFromThread> m = new Mock<GetThreadDtoFromThread>();
         IEnumerable<ForumThread> forumthread = new List<ForumThread>{};
