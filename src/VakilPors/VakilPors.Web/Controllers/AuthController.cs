@@ -1,15 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos;
 using VakilPors.Shared.Response;
 
-namespace VakilPors.Web.Controllers
+namespace VakilPors.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]

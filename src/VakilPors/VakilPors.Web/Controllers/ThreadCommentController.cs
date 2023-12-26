@@ -4,7 +4,6 @@ using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos;
 using VakilPors.Core.Domain.Dtos.Params;
 using VakilPors.Shared.Response;
-using VakilPors.Web.Controllers;
 
 namespace VakilPors.Api.Controllers
 {
@@ -27,7 +26,7 @@ namespace VakilPors.Api.Controllers
         public async Task<IActionResult> CreateComment(ThreadCommentDto commentDto)
         {
             _logger.LogInformation($"create new comment for thread : {commentDto.ThreadId}");
-            var result = await _threadCommentService.CreateComment(getUserId(), commentDto);
+            var result = await _threadCommentService.CreateComment(GetUserId(), commentDto);
             return Ok(new AppResponse<object>(result, "comment created"));
         }
 
@@ -35,7 +34,7 @@ namespace VakilPors.Api.Controllers
         public async Task<IActionResult> UpdateComment(ThreadCommentDto commentDto)
         {
             _logger.LogInformation($"update comment {commentDto.Id}");
-            var result = await _threadCommentService.UpdateComment(getUserId(), commentDto);
+            var result = await _threadCommentService.UpdateComment(GetUserId(), commentDto);
             return Ok(new AppResponse<object>(result, "comment updated"));
         }
 
@@ -43,7 +42,7 @@ namespace VakilPors.Api.Controllers
         public async Task<IActionResult> DeleteComment(int commentId)
         {
             _logger.LogInformation($"delete comment {commentId}");
-            var result = await _threadCommentService.DeleteComment(getUserId(), commentId);
+            var result = await _threadCommentService.DeleteComment(GetUserId(), commentId);
             return Ok(new AppResponse<object>(result, "comment deleted"));
         }
 
@@ -51,42 +50,42 @@ namespace VakilPors.Api.Controllers
         public async Task<IActionResult> GetCommentsForThread([FromQuery] int threadId,
             [FromQuery] PagedParams pagedParams)
         {
-            var result = await _threadCommentService.GetCommentsForThread(getUserId(), threadId, pagedParams);
+            var result = await _threadCommentService.GetCommentsForThread(GetUserId(), threadId, pagedParams);
             return Ok(new AppResponse<object>(result, "success"));
         }
 
         [HttpGet]
         public async Task<IActionResult> GetCommentById(int commentId)
         {
-            var result = await _threadCommentService.GetCommentById(getUserId(), commentId);
+            var result = await _threadCommentService.GetCommentById(GetUserId(), commentId);
             return Ok(new AppResponse<object>(result, "success"));
         }
 
         [HttpGet]
         public async Task<IActionResult> LikeComment(int commentId)
         {
-            var result = await _threadCommentService.LikeComment(getUserId(), commentId);
+            var result = await _threadCommentService.LikeComment(GetUserId(), commentId);
             return Ok(new AppResponse<object>(result, "success"));
         }
 
         [HttpGet]
         public async Task<IActionResult> UndoLikeComment(int commentId)
         {
-            var result = await _threadCommentService.UndoLikeComment(getUserId(), commentId);
+            var result = await _threadCommentService.UndoLikeComment(GetUserId(), commentId);
             return Ok(new AppResponse<object>(result, "success"));
         }
 
         [HttpGet]
         public async Task<IActionResult> SetAsAnswer(int commentId)
         {
-            var result = await _threadCommentService.SetAsAnswer(getUserId(), commentId);
+            var result = await _threadCommentService.SetAsAnswer(GetUserId(), commentId);
             return Ok(new AppResponse<object>(result, "success"));
         }
 
         [HttpGet]
         public async Task<IActionResult> UndoSetAsAnswer(int commentId)
         {
-            var result = await _threadCommentService.UndoSetAsAnswer(getUserId(), commentId);
+            var result = await _threadCommentService.UndoSetAsAnswer(GetUserId(), commentId);
             return Ok(new AppResponse<object>(result, "success"));
         }
     }

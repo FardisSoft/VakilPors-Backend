@@ -1,10 +1,9 @@
-
 using Microsoft.AspNetCore.Mvc;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Report;
 using VakilPors.Shared.Response;
 
-namespace VakilPors.Web.Controllers;
+namespace VakilPors.Api.Controllers;
 
 [ApiController]
 [Route("[controller]/[action]")]
