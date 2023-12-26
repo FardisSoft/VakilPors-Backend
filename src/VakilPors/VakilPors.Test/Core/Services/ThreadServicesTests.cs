@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.EntityFrameworkCore;
 using VakilPors.Data.Migrations;
 using VakilPors.Contracts.Repositories;
+using VakilPors.Core.Domain.Dtos.Params;
 namespace VakilPors.Test.Core.Services;
 public class ThreadServicesTests{
     private Mock<IAntiSpam> _antiSpam;
@@ -133,7 +134,7 @@ public class ThreadServicesTests{
         _forumThreadRepo.Setup(urm => urm.AsQueryable()).Returns(submock);
 
         // await threadservice.GetThreadWithComments(It.IsAny<int>() , It.IsAny<int>() );
-        await Assert.ThrowsAsync<BadArgumentException>(() => threadservice.GetThreadWithComments(It.IsAny<int>() , It.IsAny<int>() ));
+        await Assert.ThrowsAsync<BadArgumentException>(() => threadservice.GetThreadWithComments(It.IsAny<int>() , It.IsAny<int>() ,It.IsAny<PagedParams>() ));
     }
     [Fact]
     public async void GetThreadWithComments_ReturnTrueThread_SuccessWay(){
@@ -154,7 +155,7 @@ public class ThreadServicesTests{
         var submock =u.BuildMock();
         _forumThreadRepo.Setup(urm => urm.AsQueryable()).Returns(submock);
 
-        var result = await threadservice.GetThreadWithComments(It.IsAny<int>() , It.IsAny<int>() );
+        var result = await threadservice.GetThreadWithComments(It.IsAny<int>() , It.IsAny<int>(),It.IsAny<PagedParams>() );
         // await Assert.ThrowsAsync<BadArgumentException>(() => threadservice.GetThreadWithComments(It.IsAny<int>() , It.IsAny<int>() ));
         Assert.Equal(result.GetType() ,typeof(ThreadWithCommentsDto) );
         Assert.NotNull(result);

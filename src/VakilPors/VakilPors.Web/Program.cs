@@ -1,6 +1,5 @@
 
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using Serilog;
 using VakilPors.Business.Extensions;
 using VakilPors.Core.Authentication.Extensions;
@@ -11,12 +10,6 @@ using VakilPors.Data.Context;
 using VakilPors.Data.Extensions;
 using VakilPors.Web.Configuration.Extensions;
 using ZarinSharp.Extensions;
-using Amazon.S3;
-using Amazon;
-using Amazon.Extensions.NETCore.Setup;
-using Amazon.Runtime;
-using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
-using MimeKit.Cryptography;
 using VakilPors.Api.Configuration.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,6 +22,7 @@ builder.Services.RegisterAppDbContext(connectionString);
 builder.Services.RegisterIdentity<AppDbContext>();
 builder.Services.RegisterAuthentication(configuration);
 builder.Services.AddAutoMapper(typeof(MapperProfile));
+builder.Services.AddHttpClient();
 builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console().ReadFrom.Configuration(ctx.Configuration));
 builder.Services.AddZarinSharp(op =>
 {
@@ -36,14 +30,16 @@ builder.Services.AddZarinSharp(op =>
     op.IsSandbox = true;
 });
 builder.Services.AddControllers()
-    .AddNewtonsoftJson(options =>
-        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+    .AddJsonOptions(options =>
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles
+        // options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            );
 builder.Services.AddSignalR(options =>
 {
     options.EnableDetailedErrors = true;
     // options.MaximumReceiveMessageSize = 102400000;
 });
-
+builder.Services.AddHttpClient();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", builder =>

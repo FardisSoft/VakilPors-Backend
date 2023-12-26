@@ -34,7 +34,8 @@ public class GenericRepo<TEntity> : IGenericRepo<TEntity> where TEntity : class
     
     public void Update(TEntity entity)
         => Entities.Update(entity);
-    
+
+
     public void Remove(TEntity entity)
         => Entities.Remove(entity);
 

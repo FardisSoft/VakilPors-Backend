@@ -3,9 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Case;
 using VakilPors.Core.Domain.Dtos.Lawyer;
+using VakilPors.Core.Domain.Dtos.Params;
 using VakilPors.Core.Domain.Dtos.User;
+using VakilPors.Core.Domain.Entities;
 using VakilPors.Shared.Response;
-using VakilPors.Web.Controllers;
 
 namespace VakilPors.Api.Controllers
 {
@@ -24,7 +25,7 @@ namespace VakilPors.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> AddDocument([FromForm] LegalDocumentDto documentDto)
         {
-            var result = await _documentService.AddDocument(getUserId(), documentDto);
+            var result = await _documentService.AddDocument(GetUserId(), documentDto);
             return Ok(new AppResponse<object>(result, "success"));
         }
 
@@ -43,9 +44,9 @@ namespace VakilPors.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetDocumentsByUserId(int userId)
+        public async Task<IActionResult> GetDocumentsByUserId(int userId,[FromQuery]Status? documentStatus,[FromQuery]PagedParams pagedParams)
         {
-            var result = await _documentService.GetDocumentsByUserId(userId);
+            var result = await _documentService.GetDocumentsByUserId(userId,documentStatus,pagedParams);
             return Ok(new AppResponse<object>(result, "success"));
         }
 
@@ -85,12 +86,19 @@ namespace VakilPors.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetDocumentsThatLawyerHasAccessToByUserId(LawyerDocumentAccessDto lawyerDocumentAccessDto)
+        public async Task<IActionResult> GetDocumentsThatLawyerHasAccessToByUserId(LawyerDocumentAccessDto lawyerDocumentAccessDto,[FromQuery]Status? documentStatus)
         {
-            var result = await _documentService.GetDocumentsThatLawyerHasAccessToByUserId(lawyerDocumentAccessDto);
+            var result = await _documentService.GetDocumentsThatLawyerHasAccessToByUserId(lawyerDocumentAccessDto,documentStatus);
             return Ok(new AppResponse<object>(result, "success"));
         }
-
+        [HttpPatch]
+        [Authorize(Roles = RoleNames.Vakil)]
+        public async Task<IActionResult> UpdateDocumentStatus([FromBody] DocumentStatusUpdateDto updateDto)
+        {
+            var userId = GetUserId();
+            await _documentService.UpdateDocumentStatus(updateDto,userId);
+            return Ok("success");
+        }
 
     }
 }

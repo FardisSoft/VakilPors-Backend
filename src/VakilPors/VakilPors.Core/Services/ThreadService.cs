@@ -1,11 +1,10 @@
-﻿using System.ComponentModel;
-using System.Threading;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
+using Pagination.EntityFrameworkCore.Extensions;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos;
+using VakilPors.Core.Domain.Dtos.Params;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
 
@@ -64,7 +63,7 @@ public class ThreadService : IThreadService
             throw new Exception();
         await emailSender.SendEmailAsync(_user.Email, _user.Name, "ساخت رشته", $"شما با موفقیت رشته خود درباره را {threadDto.Title} ساختید");
         await _telegramService.SendToTelegram($"شما با موفقیت رشته خود درباره را {threadDto.Title} ساختید", _user.Telegram);
-        return (await GetThreadWithComments(userId, thread.Id)).Thread;
+        return await GetThread(userId, thread.Id);
     }
 
     public async Task<ThreadDto> UpdateThread(int userId, ThreadDto threadDto , IAntiSpam antispam=null)
@@ -93,7 +92,7 @@ public class ThreadService : IThreadService
         if (updateResult <= 0)
             throw new Exception();
 
-        return (await GetThreadWithComments(userId, foundThread.Id)).Thread;
+        return await GetThread(userId, foundThread.Id);
     }
 
     public async Task<bool> DeleteThread(int userId, int threadId)
@@ -139,7 +138,18 @@ public class ThreadService : IThreadService
         return threadDtos;
     }
 
-    public async Task<ThreadWithCommentsDto> GetThreadWithComments(int userId, int threadId)
+    public async Task<ThreadWithCommentsDto> GetThreadWithComments(int userId, int threadId,PagedParams pagedParams)
+    {
+        var threadDto = await GetThread(userId, threadId);
+
+        return new ThreadWithCommentsDto
+        {
+            Thread = threadDto,
+            Comments = await _threadCommentService.GetCommentsForThread(userId, threadId,pagedParams)
+        };
+    }
+
+    private async Task<ThreadDto> GetThread(int userId, int threadId)
     {
         var thread = await _uow.ForumThreadRepo
             .AsQueryable()
@@ -151,13 +161,7 @@ public class ThreadService : IThreadService
             throw new BadArgumentException("thread not found");
 
         var threadDto = await GetThreadDtoFromThread(userId, thread);
-
-        return new ThreadWithCommentsDto
-        {
-            Thread = threadDto,
-            Comments = await _threadCommentService.GetCommentsForThread(userId, threadId)
-        };
-        // return (ThreadWithCommentsDto)null;
+        return threadDto;
     }
 
     public async Task<int> LikeThread(int userId, int threadId)
@@ -248,6 +252,18 @@ public class ThreadService : IThreadService
             .CountAsync();
 
         return likes > 0;
+    }
+
+    public async Task<Pagination<ForumThread>> SearchThread(string title , PagedParams pagedParams, SortParams sortParam, int userid)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            var result =  _uow.ForumThreadRepo.AsQueryable().Include(x => x.User);
+            return await result.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize);
+        }
+        var foundthread = _uow.ForumThreadRepo.AsQueryable().Where(x => x.Title.Contains(title) || x.Description.Contains(title));
+        foundthread = foundthread.OrderByDescending(x => x.LikeCount).ThenByDescending(x => x.CreateDate);
+        return await foundthread.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize);
     }
 }
 

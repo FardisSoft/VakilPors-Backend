@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Identity;
+using MockQueryable.Moq;
 using Moq;
+using Pagination.EntityFrameworkCore.Extensions;
 using VakilPors.Contracts.Repositories;
 using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
@@ -106,8 +108,10 @@ public class WalletServicesTests
         userManagerMock.Setup(m => m.FindByIdAsync(userId.ToString())).ReturnsAsync(user);
         appUnitOfWorkMock.Setup(m => m.TransactionRepo.AddAsync(It.IsAny<Transaction>()));
         appUnitOfWorkMock.Setup(m => m.SaveChangesAsync());
-        emailSenderMock.Setup(m => m.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),It.IsAny<bool>())).Returns(Task.CompletedTask);
-        telegramServiceMock.Setup(m => m.SendToTelegram(It.IsAny<string>(), It.IsAny<string>())).Returns(Task.CompletedTask);
+        emailSenderMock.Setup(m => m.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
+            It.IsAny<string>(), It.IsAny<bool>())).Returns(Task.CompletedTask);
+        telegramServiceMock.Setup(m => m.SendToTelegram(It.IsAny<string>(), It.IsAny<string>()))
+            .Returns(Task.CompletedTask);
         userManagerMock.Setup(m => m.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
         // Act
         await walletServices.AddTransaction(userId, amount, description, authority, isSuccess, isIncome);
@@ -116,7 +120,8 @@ public class WalletServicesTests
         appUnitOfWorkMock.Verify(m => m.TransactionRepo.AddAsync(It.IsAny<Transaction>()), Times.Once);
         appUnitOfWorkMock.Verify(m => m.SaveChangesAsync(), Times.Once);
         userManagerMock.Verify(m => m.UpdateAsync(user), Times.Once);
-        emailSenderMock.Verify(m => m.SendEmailAsync(user.Email, user.Name, "تراکنش", It.IsAny<string>(),It.IsAny<bool>()), Times.Once);
+        emailSenderMock.Verify(
+            m => m.SendEmailAsync(user.Email, user.Name, "تراکنش", It.IsAny<string>(), It.IsAny<bool>()), Times.Once);
         telegramServiceMock.Verify(m => m.SendToTelegram(It.IsAny<string>(), user.Telegram), Times.Once);
     }
 
@@ -129,8 +134,8 @@ public class WalletServicesTests
         var transactionId = 123;
         var userId = 1;
         var user = new User { Id = userId, Balance = 100 };
-        var transaction = new Transaction { Id = transactionId, UserId = userId, Amount = 50,IsIncome = true};
-    
+        var transaction = new Transaction { Id = transactionId, UserId = userId, Amount = 50, IsIncome = true };
+
         userManagerMock.Setup(m => m.FindByIdAsync(userId.ToString())).ReturnsAsync(user);
         appUnitOfWorkMock.Setup(m => m.TransactionRepo.FindAsync(transactionId)).ReturnsAsync(transaction);
         userManagerMock.Setup(m => m.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
@@ -143,43 +148,43 @@ public class WalletServicesTests
         userManagerMock.Verify(m => m.UpdateAsync(user), Times.Once);
         Assert.Equal(150, user.Balance);
     }
-     [Fact]
-        public async Task ApproveTransaction_WhenTransactionIsAlreadyApplied_ShouldThrowInternalServerException()
-        {
-            // Arrange
-            var transactionId = 1;
-            var transaction = new Transaction { Id = transactionId, IsSuccess = true };
-            appUnitOfWorkMock.Setup(uow => uow.TransactionRepo.FindAsync(transactionId)).ReturnsAsync(transaction);
 
-            // Act and Assert
-            await Assert.ThrowsAsync<InternalServerException>(() => walletServices.ApproveTransaction(transactionId));
-            appUnitOfWorkMock.Verify(uow => uow.TransactionRepo.Update(transaction), Times.Never);
-            appUnitOfWorkMock.Verify(uow => uow.SaveChangesAsync(), Times.Never);
-        }
+    [Fact]
+    public async Task ApproveTransaction_WhenTransactionIsAlreadyApplied_ShouldThrowInternalServerException()
+    {
+        // Arrange
+        var transactionId = 1;
+        var transaction = new Transaction { Id = transactionId, IsSuccess = true };
+        appUnitOfWorkMock.Setup(uow => uow.TransactionRepo.FindAsync(transactionId)).ReturnsAsync(transaction);
 
-        [Fact]
-        public async Task ApproveTransaction_WhenTransactionIsValid_ShouldUpdateTransactionAndSaveChanges()
-        {
-            // Arrange
-            var transactionId = 1;
-            var transaction = new Transaction { Id = transactionId, IsSuccess = false };
-            appUnitOfWorkMock.Setup(uow => uow.TransactionRepo.FindAsync(transactionId)).ReturnsAsync(transaction);
-            userManagerMock.Setup(um => um.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new User());
-            userManagerMock.Setup(um => um.UpdateAsync(It.IsAny<User>())).ReturnsAsync(IdentityResult.Success);
+        // Act and Assert
+        await Assert.ThrowsAsync<InternalServerException>(() => walletServices.ApproveTransaction(transactionId));
+        appUnitOfWorkMock.Verify(uow => uow.TransactionRepo.Update(transaction), Times.Never);
+        appUnitOfWorkMock.Verify(uow => uow.SaveChangesAsync(), Times.Never);
+    }
 
-            // Act
-            await walletServices.ApproveTransaction(transactionId);
+    [Fact]
+    public async Task ApproveTransaction_WhenTransactionIsValid_ShouldUpdateTransactionAndSaveChanges()
+    {
+        // Arrange
+        var transactionId = 1;
+        var transaction = new Transaction { Id = transactionId, IsSuccess = false };
+        appUnitOfWorkMock.Setup(uow => uow.TransactionRepo.FindAsync(transactionId)).ReturnsAsync(transaction);
+        userManagerMock.Setup(um => um.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new User());
+        userManagerMock.Setup(um => um.UpdateAsync(It.IsAny<User>())).ReturnsAsync(IdentityResult.Success);
 
-            // Assert
-            appUnitOfWorkMock.Verify(uow => uow.TransactionRepo.Update(transaction), Times.Once);
-            appUnitOfWorkMock.Verify(uow => uow.SaveChangesAsync(), Times.Once);
-            userManagerMock.Verify(um => um.FindByIdAsync(It.IsAny<string>()), Times.Once);
-            userManagerMock.Verify(um => um.UpdateAsync(It.IsAny<User>()), Times.Once);
-            Assert.True(transaction.IsSuccess);
-        }
+        // Act
+        await walletServices.ApproveTransaction(transactionId);
 
-    
-    
+        // Assert
+        appUnitOfWorkMock.Verify(uow => uow.TransactionRepo.Update(transaction), Times.Once);
+        appUnitOfWorkMock.Verify(uow => uow.SaveChangesAsync(), Times.Once);
+        userManagerMock.Verify(um => um.FindByIdAsync(It.IsAny<string>()), Times.Once);
+        userManagerMock.Verify(um => um.UpdateAsync(It.IsAny<User>()), Times.Once);
+        Assert.True(transaction.IsSuccess);
+    }
+
+
     [Fact]
     public async Task GetBalance_ReturnsUserBalance()
     {
@@ -207,7 +212,7 @@ public class WalletServicesTests
         // Act and Assert
         await Assert.ThrowsAsync<NotFoundException>(() => walletServices.GetBalance(phoneNumber));
     }
-    
+
     [Fact]
     public async Task Withdraw_WhenBalanceIsSufficient_ShouldAddTransactionAndReduceBalance()
     {
@@ -249,50 +254,193 @@ public class WalletServicesTests
         userManagerMock.Verify(m => m.UpdateAsync(user), Times.Never);
     }
 
-        [Fact]
-        public async Task PayWithdraw_WhenTransactionIsNotWithdraw_ShouldThrowBadArgumentException()
+    [Fact]
+    public async Task PayWithdraw_WhenTransactionIsNotWithdraw_ShouldThrowBadArgumentException()
+    {
+        // Arrange
+        var transactionId = 1;
+        var transaction = new Transaction { Id = transactionId, IsWithdraw = false };
+        appUnitOfWorkMock.Setup(uow => uow.TransactionRepo.FindAsync(transactionId)).ReturnsAsync(transaction);
+
+        // Act and Assert
+        await Assert.ThrowsAsync<BadArgumentException>(() => walletServices.PayWithdraw(transactionId));
+        appUnitOfWorkMock.Verify(uow => uow.TransactionRepo.Update(transaction), Times.Never);
+        appUnitOfWorkMock.Verify(uow => uow.SaveChangesAsync(), Times.Never);
+    }
+
+    [Fact]
+    public async Task PayWithdraw_WhenTransactionIsAlreadyPaid_ShouldThrowBadArgumentException()
+    {
+        // Arrange
+        var transactionId = 1;
+        var transaction = new Transaction { Id = transactionId, IsWithdraw = true, IsPaid = true };
+        appUnitOfWorkMock.Setup(uow => uow.TransactionRepo.FindAsync(transactionId)).ReturnsAsync(transaction);
+
+        // Act and Assert
+        await Assert.ThrowsAsync<BadArgumentException>(() => walletServices.PayWithdraw(transactionId));
+        appUnitOfWorkMock.Verify(uow => uow.TransactionRepo.Update(transaction), Times.Never);
+        appUnitOfWorkMock.Verify(uow => uow.SaveChangesAsync(), Times.Never);
+    }
+
+    [Fact]
+    public async Task PayWithdraw_WhenTransactionIsValid_ShouldUpdateTransactionAndSaveChanges()
+    {
+        // Arrange
+        var transactionId = 1;
+        var transaction = new Transaction { Id = transactionId, IsWithdraw = true, IsPaid = false };
+        appUnitOfWorkMock.Setup(uow => uow.TransactionRepo.FindAsync(transactionId)).ReturnsAsync(transaction);
+
+        // Act
+        await walletServices.PayWithdraw(transactionId);
+
+        // Assert
+        appUnitOfWorkMock.Verify(uow => uow.TransactionRepo.Update(transaction), Times.Once);
+        appUnitOfWorkMock.Verify(uow => uow.SaveChangesAsync(), Times.Once);
+        Assert.True(transaction.IsPaid);
+    }
+
+    [Fact]
+    public async Task ApplyTransaction_TransactionExistsAndIsSuccessfulAndBalanceIsSufficient_UpdatesBalance()
+    {
+        // Arrange
+        var user = new User
         {
-            // Arrange
-            var transactionId = 1;
-            var transaction = new Transaction { Id = transactionId, IsWithdraw = false };
-            appUnitOfWorkMock.Setup(uow => uow.TransactionRepo.FindAsync(transactionId)).ReturnsAsync(transaction);
-
-            // Act and Assert
-            await Assert.ThrowsAsync<BadArgumentException>(() => walletServices.PayWithdraw(transactionId));
-            appUnitOfWorkMock.Verify(uow => uow.TransactionRepo.Update(transaction), Times.Never);
-            appUnitOfWorkMock.Verify(uow => uow.SaveChangesAsync(), Times.Never);
-        }
-
-        [Fact]
-        public async Task PayWithdraw_WhenTransactionIsAlreadyPaid_ShouldThrowBadArgumentException()
+            /* ...properties... */
+        };
+        var transaction = new Transaction
         {
-            // Arrange
-            var transactionId = 1;
-            var transaction = new Transaction { Id = transactionId, IsWithdraw = true, IsPaid = true };
-            appUnitOfWorkMock.Setup(uow => uow.TransactionRepo.FindAsync(transactionId)).ReturnsAsync(transaction);
+            /* ...properties... */
+        };
+        // Assume transaction is successful and balance is sufficient.
 
-            // Act and Assert
-            await Assert.ThrowsAsync<BadArgumentException>(() => walletServices.PayWithdraw(transactionId));
-            appUnitOfWorkMock.Verify(uow => uow.TransactionRepo.Update(transaction), Times.Never);
-            appUnitOfWorkMock.Verify(uow => uow.SaveChangesAsync(), Times.Never);
-        }
+        // Mock retrieval of the transaction with related user data
+        // Mock any user balance updates or other necessary interactions
 
-        [Fact]
-        public async Task PayWithdraw_WhenTransactionIsValid_ShouldUpdateTransactionAndSaveChanges()
+        // Act
+        // Call ApplyTransaction with transactionId
+
+        // Assert
+        // Verify user balance update
+        // Verify transaction was saved
+    }
+
+
+    [Fact]
+    public async Task GetWithdrawTransactions_OnlyReturnsWithdrawTransactions()
+    {
+        // Arrange
+        var transactions = new List<Transaction>
         {
-            // Arrange
-            var transactionId = 1;
-            var transaction = new Transaction { Id = transactionId, IsWithdraw = true, IsPaid = false };
-            appUnitOfWorkMock.Setup(uow => uow.TransactionRepo.FindAsync(transactionId)).ReturnsAsync(transaction);
+            // Simulate several transactions (some withdraw, some not)
+            new Transaction { IsWithdraw = true, /* Other properties */ },
+            new Transaction { IsWithdraw = false, /* Other properties */ },
+            // ... More test transactions
+        }.BuildMock();
+        appUnitOfWorkMock.Setup(u => u.TransactionRepo.AsQueryableNoTracking()).Returns(transactions);
 
-            // Act
-            await walletServices.PayWithdraw(transactionId);
+        // Act
+        var results = await walletServices.GetWithdrawTransactions();
 
-            // Assert
-            appUnitOfWorkMock.Verify(uow => uow.TransactionRepo.Update(transaction), Times.Once);
-            appUnitOfWorkMock.Verify(uow => uow.SaveChangesAsync(), Times.Once);
-            Assert.True(transaction.IsPaid);
-        }
+        // Assert
+        Assert.All(results, t => Assert.True(t.IsWithdraw));
+        // Add other assertions below to perform more detailed checking, such as transaction count, etc.
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task ApplyTransaction_SucceedsAndUpdatesBalance_WhenTransactionIsIncome(bool isSuccess)
+    {
+        // Arrange
+        int transactionId = 123;
+        decimal userBalance = 100M;
+        decimal transactionAmount = 50M;
+        bool isIncome = true;
+        var user = new User { Id = 1, Balance = userBalance };
+        var transaction = new Transaction
+        {
+            Id = transactionId,
+            UserId = user.Id,
+            Amount = transactionAmount,
+            IsIncome = isIncome,
+            IsSuccess = isSuccess,
+            User = user
+        };
+
+
+        appUnitOfWorkMock.Setup(u => u.TransactionRepo.AsQueryable())
+            .Returns(new List<Transaction>() { transaction }.BuildMock());
+        appUnitOfWorkMock.Setup(u => u.UserRepo.Update(user));
         
 
+
+        // Act
+        await walletServices.ApplyTransaction(transactionId);
+
+        // Assert
+        appUnitOfWorkMock.Verify(u => u.SaveChangesAsync(), isSuccess ? Times.Once : Times.Never);
+        appUnitOfWorkMock.Verify(m => m.UserRepo.Update(It.Is<User>(u => u.Balance == userBalance + transactionAmount)),
+            isSuccess ? Times.Once : Times.Never);
+    }
+    private void ArrangeTransactionsForMonth(DateTime date, int count)
+    {
+        var firstDayOfMonth = new DateTime(date.Year, date.Month, 1);
+        var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddTicks(-1);
+
+        var transactions = Enumerable.Range(1, count)
+            .Select(n => new Transaction
+            {
+                Date = new DateTime(date.Year, date.Month, n % 28 + 1) // to keep the date within the month
+            })
+            .BuildMock();
+        
+        appUnitOfWorkMock.Setup(u => u.TransactionRepo.AsQueryableNoTracking()).Returns(transactions);
+    }
+
+    [Fact]
+    public async Task GetCountTransactionsOfMonth_ReturnsCorrectCount()
+    {
+        // Arrange
+        var targetDate = new DateTime(2023, 3, 1);
+        int expectedCount = 10;
+        ArrangeTransactionsForMonth(targetDate, expectedCount);
+
+        // Act
+        var result = await walletServices.GetCountTransactionsOfMonth(targetDate);
+
+        // Assert
+        Assert.Equal(expectedCount, result.Count);
+        Assert.Equal("اسفند", result.Month);
+    }
+    
+    private void ArrangeTransactionsAmountForMonth(DateTime date, int count, decimal amount)
+    {
+        var transactions = Enumerable.Range(1, count)
+            .Select(n => new Transaction
+            {
+                Date = new DateTime(date.Year, date.Month, n % 28 + 1), // within the month
+                Amount = amount
+            })
+            .BuildMock();
+        
+        appUnitOfWorkMock.Setup(u => u.TransactionRepo.AsQueryableNoTracking()).Returns(transactions);
+    }
+
+    [Fact]
+    public async Task GetAmountTransactionsOfMonth_ReturnsCorrectAmount()
+    {
+        // Arrange
+        var targetDate = new DateTime(2023, 3, 1);
+        var transactionCount = 5;
+        var transactionAmount = 100.00m;
+        var expectedTotalAmount = transactionCount * transactionAmount;
+        ArrangeTransactionsAmountForMonth(targetDate, transactionCount, transactionAmount);
+
+        // Act
+        var result = await walletServices.GetAmountTransactionsOfMonth(targetDate, null); // Assuming no userId filter is needed for the test
+
+        // Assert
+        Assert.Equal(expectedTotalAmount, result.Amount);
+        Assert.Equal("اسفند", result.Month);
+    }
 }

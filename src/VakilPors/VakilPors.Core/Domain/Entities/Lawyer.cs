@@ -15,15 +15,13 @@ namespace VakilPors.Core.Domain.Entities
         [Key]
         public int Id { get; set; }
         public double Rating { get; set; }=0d;
-        public string ParvandeNo { get; set; }
-        public bool IsAuthorized { get; set; } = false;
         public string ProfileImageUrl { get; set; }
         public string Title { get; set; }
         public string City { get; set; }
-        [ValueRange(1,3)]
-        public byte Grade { get; set; }
         [StringLength(5)]
         public string LicenseNumber  { get; set; }
+        [StringLength(10)]
+        public string NationalCode  { get; set; }
         public string MemberOf { get; set; }
         public int YearsOfExperience { get; set; }
         public string OfficeAddress { get; set; }
@@ -38,16 +36,13 @@ namespace VakilPors.Core.Domain.Entities
         public string ProfileBackgroundPictureUrl {get; set; }
         public int NumberOfRates { get; set; } 
         public string Gender { get; set; }
-        public int NumbereOfConsulations { get; set; } 
-        public int NumberOfAnswers { get; set; } 
-        public int NumberOfLikes { get; set; } 
-        public int NumberOfVerifies { get; set; } 
-        public List<string> RatesList { get; set; }
-
         public int Tokens { get; set; }
-        public bool IsVerified { get; set; }
-
+        public bool IsVerified { get; set; } = false;
         public string NationalCardImageUrl { get; set; } 
         public virtual ICollection<DocumentAccess> DocumentAccesses { get; set; }
+        public virtual ICollection<Event> Events { get; set; }
+        public string PremiumPlan { get; set; } = "Free";
+        public DateTime ExpireDate { get; set; } = DateTime.MaxValue;
+        public int PremiumRemainingDays { get { return (ExpireDate - DateTime.Now).Days; } }
     }
 }

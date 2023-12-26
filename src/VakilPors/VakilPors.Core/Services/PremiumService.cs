@@ -16,6 +16,7 @@ using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
 using VakilPors.Core.Domain.Dtos.Premium;
 using VakilPors.Core.Services;
+using Pagination.EntityFrameworkCore.Extensions;
 
 namespace VakilPors.Core.Services
 {
@@ -38,32 +39,45 @@ namespace VakilPors.Core.Services
         public async Task<Subscribed> ActivatePremium(string premium, int user_id)
         {
             var row = _appUnitOfWork.SubscribedRepo.AsQueryable().Where(x => x.UserId == user_id).First();
+            var user = _appUnitOfWork.UserRepo.AsQueryable().Where(x=> x.Id == user_id).First();
+            bool vakilpremium = false;
+            if(user.LawyerId != 0) { vakilpremium = true; }
             if (row == null)
                 throw new BadArgumentException("Subscription Not Found");
+            var expdate = DateTime.Now;
             switch (premium)
             {
                 case "gold":
                     row.PremiumID = 3;
                     await TransactUser("gold", user_id, 50000, "طلایی");
-                    row.ExpireDate = DateTime.Now.AddDays(90);
+                    expdate = DateTime.Now.AddDays(90);
+                    row.ExpireDate = expdate;
                     break;
                 case "silver":
                     row.PremiumID = 2;
                     await TransactUser("silver", user_id, 30000, "نقره ای");
-                    row.ExpireDate = DateTime.Now.AddDays(60);
+                    expdate = DateTime.Now.AddDays(60);
+                    row.ExpireDate = expdate;
                     break;
                 case "bronze":
-                    await TransactUser("bronze", user_id, 20000, "برنزی");
-                    row.ExpireDate = DateTime.Now.AddDays(30);
                     row.PremiumID = 1;
+                    await TransactUser("bronze", user_id, 20000, "برنزی");
+                    expdate = DateTime.Now.AddDays(30);
+                    row.ExpireDate = expdate;
                     break;
+            }
+            if (vakilpremium)
+            {
+                var lawyer = _appUnitOfWork.LawyerRepo.AsQueryable().Where(x => x.UserId == user_id).FirstOrDefault();
+                lawyer.PremiumPlan = premium;
+                lawyer.ExpireDate = expdate;
             }
             await _appUnitOfWork.SaveChangesAsync();
             return row;
 
         }
 
-        private async Task TransactUser(string v, int user_id, int amount, string baste)
+        public async Task TransactUser(string v, int user_id, int amount, string baste)
         {
             var user = await _appUnitOfWork.UserRepo.FindAsync(user_id);
             await _walletservice.AddTransaction(user_id, amount, $"خرید بسته {baste}", " ", true, false);
@@ -72,10 +86,7 @@ namespace VakilPors.Core.Services
 
         public async Task DeactivatePremium(int user_id)
         {
-            //var subscribed = await _appUnitOfWork.SubscribedRepo.FindAsync(user_id);
-            //subscribed.ExpireDate = DateTime.Now;
-            //_appUnitOfWork.SubscribedRepo.Update(subscribed);
-            //await _appUnitOfWork.SaveChangesAsync();    
+             
             var sub = await _appUnitOfWork.SubscribedRepo.AsQueryable().Where(x => x.UserId == user_id).FirstAsync();
             if (sub == null)
                 throw new BadArgumentException("Subscription Not Found");
@@ -107,5 +118,18 @@ namespace VakilPors.Core.Services
 
             return isPremium;
         }
+        public async Task<Pagination<Subscribed>> GetAllSubscriptionStatus(PagedParams pagedParams, SortParams sortParams)
+        {
+            var all_subs = _appUnitOfWork.SubscribedRepo.AsQueryable().Include(x => x.User).Where(x => x.PremiumID > 1);
+            return await all_subs.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize);
+
+        }
+        public async Task<Pagination<Subscribed>> GetAllSubscribedLawyersStatus(PagedParams pagedParams, SortParams sortParams)
+        {
+            var all_lawyersubs = _appUnitOfWork.SubscribedRepo.AsQueryable().Include(x => x.User).Where(x => x.PremiumID > 1 && x.User.LawyerId != 0);
+            //var all_lawyersubs = _appUnitOfWork.LawyerRepo.AsQueryable().Where(x => x.PremiumPlan != "Free");
+            return await all_lawyersubs.AsPaginationAsync(pagedParams.PageNumber, pagedParams.PageSize);
+        }
     }
+
 }

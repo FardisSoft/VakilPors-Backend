@@ -1,6 +1,8 @@
 ﻿
 
+using Pagination.EntityFrameworkCore.Extensions;
 using VakilPors.Core.Domain.Dtos;
+using VakilPors.Core.Domain.Dtos.Params;
 using VakilPors.Core.Services;
 using VakilPors.Shared.Services;
 
@@ -11,7 +13,7 @@ public interface IThreadCommentService : IScopedDependency
     Task<ThreadCommentDto> CreateComment(int userId, ThreadCommentDto commentDto,AntiSpamService antispam = null);
     Task<ThreadCommentDto> UpdateComment(int userId, ThreadCommentDto commentDto);
     Task<bool> DeleteComment(int userId, int commentId);
-    Task<List<ThreadCommentDto>> GetCommentsForThread(int userId, int threadId);
+    Task<Pagination<ThreadCommentDto>> GetCommentsForThread(int userId, int threadId,PagedParams pagedParams);
     Task<ThreadCommentDto> GetCommentById(int userId, int commentId);
     Task<int> GetCommentCountForThread(int threadId);
     Task<int> LikeComment(int userId, int commentId);

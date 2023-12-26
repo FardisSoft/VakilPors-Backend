@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Bogus;
+using Bogus.DataSets;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using VakilPors.Core.Domain.Entities;
@@ -59,7 +60,7 @@ namespace VakilPors.Data.Seeder
             }
             modelBuilder.Entity<Role>().HasData(roles);
         }
-        public const int countUsers = 30;
+        public const int countUsers = 400;
         public const int countTrans = 200;
         public const int startUserId = 100;
         public static IEnumerable<Transaction> seedTransactions()
@@ -84,7 +85,7 @@ namespace VakilPors.Data.Seeder
             // long phoneNumber=09116863557;
             const int startSubscribedId = 1;
             int subscribedId = startSubscribedId;
-            var fakerUser = new Faker<User>()
+            var fakerUser = new Faker<User>("fa")
             .RuleFor(u => u.Id, f => uid++)
             .RuleFor(u => u.ConcurrencyStamp, f => f.Random.Guid().ToString())
             .RuleFor(u => u.Name, f => f.Person.FullName)
@@ -152,10 +153,22 @@ namespace VakilPors.Data.Seeder
             }
             int vid_index = 0;
             // int vid = 1001;
-            var fakerLawyer = new Faker<Lawyer>()
+            var types =new [] {"جنایی","حقوقی","انتخابی","معاضدتی","سازمانی","تسخیری" };
+            var fakerLawyer = new Faker<Lawyer>("fa")
                 .RuleFor(l => l.UserId, f => ids[vid_index++])
-                .RuleFor(l => l.ParvandeNo, f => f.Random.Int(10000, 99999).ToString());
-
+                .RuleFor(l => l.LicenseNumber, f => f.Random.Int(10000, 99999).ToString())
+                .RuleFor(l => l.City, f => f.Address.City())
+                .RuleFor(l => l.Title, f => f.PickRandom(types))
+                .RuleFor(l => l.AboutMe, f => f.Lorem.Paragraph())
+                .RuleFor(l => l.YearsOfExperience, f => f.Random.Int(1, 10))
+                .RuleFor(l => l.OfficeAddress, f => f.Address.FullAddress())
+                .RuleFor(l => l.Specialties, f => f.Lorem.Sentence())
+                .RuleFor(l => l.MemberOf, f => f.Lorem.Word())
+                .RuleFor(l => l.Gender, f => f.Person.Gender==Name.Gender.Male?"مذکر":"مونث")
+                .RuleFor(l => l.ProfileImageUrl, (f, l) => $"https://i.pravatar.cc/150?u={l.UserId}");
+            var fakerPerson = new Faker<Person>("fa")
+                .RuleFor(n => n.FullName, f => f.Person.FullName)
+                .RuleFor(n => n.Gender, f=>f.Person.Gender==Name.Gender.Male?"مذکر":"مونث");
             var lawyers = fakerLawyer.Generate(countUserslocal);
             await context.Set<Lawyer>().AddRangeAsync(lawyers);
             await context.SaveChangesAsync();
@@ -163,11 +176,23 @@ namespace VakilPors.Data.Seeder
             {
                 var user = await context.Users.FindAsync(lawyer.UserId);
                 user.LawyerId = lawyer.Id;
+                Person person;
+                do
+                {
+                    person = fakerPerson.Generate();
+                } while (person.Gender != lawyer.Gender);
+                user.Name = person.FullName;
                 context.Update(user);
             }
             await context.SaveChangesAsync();
             // userManager.Dispose();
             // modelBuilder.Entity<Lawyer>().HasData(fakerLawyer.Generate(countUsers));
+        }
+
+        class Person
+        {
+            public string FullName { get; set; }
+            public string Gender { get; set; }
         }
     }
 }

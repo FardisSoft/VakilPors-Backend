@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.User;
 using VakilPors.Shared.Response;
-using VakilPors.Web.Controllers;
 
 namespace VakilPors.Api.Controllers;
 
@@ -48,6 +47,6 @@ public class CustomerController : MyControllerBase
     [HttpGet]
     [Authorize]
     public async Task<IActionResult> GetCurrentUser()
-       => await GetUserById(getUserId());
+       => await GetUserById(GetUserId());
 }
 

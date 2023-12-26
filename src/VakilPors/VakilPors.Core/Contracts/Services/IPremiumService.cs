@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Pagination.EntityFrameworkCore.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VakilPors.Core.Domain.Dtos.Params;
 using VakilPors.Core.Domain.Dtos.Premium;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Shared.Services;
@@ -17,5 +19,8 @@ namespace VakilPors.Core.Contracts.Services
         Task UpdatePlan(SubscribedDto subscribedDto);
 
         Task<bool> DoseUserHaveAnyActiveSubscription(int userId);
+        Task<Pagination<Subscribed>> GetAllSubscriptionStatus(PagedParams pagedParams, SortParams sortParams);
+        Task<Pagination<Subscribed>> GetAllSubscribedLawyersStatus(PagedParams pagedParams, SortParams sortParams);
+
     }
 }

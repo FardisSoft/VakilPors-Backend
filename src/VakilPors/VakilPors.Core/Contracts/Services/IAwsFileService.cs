@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using VakilPors.Core.Domain.Dtos.File;
 using VakilPors.Shared.Services;
 
 namespace VakilPors.Core.Contracts.Services
@@ -11,6 +12,7 @@ namespace VakilPors.Core.Contracts.Services
     public interface IAwsFileService : IScopedDependency    
     {
         Task<string> UploadAsync(IFormFile file);
+        Task<FileDto> UploadFileMessageAsync(IFormFile file);
 
         Task<Stream> DownloadAsync(string key);
 

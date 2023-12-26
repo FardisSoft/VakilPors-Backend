@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<RunSettings>
+    <DataCollectionRunSettings>
+        <DataCollectors>
+            <DataCollector friendlyName="XPlat code coverage">
+                <Configuration>
+                    <CollectCoverage>true</CollectCoverage>
+                    <CollectOutput>TestResults/</CollectOutput>
+                    <Format>opencover</Format>
+<!--                    <Format>json,cobertura,lcov,teamcity,opencover</Format>-->
+                    <ExcludeByAttribute>Obsolete,GeneratedCodeAttribute,CompilerGeneratedAttribute</ExcludeByAttribute>
+                    <ExcludeByFile>**/VakilPors.Data/**/*.cs,**/VakilPors.Shared/**/*.cs,**/VakilPors.Web/Configuration/**/*.cs,**/VakilPors.Web/Program.cs,**/VakilPors.Core/Authentication/**/*.cs,**/VakilPors.Core/Contracts/**/*.cs,**/VakilPors.Core/Domain/**/*.cs,**/VakilPors.Core/Exceptions/**/*.cs,**/VakilPors.Core/Hubs/**/*.cs,**/VakilPors.Core/Mapper/**/*.cs</ExcludeByFile> <!-- Globbing filter -->
+                    <IncludeDirectory>**/VakilPors.Web/Controllers,**/VakilPors.Core/Services</IncludeDirectory>
+<!--                    <SingleHit>false</SingleHit>-->
+<!--                    <UseSourceLink>true</UseSourceLink>-->
+                    <IncludeTestAssembly>true</IncludeTestAssembly>
+                    <SkipAutoProps>true</SkipAutoProps>
+<!--                    <DeterministicReport>false</DeterministicReport>-->
+                    <ExcludeAssembliesWithoutSources>MissingAll,MissingAny,None</ExcludeAssembliesWithoutSources>
+                </Configuration>
+            </DataCollector>
+        </DataCollectors>
+    </DataCollectionRunSettings>
+</RunSettings>
