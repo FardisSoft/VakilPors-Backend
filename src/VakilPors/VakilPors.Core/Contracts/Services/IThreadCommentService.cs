@@ -3,6 +3,7 @@
 using Pagination.EntityFrameworkCore.Extensions;
 using VakilPors.Core.Domain.Dtos;
 using VakilPors.Core.Domain.Dtos.Params;
+using VakilPors.Core.Services;
 using VakilPors.Shared.Services;
 
 namespace VakilPors.Core.Contracts.Services;
