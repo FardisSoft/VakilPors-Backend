@@ -46,7 +46,7 @@ public class ThreadCommentControllerTests
         // Arrange
         var commentDto = new ThreadCommentDto { /* ... Properties setup ... */ };
         var serviceResult = new ThreadCommentDto(){ /* ... Properties setup ... */ };
-        _mockThreadCommentService.Setup(s => s.CreateComment(_userId, commentDto , null))
+        _mockThreadCommentService.Setup(s => s.CreateComment(_userId, commentDto))
             .ReturnsAsync(serviceResult);
         
         // Act

@@ -522,13 +522,44 @@ public class ThreadServicesTests{
     }
 
     // [Fact]
-    // public async Task<Pagination<ForumThread>> SearchThread(string title , PagedParams pagedParams, SortParams sortParam, int userid)
+    // public async Task SearchThread_WithTitle_ReturnsPaginatedThreads()
+    // {
+    //     // Arrange
+    //     var title = "test title";
+    //     var pagedParams = new PagedParams { PageNumber = 1, PageSize = 10 };
+    //     var sortParams = new SortParams(); // assuming SortParams has default or can be omitted
+    //     var userId = 1;
+    //     // var threads = new List<ForumThread>
+    //     // {
+    //     //     new ForumThread { Title = "test title", Description = "description", LikeCount = 5, CreateDate = DateTime.UtcNow },
+    //     //     // ... add more threads to test different cases
+    //     // };
+    //     // var queryableThreads = threads.AsQueryable();
 
-    // public async Task SearchThread(){
-        
-    //     var u = new List<ForumThread>{thread};
-    //     var submock =u.BuildMock();
-    //     _forumThreadRepo.Setup(urm => urm.AsQueryable()).Returns(submock);
+    //     var threads = new List<ForumThread>
+    //     {
+    //         new ForumThread { Id = 0, LikeCount = 0,
+    //         UserLikes = new List<UserThreadLike>{ new UserThreadLike{ UserId=userId , ThreadId = 0 } }
+    //         }
+    //     };//.AsQueryable();
+    //     var threadmock = threads.AsQueryable().BuildMock();
+    //     _uow.Setup(uow => uow.ForumThreadRepo.AsQueryable()).Returns(threadmock);
+    //     // var mockSet = new Mock<DbSet<ForumThread>>();
+    //     // mockSet.As<IQueryable<ForumThread>>().Setup(m => m.Provider).Returns(queryableThreads.Provider);
+    //     // mockSet.As<IQueryable<ForumThread>>().Setup(m => m.Expression).Returns(queryableThreads.Expression);
+    //     // mockSet.As<IQueryable<ForumThread>>().Setup(m => m.ElementType).Returns(queryableThreads.ElementType);
+    //     // mockSet.As<IQueryable<ForumThread>>().Setup(m => m.GetEnumerator()).Returns(queryableThreads.GetEnumerator());
+    //     // _uow.Setup(uow => uow.ForumThreadRepo.AsQueryable()).Returns(mockSet.Object);
 
+
+    //     // Act
+    //     var result = await threadservice.SearchThread(title, pagedParams, sortParams, userId);
+
+    //     // Assert
+    //     Assert.NotNull(result);
+    //     // Assert.IsType<Pagination<ForumThread>>(result);
+    //     // Assert.True(result.Items.Any());
+    //     // Assert.All(result.Items, item => Assert.True(item.Title.Contains(title) item.Description.Contains(title)));
+    //     // ...additional assertions based on your paging logic
     // }
 }

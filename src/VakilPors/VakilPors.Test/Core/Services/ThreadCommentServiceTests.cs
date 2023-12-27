@@ -27,13 +27,14 @@ namespace VakilPors.Test.Core.Services
 
         public ThreadCommentServiceTests()
         {
+            antispammock = new Mock<IAntiSpam>();
             appUnitOfWorkmock = new Mock<IAppUnitOfWork>();
             mappermock = new Mock<IMapper>();
             lawyerservicesmock = new Mock<ILawyerServices>();
             premiumservicemock = new Mock<IPremiumService>();
             threadCommentService = new ThreadCommentService
                 (
-                appUnitOfWorkmock.Object, mappermock.Object, lawyerservicesmock.Object, premiumservicemock.Object
+                appUnitOfWorkmock.Object, mappermock.Object, lawyerservicesmock.Object, premiumservicemock.Object,antispammock.Object
                 );
         }
 
@@ -49,7 +50,6 @@ namespace VakilPors.Test.Core.Services
             };
             var mock = threadComments.BuildMock();
             //var antspm = new Mock<IAntiSpam>();
-            antispammock = new Mock<IAntiSpam>();
             IEnumerable<Lawyer> lawyers = new List<Lawyer>()
             {
                 new Lawyer()
@@ -98,7 +98,6 @@ namespace VakilPors.Test.Core.Services
             //Arrange 
             var userid = 1;
             var threadcommentdto = new ThreadCommentDto() { Text = "@alireza" };
-            antispammock = new Mock<IAntiSpam>();
             antispammock.Setup(u => u.IsSpam(threadcommentdto.Text)).ReturnsAsync("This message is detected as a spam and can not be shown.");
 
             //Act & Assert

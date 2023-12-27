@@ -12,9 +12,9 @@ using Microsoft.Extensions.Logging;
 
 namespace VakilPors.Core.Services
 {
-    public class EmailSender : IEmailSender //, IDisposable
+    public class EmailService : IEmailSender , IDisposable
     {
-        private readonly ILogger<EmailSender> _logger;
+        private readonly ILogger<EmailService> _logger;
         private string _fromName;
         private string _fromEmail;
         private string _host;
@@ -26,7 +26,7 @@ namespace VakilPors.Core.Services
         private SmtpClient _client;
 
 
-        public EmailSender(IConfiguration configuration, ILogger<EmailSender> logger , MimeMessage message =null , SmtpClient client= null )
+        public EmailService(IConfiguration configuration, ILogger<EmailService> logger , MimeMessage message , SmtpClient client )
         {
             _fromName = Environment.GetEnvironmentVariable("EMAIL_NAME") ?? Environment.GetEnvironmentVariable("EMAIL_NAME", EnvironmentVariableTarget.User) ?? configuration["Email:Name"];
             _fromEmail = Environment.GetEnvironmentVariable("EMAIL_FROM") ?? Environment.GetEnvironmentVariable("EMAIL_FROM", EnvironmentVariableTarget.User) ?? configuration["Email:From"];
@@ -36,8 +36,8 @@ namespace VakilPors.Core.Services
             _password = Environment.GetEnvironmentVariable("EMAIL_PASSWORD") ?? Environment.GetEnvironmentVariable("EMAIL_PASSWORD", EnvironmentVariableTarget.User) ?? configuration["Email:Password"];
             _useSSL = Convert.ToBoolean(Environment.GetEnvironmentVariable("EMAIL_USESSL") ?? Environment.GetEnvironmentVariable("EMAIL_USESSL", EnvironmentVariableTarget.User) ?? configuration["Email:UseSSL"]);
             this._logger = logger;
-            _message = message ?? new MimeMessage();
-            _client = client ?? new SmtpClient();
+            _message = message;
+            _client = client;
         }
 
         public async Task SendEmailAsync(string email, string name, string subject, string htmlMessage, bool useHtml = true)

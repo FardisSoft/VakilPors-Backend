@@ -18,21 +18,22 @@ public class ThreadCommentService : IThreadCommentService
     private readonly IMapper _mapper;
     private readonly ILawyerServices _lawyerServices;
     private readonly IPremiumService _premiumService;
+    private readonly IAntiSpam _antiSpam;
 
-    public ThreadCommentService(IAppUnitOfWork uow, IMapper mapper, ILawyerServices lawyerServices, IPremiumService premiumService)
+    public ThreadCommentService(IAppUnitOfWork uow, IMapper mapper, ILawyerServices lawyerServices, IPremiumService premiumService , IAntiSpam antiSpam)
     {
         _uow = uow;
         _mapper = mapper;
         _lawyerServices = lawyerServices;
         _premiumService = premiumService;
+        _antiSpam = antiSpam;
     }
 
 
-    public async Task<ThreadCommentDto> CreateComment(int userId, ThreadCommentDto commentDto,AntiSpamService antispam = null)
+    public async Task<ThreadCommentDto> CreateComment(int userId, ThreadCommentDto commentDto)
     {
         var check_2minutes = await CheckWithin2Minutes(userId, commentDto);
-        var anti_spam = antispam ?? new AntiSpamService();
-        var result = await anti_spam.IsSpam(commentDto.Text);
+        var result = await _antiSpam.IsSpam(commentDto.Text);
         if (result == "This message is detected as a spam and can not be shown.")
         {
             throw new BadArgumentException(result);
@@ -87,8 +88,7 @@ public class ThreadCommentService : IThreadCommentService
 
     public async Task<ThreadCommentDto> UpdateComment(int userId, ThreadCommentDto commentDto)
     {
-        var anti_spam = new AntiSpamService();
-        var result = await anti_spam.IsSpam(commentDto.Text);
+        var result = await _antiSpam.IsSpam(commentDto.Text);
         if (result == "This message is detected as a spam and can not be shown.")
         {
             throw new BadArgumentException(result);
