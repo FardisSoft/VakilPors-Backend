@@ -11,6 +11,7 @@ using VakilPors.Contracts.UnitOfWork;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Case;
 using VakilPors.Core.Domain.Dtos.Lawyer;
+using VakilPors.Core.Domain.Dtos.User;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Exceptions;
 using VakilPors.Core.Services;
@@ -291,6 +292,27 @@ namespace VakilPors.Test.Core.Services
             //Assert 
             Assert.Equal(documentAccesses.First().DocumentStatus, docdto.DocumentStatus);
 
+
+        }
+
+        [Fact]
+        public async Task GetUsersThatLawyerHasAccessToTheirDocuments()
+        {
+            //Arrnage 
+            var lawyeruserid = 1;
+            UserDto userDto = new UserDto();
+            User user = new User { Id = 1};
+            List<DocumentAccess> accesss = new List<DocumentAccess> { new DocumentAccess { LawyerId = 1 } , new DocumentAccess() };
+            IEnumerable<LegalDocument> legalDocuments = new List<LegalDocument>
+            {
+                new LegalDocument { User = user , Accesses = accesss }
+            };
+            var mock = legalDocuments.AsQueryable().BuildMock();
+            _appUnitOfWorkMock.Setup(x => x.DocumentRepo.AsQueryable()).Returns(mock);
+            _premiumservice.Setup(x => x.DoseUserHaveAnyActiveSubscription(1)).ReturnsAsync(true);
+
+            //Act and Assert
+            var result = legalDocumentService.GetUsersThatLawyerHasAccessToTheirDocuments(lawyeruserid);
 
         }
     }
