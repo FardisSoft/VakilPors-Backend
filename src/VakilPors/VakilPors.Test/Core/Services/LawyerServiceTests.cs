@@ -481,5 +481,41 @@ namespace VakilPors.Test.Core.Services
             //Act 
             var result = await lawyerServices.GetLawyerById(id);
         }
+
+        [Fact]
+        public async Task GetLawyerCityCounts()
+        {
+            //Arrange 
+            IEnumerable<Lawyer> _lawyers = new List<Lawyer>()
+            {
+                new Lawyer{Id = 1 , City = "Tehran"},
+                new Lawyer{Id = 2 , City = "Tehran"},
+                new Lawyer{Id = 3},
+                new Lawyer{ User = new User() , Id = 4}
+            };
+            IQueryable<Lawyer> lawyers = _lawyers.AsQueryable();
+            var _mock = lawyers.BuildMock();
+            appUnitOfWorkMock.Setup(x => x.LawyerRepo.AsQueryableNoTracking()).Returns(_mock);
+            //Act 
+            var result = await lawyerServices.GetLawyerCityCounts();
+        }
+
+        [Fact]
+        public async Task GetLawyerTitleCounts()
+        {
+            //Arrange 
+            IEnumerable<Lawyer> _lawyers = new List<Lawyer>()
+            {
+                new Lawyer{Id = 1 , City = "Tehran" , Title = "sample"},
+                new Lawyer{Id = 2 , City = "Tehran" , Title = "sample"},
+                new Lawyer{Id = 3},
+                new Lawyer{ User = new User() , Id = 4}
+            };
+            IQueryable<Lawyer> lawyers = _lawyers.AsQueryable();
+            var _mock = lawyers.BuildMock();
+            appUnitOfWorkMock.Setup(x => x.LawyerRepo.AsQueryableNoTracking()).Returns(_mock);
+            //Act 
+            var result = await lawyerServices.GetLawyerTitleCounts();
+        }
     }
 }
