@@ -46,7 +46,7 @@ public class ThreadServicesTests{
 
         threadservice = new ThreadService(_uow.Object , _mapper.Object 
         , _threadCommentService.Object ,_lawyerServices.Object , _premiumService.Object 
-        , _telegramService.Object , _emailSender.Object,_antiSpam.Object);
+        , _telegramService.Object , _emailSender.Object);//,_antiSpam.Object);
         _threadDto = new Mock<ThreadDto>();
 
         _userRepoMock= new Mock<IGenericRepo<User>>();
@@ -62,7 +62,7 @@ public class ThreadServicesTests{
         _antiSpam.Setup(sp => sp.IsSpam(_threadDto.Object.Description)).ReturnsAsync("This message is detected as a spam and can not be shown.");// inja ke log ya kar ezafe nemikone bekhatere parameter exception
         _uow.Setup(uow => uow.UserRepo.FindAsync(It.IsAny<int>)).ReturnsAsync((int userId) => null);
 
-        await Assert.ThrowsAsync<BadArgumentException>(() => threadservice.CreateThread(It.IsAny<int>() , _threadDto.Object));
+        await Assert.ThrowsAsync<BadArgumentException>(() => threadservice.CreateThread(It.IsAny<int>() , _threadDto.Object,_antiSpam.Object));
     }
     [Fact]
     public async void CreateThread_TitleMustSpam_ThrowBadArgumentException(){
@@ -72,7 +72,7 @@ public class ThreadServicesTests{
         _antiSpam.Setup(sp => sp.IsSpam(_threadDto.Object.Title)).ReturnsAsync("This message is detected as a spam and can not be shown.");// inja ke log ya kar ezafe nemikone bekhatere parameter exception
         _uow.Setup(uow => uow.UserRepo.FindAsync(It.IsAny<int>)).ReturnsAsync((int userId) => null);
 
-        await Assert.ThrowsAsync<BadArgumentException>(() => threadservice.CreateThread(It.IsAny<int>() , _threadDto.Object ));
+        await Assert.ThrowsAsync<BadArgumentException>(() => threadservice.CreateThread(It.IsAny<int>() , _threadDto.Object ,_antiSpam.Object));
     }
     [Fact]
     public async void CreateThread_FailSaveChangesAsync_ThrowException(){        
@@ -82,7 +82,7 @@ public class ThreadServicesTests{
         //This will mark the call as verifiable but not actually invoke it.
 
         _uow.Setup(sca => sca.SaveChangesAsync()).ReturnsAsync(0);
-        await Assert.ThrowsAsync<Exception>(() => threadservice.CreateThread(It.IsAny<int>() , _threadDto.Object));
+        await Assert.ThrowsAsync<Exception>(() => threadservice.CreateThread(It.IsAny<int>() , _threadDto.Object,_antiSpam.Object));
     }
     // [Fact(Skip = "first must complete GetThreadWithComments function")]
     [Fact]
@@ -118,7 +118,7 @@ public class ThreadServicesTests{
         _telegramService.Setup(ts => ts.SendToTelegram(It.IsAny<string>(),user.Telegram)).Returns(Task.CompletedTask);
         
 
-        await threadservice.CreateThread(It.IsAny<int>() , _threadDto.Object);
+        await threadservice.CreateThread(It.IsAny<int>() , _threadDto.Object,_antiSpam.Object);
 
         _uow.Verify(o => o.ForumThreadRepo.AddAsync(It.IsAny<ForumThread>()));
         _emailSender.Verify(client => client.SendEmailAsync(It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>(),It.IsAny<string>(),true),Times.Once);//(It.IsAny<MimeMessage>(),It.IsAny<CancellationToken>() ,It.IsAny<ITransferProgress>()));
@@ -165,7 +165,7 @@ public class ThreadServicesTests{
 		_threadDto.Object.Description="Description";
 		_antiSpam.Setup(sp => sp.IsSpam(_threadDto.Object.Description)).ReturnsAsync("This message is detected as a spam and can not be shown.");
 		
-		await Assert.ThrowsAsync<BadArgumentException>(() => threadservice.UpdateThread(It.IsAny<int>() , _threadDto.Object));
+		await Assert.ThrowsAsync<BadArgumentException>(() => threadservice.UpdateThread(It.IsAny<int>() , _threadDto.Object,_antiSpam.Object));
 		
 	}
 	[Fact]
@@ -175,7 +175,7 @@ public class ThreadServicesTests{
 		_antiSpam.Setup(sp => sp.IsSpam(_threadDto.Object.Description)).Verifiable();
 		_uow.Setup(uow => uow.ForumThreadRepo.FindAsync(_threadDto.Object.Id)).ReturnsAsync((int id ) => null);
 		
-		await Assert.ThrowsAsync<BadArgumentException>(() => threadservice.UpdateThread(It.IsAny<int>() , _threadDto.Object));
+		await Assert.ThrowsAsync<BadArgumentException>(() => threadservice.UpdateThread(It.IsAny<int>() , _threadDto.Object,_antiSpam.Object));
 		
 		
 	}
@@ -189,7 +189,7 @@ public class ThreadServicesTests{
 		_uow.Setup(uow => uow.ForumThreadRepo.FindAsync(_threadDto.Object.Id)).ReturnsAsync(new ForumThread{Id = user_id_input +1});
 
 
-		await Assert.ThrowsAsync<AccessViolationException>(() => threadservice.UpdateThread(user_id_input , _threadDto.Object));
+		await Assert.ThrowsAsync<AccessViolationException>(() => threadservice.UpdateThread(user_id_input , _threadDto.Object,_antiSpam.Object));
     }
     [Fact]
     public async void UpdateThread_FailedToSaveChangesThread_ThrowException(){
@@ -204,7 +204,7 @@ public class ThreadServicesTests{
         _uow.Setup(uow => uow.ForumThreadRepo.Update(It.IsAny<ForumThread>())).Verifiable();
         _uow.Setup(sca => sca.SaveChangesAsync()).ReturnsAsync(0);
 
-		await Assert.ThrowsAsync<Exception>(() => threadservice.UpdateThread(user_id_input , _threadDto.Object));
+		await Assert.ThrowsAsync<Exception>(() => threadservice.UpdateThread(user_id_input , _threadDto.Object,_antiSpam.Object));
     }
     [Fact]
     public async void UpdateThread_UpdateThread_ReturnThreadDto(){
@@ -236,7 +236,7 @@ public class ThreadServicesTests{
         _uow.Setup(uow => uow.ForumThreadRepo.Update(It.IsAny<ForumThread>())).Verifiable();
         _uow.Setup(sca => sca.SaveChangesAsync()).ReturnsAsync(1);
 
-		ThreadDto result = await threadservice.UpdateThread(user_id_input , _threadDto.Object);
+		ThreadDto result = await threadservice.UpdateThread(user_id_input , _threadDto.Object,_antiSpam.Object);
 
         Assert.Equal(typeof(ThreadDto) , result.GetType());
 

@@ -19,9 +19,9 @@ public class ThreadService : IThreadService
     private readonly IPremiumService _premiumService;
     private readonly ITelegramService _telegramService;
     private readonly IEmailSender emailSender;
-    private readonly IAntiSpam _antiSpam;
+    // private readonly IAntiSpam _antiSpam;
 
-    public ThreadService(IAppUnitOfWork uow, IMapper mapper, IThreadCommentService threadCommentService, ILawyerServices lawyerServices, IPremiumService premiumService, ITelegramService telegramService, IEmailSender emailSender , IAntiSpam antiSpam)
+    public ThreadService(IAppUnitOfWork uow, IMapper mapper, IThreadCommentService threadCommentService, ILawyerServices lawyerServices, IPremiumService premiumService, ITelegramService telegramService, IEmailSender emailSender)// , IAntiSpam antiSpam)
     {
         _uow = uow;
         _mapper = mapper;
@@ -30,12 +30,13 @@ public class ThreadService : IThreadService
         _premiumService = premiumService;
         _telegramService = telegramService;
         this.emailSender = emailSender;
-        _antiSpam = antiSpam;
+        // _antiSpam = antiSpam;
     }
 
 
-    public async Task<ThreadDto> CreateThread(int userId, ThreadDto threadDto )
+    public async Task<ThreadDto> CreateThread(int userId, ThreadDto threadDto, IAntiSpam antispam = null )
     {
+        var _antiSpam = antispam ?? new AntiSpamService();
         var result = await _antiSpam.IsSpam(threadDto.Description);
         var result2 = await _antiSpam.IsSpam(threadDto.Title);
         var _user = await _uow.UserRepo.FindAsync(userId);
@@ -67,8 +68,9 @@ public class ThreadService : IThreadService
         return await GetThread(userId, thread.Id);
     }
 
-    public async Task<ThreadDto> UpdateThread(int userId, ThreadDto threadDto)
+    public async Task<ThreadDto> UpdateThread(int userId, ThreadDto threadDto , IAntiSpam antispam=null)
     {
+        var _antiSpam = antispam ?? new AntiSpamService();
         var result = await _antiSpam.IsSpam(threadDto.Description);
         if (result == "This message is detected as a spam and can not be shown.")
         {
