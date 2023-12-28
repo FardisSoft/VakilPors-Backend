@@ -144,5 +144,17 @@ namespace VakilPors.Test.Core.Services
 
 
         }
+
+        [Fact]
+        public async Task DeleteRateAsync()
+        {
+            //Arrange 
+            var rateid = 1;
+            var rate = new Rate();
+            appUnitOfWorkMock.Setup(x => x.RateRepo.FindAsync(rateid)).ReturnsAsync(rate);
+            appUnitOfWorkMock.Setup(x => x.RateRepo.Remove(rate));
+            //Act 
+            await rateService.DeleteRateAsync(rateid);
+        }
     }
 }
