@@ -216,11 +216,6 @@ namespace VakilPors.Test.Core.Services
 
             //Act and Assert  
             await premiumService.TransactUser(v, userid, amount, baste);
-
-
-
-
-
         }
     }
 }
