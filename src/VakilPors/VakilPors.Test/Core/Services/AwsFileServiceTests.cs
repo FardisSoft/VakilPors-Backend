@@ -13,6 +13,7 @@ using Amazon.S3.Model;
 using Amazon.Runtime;
 using Amazon.S3.Internal;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace VakilPors.Test.Core.Services
 {
@@ -94,6 +95,26 @@ namespace VakilPors.Test.Core.Services
             //Assert 
             Assert.NotNull(result);
             Assert.Equal(sample_output, result);
+        }
+
+        [Fact]
+        public async Task UploadFileMessageAsync()
+        {
+            //Arrange 
+            var key = Guid.NewGuid().ToString();
+            var request = new PutObjectRequest { Key = key, BucketName = _bucketName, InputStream = null };
+            var response = new PutObjectResponse { ETag = "sample" };
+            var formFileMock = new Mock<IFormFile>();
+            formFileMock.Setup(f => f.Length).Returns(1024);
+            formFileMock.Setup(f => f.OpenReadStream());
+            _s3Client.Setup(u => u.PutObjectAsync(It.IsAny<PutObjectRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(response);
+
+            //Act 
+            var result = await awsFileService.UploadFileMessageAsync(formFileMock.Object);
+            //Assert
+            Assert.NotNull(result);
+
+
         }
     }
 }
