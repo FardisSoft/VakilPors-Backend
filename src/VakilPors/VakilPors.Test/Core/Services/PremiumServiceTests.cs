@@ -201,5 +201,26 @@ namespace VakilPors.Test.Core.Services
             Assert.True(result);
 
         }
+        [Fact]
+        public async Task transact_user()
+        {
+            //Arrange 
+
+            var v = "none";
+            var userid = 1;
+            var amount = 1000;
+            var baste = "gold";
+            var user = new User { };
+            appUnitOfWorkMock.Setup(x => x.UserRepo.FindAsync(userid)).ReturnsAsync(user);
+            walletserviceMock.Setup(x => x.AddTransaction(userid , amount , "خرید بسته" , " " , true , false ,false)).Returns(Task.CompletedTask);
+
+            //Act and Assert  
+            await premiumService.TransactUser(v, userid, amount, baste);
+
+
+
+
+
+        }
     }
 }
