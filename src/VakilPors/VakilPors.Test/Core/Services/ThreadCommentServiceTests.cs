@@ -34,7 +34,7 @@ namespace VakilPors.Test.Core.Services
             premiumservicemock = new Mock<IPremiumService>();
             threadCommentService = new ThreadCommentService
                 (
-                appUnitOfWorkmock.Object, mappermock.Object, lawyerservicesmock.Object, premiumservicemock.Object,antispammock.Object
+                appUnitOfWorkmock.Object, mappermock.Object, lawyerservicesmock.Object, premiumservicemock.Object
                 );
         }
 
@@ -66,7 +66,7 @@ namespace VakilPors.Test.Core.Services
 
 
             //Act & Assert
-            var exception = await Assert.ThrowsAsync<BadArgumentException>(() => threadCommentService.CreateComment(userid , commentdto));
+            var exception = await Assert.ThrowsAsync<BadArgumentException>(() => threadCommentService.CreateComment(userid , commentdto , antispammock.Object));
             Assert.Equal("comment not found", exception.Message);
 
         }

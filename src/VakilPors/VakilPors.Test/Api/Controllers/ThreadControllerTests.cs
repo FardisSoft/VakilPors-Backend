@@ -56,7 +56,7 @@ public class ThreadControllerTests
         // Arrange
         var threadDto = new ThreadDto { /* ... properties setup ... */ };
         var result = new ThreadDto(){ /* ... properties setup ... */ };
-        _mockThreadService.Setup(service => service.CreateThread(GetUserId(), threadDto))
+        _mockThreadService.Setup(service => service.CreateThread(GetUserId(), threadDto,null))
             .ReturnsAsync(result);
 
         // Act
@@ -74,7 +74,7 @@ public class ThreadControllerTests
         // Arrange
         var threadDto = new ThreadDto { /* ... properties setup ... */ };
         var result = new ThreadDto{ /* ... properties setup ... */ };
-        _mockThreadService.Setup(service => service.UpdateThread(GetUserId(), threadDto))
+        _mockThreadService.Setup(service => service.UpdateThread(GetUserId(), threadDto , null))
             .ReturnsAsync(result);
 
         // Act

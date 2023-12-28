@@ -28,13 +28,13 @@ public class EmailSenderTests{
     // } 
     private Mock<SmtpClient> _smtpclient;
     private Mock<MimeMessage> _mimemessage;
-    private Mock<ILogger<EmailService>> _logger;
+    private Mock<ILogger<EmailSender>> _logger;
     private Mock<IConfiguration> _config;
     
     public EmailSenderTests(){
         _smtpclient = new Mock<SmtpClient>();
         _mimemessage = new Mock<MimeMessage>();
-        _logger = new Mock<ILogger<EmailService>>();
+        _logger = new Mock<ILogger<EmailSender>>();
         _logger.SetupAllProperties(); // This is necessary to use the LogCapture extension method.
 
         _config = new Mock<IConfiguration>();
@@ -59,7 +59,8 @@ public class EmailSenderTests{
         var fromEmail = "from@example.com";
 
         
-        using var emailService = new EmailService(_config.Object,_logger.Object, _mimemessage.Object , _smtpclient.Object);// ,"somename" , "someemail"); // Create an instance of your email service
+        // using var emailService = new EmailSender(_config.Object,_logger.Object);// ,"somename" , "someemail"); // Create an instance of your email service
+        var emailService = new EmailSender(_config.Object,_logger.Object ,_mimemessage.Object, _smtpclient.Object);// ,"somename" , "someemail"); // Create an instance of your email service
 
         await emailService.SendEmailAsync(email, name, subject, htmlMessage);
 
@@ -80,7 +81,8 @@ public class EmailSenderTests{
         It.IsAny<ITransferProgress>())).
         Throws(new Exception());//(new SystemException("An error occurred while sending the email."));
 
-        using var emailService = new EmailService(_config.Object,_logger.Object, _mimemessage.Object , _smtpclient.Object );//,"somename" , "someemail"); // Create an instance of your email service
+        // using var emailService = new EmailSender(_config.Object,_logger.Object );//,"somename" , "someemail"); // Create an instance of your email service
+        var emailService = new EmailSender(_config.Object,_logger.Object);//,_smtpclient.Object);//,"somename" , "someemail"); // Create an instance of your email service
         
         await emailService.SendEmailAsync(email, name, subject, htmlMessage);
 

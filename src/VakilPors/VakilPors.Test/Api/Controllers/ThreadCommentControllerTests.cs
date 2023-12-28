@@ -46,7 +46,7 @@ public class ThreadCommentControllerTests
         // Arrange
         var commentDto = new ThreadCommentDto { /* ... Properties setup ... */ };
         var serviceResult = new ThreadCommentDto(){ /* ... Properties setup ... */ };
-        _mockThreadCommentService.Setup(s => s.CreateComment(_userId, commentDto))
+        _mockThreadCommentService.Setup(s => s.CreateComment(_userId, commentDto , null))
             .ReturnsAsync(serviceResult);
         
         // Act
@@ -73,7 +73,7 @@ public async Task UpdateComment_ShouldReturnOkResult()
 {
     // Arrange
     var commentDto = new ThreadCommentDto { /* ... Properties setup ... */ };
-    _mockThreadCommentService.Setup(s => s.UpdateComment(_userId, commentDto))
+    _mockThreadCommentService.Setup(s => s.UpdateComment(_userId, commentDto , null))
         .ReturnsAsync(commentDto); // assuming the service returns the updated DTO
     
     // Act

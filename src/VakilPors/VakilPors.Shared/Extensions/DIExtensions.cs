@@ -1,8 +1,6 @@
 ﻿using System.Reflection;
 using VakilPors.Shared.Services;
 using Microsoft.Extensions.DependencyInjection;
-using System.Net.Mail;
-
 namespace VakilPors.Shared.Extensions;
 
 public static class DIExtensions
@@ -20,7 +18,8 @@ public static class DIExtensions
                     services.AddScoped(type);
             });
         }
-        services.AddScoped<SmtpClient>();
+        // services.AddScoped<SmtpClient>();
+        // services.AddScoped<IAntiSpam>();
     }
 
     public static void RegisterTransientDependencies(this IServiceCollection services, params Assembly[] assemblies)
