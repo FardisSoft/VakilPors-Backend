@@ -40,8 +40,8 @@ namespace VakilPors.Test.Core.Services
 
             legalDocumentService = new LegalDocumentService
                 (_lawyerServicesMock.Object, _awsFileServiceMock.Object, _appUnitOfWorkMock.Object, _mappermock.Object, _emailsenderMock.Object, _telegramserviceMock.Object, _premiumservice.Object);
-                
-                
+
+
         }
 
 
@@ -50,7 +50,7 @@ namespace VakilPors.Test.Core.Services
         {
             //Arrange 
             var userid = 1;
-            var legaldocumentdto = new LegalDocumentDto { File = null};
+            var legaldocumentdto = new LegalDocumentDto { File = null };
             var legaldocument = new LegalDocument { };
             _lawyerServicesMock.Setup(x => x.IsLawyer(It.IsAny<int>())).ReturnsAsync(false);
             _mappermock.Setup(x => x.Map<LegalDocument>(legaldocumentdto)).Returns(legaldocument);
@@ -157,10 +157,10 @@ namespace VakilPors.Test.Core.Services
             };
             var mock2 = lawyers.AsQueryable().BuildMock();
             _appUnitOfWorkMock.Setup(x => x.DocumentRepo.AsQueryable()).Returns(mock);
-            _appUnitOfWorkMock.Setup(x => x.LawyerRepo.AsQueryable()).Returns(mock2 );
+            _appUnitOfWorkMock.Setup(x => x.LawyerRepo.AsQueryable()).Returns(mock2);
             _appUnitOfWorkMock.Setup(x => x.DocumentRepo.Update(It.IsAny<LegalDocument>()));
             _appUnitOfWorkMock.Setup(x => x.SaveChangesAsync()).ReturnsAsync(1);
-            _emailsenderMock.Setup(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>() , It.IsAny<bool>()));
+            _emailsenderMock.Setup(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()));
 
             //Act 
             var exception = await Assert.ThrowsAsync<BadArgumentException>(() => legalDocumentService.GrantAccessToLawyer(docaccessdto));
@@ -203,14 +203,14 @@ namespace VakilPors.Test.Core.Services
 
             Assert.True(result);
 
-        
+
         }
 
         [Fact]
         public async Task lawyersaccesstodoument()
         {
             //Arrange 
-            int docid  = 1;
+            int docid = 1;
             var legaldocumentdto = new LegalDocumentDto { File = null };
             var legaldocument = new LegalDocument { };
             var docaccessdto = new DocumentAccessDto();
@@ -267,12 +267,31 @@ namespace VakilPors.Test.Core.Services
             _mappermock.Setup(x => x.Map<LegalDocumentDto>(legaldocument)).Returns(legaldocumentdto);
 
             //Act 
-            var exception = await Assert.ThrowsAsync<ArgumentNullException>(() => legalDocumentService.GetDocumentsThatLawyerHasAccessToByUserId(new LawyerDocumentAccessDto(),null));
+            var exception = await Assert.ThrowsAsync<ArgumentNullException>(() => legalDocumentService.GetDocumentsThatLawyerHasAccessToByUserId(new LawyerDocumentAccessDto(), null));
 
 
         }
 
+        [Fact]
+        public async Task UpdateDocumentStatus()
+        {
+            //Arrange 
+            var lawyeruserid = 1;
+            IEnumerable<DocumentAccess> documentAccesses = new List<DocumentAccess>
+            {
+                new DocumentAccess { Lawyer = new Lawyer{ UserId = 1 }  , DocumentId = 1}
+            };
+            var docmock = documentAccesses.AsQueryable().BuildMock();
+            var docdto = new DocumentStatusUpdateDto { DocumentId = lawyeruserid };
+            _appUnitOfWorkMock.Setup(x => x.DocumentAccessRepo.AsQueryable()).Returns(docmock);
+
+            //Act 
+            await legalDocumentService.UpdateDocumentStatus(docdto, lawyeruserid);
+
+            //Assert 
+            Assert.Equal(documentAccesses.First().DocumentStatus, docdto.DocumentStatus);
 
 
+        }
     }
 }
