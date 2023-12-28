@@ -17,5 +17,5 @@ public class Report :IEntity
     public int ThreadId { get; set; }
     [ForeignKey(nameof(ThreadId))]
     public virtual ForumThread Thread { get; set; }
-    //TODO: create enum(install extension)
+    public Status Status { get; set; } = Status.PENDING;
 }

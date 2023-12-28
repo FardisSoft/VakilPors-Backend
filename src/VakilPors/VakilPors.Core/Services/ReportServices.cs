@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using MimeKit.Encodings;
 using Microsoft.AspNetCore.Mvc;
+using VakilPors.Core.Exceptions;
 
 namespace VakilPors.Core.Services
 {
@@ -80,6 +81,20 @@ namespace VakilPors.Core.Services
                 return false; // Report deletion failed
             }
         }
+    public async Task<Report> UpdateReportStatusAsync(int id, Status status)
+    {
+        var existingReport = await _appUnitOfWork.ReportRepo.AsQueryable()
+            .FirstOrDefaultAsync(e=>e.Id==id);
+        if (existingReport == null)
+        {
+            throw new NotFoundException("Report not found.");
+        }
+
+        existingReport.Status = status;
+        await _appUnitOfWork.SaveChangesAsync();
+
+        return existingReport;
+    }
 
     }
 

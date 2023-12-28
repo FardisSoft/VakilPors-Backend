@@ -9,6 +9,8 @@ namespace VakilPors.Core.Contracts.Services
         Task<List<ReportDto>> GetAllReport();
         Task<bool> PostReport(PostReportDto reportDto);
         Task<bool> DeleteReport(int reportId);
+        Task<Report> UpdateReportStatusAsync(int id, Status status);
+
 
 
     }
