@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿    using AutoMapper;
 using Bogus.DataSets;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -367,6 +367,7 @@ namespace VakilPors.Test.Core.Services
         
         }
 
+
         //[Fact]
         //public async Task get_lawyers()
         //{
@@ -404,14 +405,117 @@ namespace VakilPors.Test.Core.Services
         //    //Act
 
         //    var result =await  lawyerServices.GetLawyers(pagedparams, sortparams, filterparams);
-            
 
         //    //Assert 
-
-
-
-
-
         //}
+
+
+        [Fact]
+        public async Task GetLawyerById()
+        {
+            //Arrange
+            int id = 4;
+            //IEnumerable<Lawyer> lawyers = new List<Lawyer>
+            //{
+            //    new Lawyer{ User = new User() , Id = id}
+            //};
+            //var mock = lawyers.AsQueryable().BuildMock(); 
+            //appUnitOfWorkMock.Setup(x => x.LawyerRepo.AsQueryable()).Returns(mock);
+
+            var lawyerDto = new LawyerDto { Rating = 1, AboutMe = "example", Education = "sample" };
+            var found_lawyer = new Lawyer { Rating = 5 };
+            var found_user = new User();
+            var p = 0;
+            IEnumerable<ThreadComment> threadComments = new List<ThreadComment>
+            {
+                new ThreadComment (),
+                new ThreadComment ()
+            };
+            IEnumerable<Chat> chats = new List<Chat>
+            {
+                new Chat(),
+                new Chat ()
+            };
+            IEnumerable<Subscribed> subscribeds = new List<Subscribed>
+            {
+                new Subscribed(),
+                new Subscribed()
+            };
+            IEnumerable<Lawyer> _lawyers = new List<Lawyer>()
+            {
+                new Lawyer{Id = 1},
+                new Lawyer{Id = 2},
+                new Lawyer{Id = 3},
+                new Lawyer{ User = new User() , Id = id}
+            };
+            IEnumerable<LawyerDto> lawyerdtos = new List<LawyerDto>()
+            {
+                new LawyerDto{Id = 1 , NumberOfAnswers = 2},
+                new LawyerDto{Id = 2},
+                new LawyerDto{Id = 3},
+                new LawyerDto{ Id = 4},
+            };
+            IQueryable<ThreadComment> threadCommentsQueryable = threadComments.AsQueryable();
+            var mock1 = threadCommentsQueryable.BuildMock();
+
+            IQueryable<Chat> chatQueryable = chats.AsQueryable();
+            var mock2 = chatQueryable.BuildMock();
+
+            IQueryable<Subscribed> subscribedQueryable = subscribeds.AsQueryable();
+            var mock3 = subscribedQueryable.BuildMock();
+
+            IQueryable<Lawyer> lawyers = _lawyers.AsQueryable();
+            var _mock = lawyers.BuildMock();
+
+            foreach (var lawyer in _lawyers)
+            {
+                imapperMock.Setup(u => u.Map<LawyerDto>(lawyer)).Returns(lawyerdtos.ToList()[p]);
+                p++;
+            }
+            appUnitOfWorkMock.Setup(u => u.ThreadCommentRepo.AsQueryable()).Returns(mock1);
+            appUnitOfWorkMock.Setup(x => x.LawyerRepo.AsQueryable()).Returns(_mock);
+            appUnitOfWorkMock.Setup(u => u.ChatRepo.AsQueryable()).Returns(mock2);
+            appUnitOfWorkMock.Setup(u => u.SubscribedRepo.AsQueryable()).Returns(mock3);
+
+
+            //Act 
+            var result = await lawyerServices.GetLawyerById(id);
+        }
+
+        [Fact]
+        public async Task GetLawyerCityCounts()
+        {
+            //Arrange 
+            IEnumerable<Lawyer> _lawyers = new List<Lawyer>()
+            {
+                new Lawyer{Id = 1 , City = "Tehran"},
+                new Lawyer{Id = 2 , City = "Tehran"},
+                new Lawyer{Id = 3},
+                new Lawyer{ User = new User() , Id = 4}
+            };
+            IQueryable<Lawyer> lawyers = _lawyers.AsQueryable();
+            var _mock = lawyers.BuildMock();
+            appUnitOfWorkMock.Setup(x => x.LawyerRepo.AsQueryableNoTracking()).Returns(_mock);
+            //Act 
+            var result = await lawyerServices.GetLawyerCityCounts();
+        }
+
+        [Fact]
+        public async Task GetLawyerTitleCounts()
+        {
+            //Arrange 
+            IEnumerable<Lawyer> _lawyers = new List<Lawyer>()
+            {
+                new Lawyer{Id = 1 , City = "Tehran" , Title = "sample"},
+                new Lawyer{Id = 2 , City = "Tehran" , Title = "sample"},
+                new Lawyer{Id = 3},
+                new Lawyer{ User = new User() , Id = 4}
+            };
+            IQueryable<Lawyer> lawyers = _lawyers.AsQueryable();
+            var _mock = lawyers.BuildMock();
+            appUnitOfWorkMock.Setup(x => x.LawyerRepo.AsQueryableNoTracking()).Returns(_mock);
+            //Act 
+            var result = await lawyerServices.GetLawyerTitleCounts();
+        }
     }
 }
