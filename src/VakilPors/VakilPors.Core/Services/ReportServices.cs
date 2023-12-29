@@ -26,7 +26,7 @@ namespace VakilPors.Core.Services
             var reports = await _appUnitOfWork.ReportRepo
                 .AsQueryable()
                 .Include(x  => x.User)
-                .Include(x=>x.Thread).ThenInclude(u=>u.User)
+                .Include(x=>x.ThreadComment).ThenInclude(u=>u.User)
                 .ToListAsync();
 
             var ReportDtos =new List<ReportDto>();
