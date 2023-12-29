@@ -1,18 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNetCore.Mvc;
 using VakilPors.Core.Exceptions;
 
-namespace VakilPors.Web.Controllers
+namespace VakilPors.Api.Controllers
 {
     public class MyControllerBase : ControllerBase
     {
-        protected string getPhoneNumber()
+        protected string GetPhoneNumber()
         {
             var phoneNumber = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (phoneNumber == null)
@@ -21,7 +16,7 @@ namespace VakilPors.Web.Controllers
             }
             return phoneNumber;
         }
-        protected int getUserId()
+        protected int GetUserId()
         {
             var userId = User.FindFirstValue("uid");
             if (userId == null)
@@ -30,7 +25,7 @@ namespace VakilPors.Web.Controllers
             }
             return Convert.ToInt32(userId);
         }
-        protected string getQueryString(object obj)
+        protected string GetQueryString(object obj)
         {
             var properties = from p in obj.GetType().GetProperties()
                              where p.GetValue(obj, null) != null
@@ -38,7 +33,7 @@ namespace VakilPors.Web.Controllers
 
             return String.Join("&", properties.ToArray());
         }
-        protected string getBaseRoute(){
+        protected string GetBaseRoute(){
             var baseRoute = $"{Request.Scheme}://{Request.Host.Value}";
             return baseRoute;
         }

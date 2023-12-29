@@ -10,7 +10,6 @@ using VakilPors.Core.Domain.Dtos.User;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Core.Mapper;
 using VakilPors.Shared.Response;
-using VakilPors.Web.Controllers;
 
 namespace VakilPors.Api.Controllers;
 [Authorize(Roles = RoleNames.Admin)]
@@ -31,7 +30,7 @@ public class UserController:MyControllerBase
     [HttpGet]
     public async Task<ActionResult> GetAllPaged([FromQuery]string? query,[FromQuery]int? roleId,[FromQuery] PagedParams pagedParams, [FromQuery] SortParams sortParams)
     {
-        _logger.LogInformation($"GET ALL users paged by admin with phone number:{getPhoneNumber()}. page no:{pagedParams.PageNumber} page size:{pagedParams.PageSize}, search query:{query}, sort by:{sortParams.Sort}, isAscending:{sortParams.IsAscending}");
+        _logger.LogInformation($"GET ALL users paged by admin with phone number:{GetPhoneNumber()}. page no:{pagedParams.PageNumber} page size:{pagedParams.PageSize}, search query:{query}, sort by:{sortParams.Sort}, isAscending:{sortParams.IsAscending}");
         var all = await _userServices.GetUsers(query,roleId,pagedParams, sortParams);
         // var res = all.ToMappedPagination<Us, UserDto>(_mapper,pagedParams.PageSize);
         return Ok(new AppResponse<Pagination<UserDto>>(all, "success"));

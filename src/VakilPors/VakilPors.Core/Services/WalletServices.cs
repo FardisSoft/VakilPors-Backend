@@ -185,7 +185,7 @@ namespace VakilPors.Core.Services
             }
         }
 
-        private async Task<MonthlyTransactionCountDto> GetCountTransactionsOfMonth(DateTime date)
+        public async Task<MonthlyTransactionCountDto> GetCountTransactionsOfMonth(DateTime date)
         {
             var firstDayOfMonth = new DateTime(date.Year, date.Month, 1);
             var lastDayOfMonth = firstDayOfMonth.AddMonths(1);
@@ -197,7 +197,7 @@ namespace VakilPors.Core.Services
                 Count = count
             };
         }
-        private async Task<MonthlyTransactionAmountDto> GetAmountTransactionsOfMonth(DateTime date,int? userId)
+        public async Task<MonthlyTransactionAmountDto> GetAmountTransactionsOfMonth(DateTime date,int? userId)
         {
             var firstDayOfMonth = new DateTime(date.Year, date.Month, 1);
             var lastDayOfMonth = firstDayOfMonth.AddMonths(1);

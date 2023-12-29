@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Ocr;
 using VakilPors.Shared.Response;
-using VakilPors.Web.Controllers;
 
 namespace VakilPors.Api.Controllers;
 

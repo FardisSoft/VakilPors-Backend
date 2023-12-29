@@ -6,7 +6,7 @@ using VakilPors.Core.Domain.Dtos.Report;
 using VakilPors.Core.Domain.Entities;
 using VakilPors.Shared.Response;
 
-namespace VakilPors.Web.Controllers;
+namespace VakilPors.Api.Controllers;
 
 [ApiController]
 [Authorize(Roles = RoleNames.Admin)]
