@@ -27,6 +27,7 @@ public class ReportController : MyControllerBase
         return Ok(new AppResponse<object>(result, "success"));
     }
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> PostReport([FromBody] PostReportDto postReportDto)
     {
         var result =await _reportservice.PostReport(postReportDto);
@@ -60,7 +61,7 @@ public class ReportController : MyControllerBase
         }
     }
     [HttpPatch("/Report/status/{id}")]
-    public async Task<IActionResult> UpdateStatus(int id, Status status)
+    public async Task<IActionResult> UpdateStatus(int id, [FromBody]Status status)
     {
         var updatedReport = await _reportservice.UpdateReportStatusAsync(id, status);
         return Ok(updatedReport);
