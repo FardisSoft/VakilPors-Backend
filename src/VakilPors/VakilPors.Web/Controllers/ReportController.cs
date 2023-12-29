@@ -61,7 +61,7 @@ public class ReportController : MyControllerBase
         }
     }
     [HttpPatch("/Report/status/{id}")]
-    public async Task<IActionResult> UpdateStatus(int id, [FromBody]Status status)
+    public async Task<IActionResult> UpdateStatus(int id,Status status)
     {
         var updatedReport = await _reportservice.UpdateReportStatusAsync(id, status);
         return Ok(updatedReport);
