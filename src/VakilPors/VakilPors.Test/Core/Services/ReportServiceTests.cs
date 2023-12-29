@@ -9,6 +9,7 @@ using VakilPors.Contracts.Repositories;
 using VakilPors.Core.Services;
 using Org.BouncyCastle.Crypto.Parameters;
 using VakilPors.Core.Exceptions;
+using VakilPors.Data.Migrations;
 
 
 public class ReportServiceTests{
@@ -197,5 +198,49 @@ public class ReportServiceTests{
         Assert.False(result);
         // _uow.Verify(uow => 
         //     uow.SaveChangesAsync(), Times.Never());
+    }
+    [Fact]
+    public async void UpdateReportStatusAsync_SuccessWay_ReturnFindedReport(){
+        var report = new List<Report>(){
+            new Report{
+                Description = "Test Description",
+                UserId = 1,
+            },
+        
+        };
+        var reportmock = report.BuildMock();
+        
+        var reportRepositorymock = new Mock<IGenericRepo<Report>>();
+        _uow.Setup(x => x.ReportRepo)
+            .Returns(reportRepositorymock.Object);
+        reportRepositorymock.Setup(x=>x.AsQueryable()).Returns(reportmock);
+
+        _uow.Setup(x=>x.SaveChangesAsync()).ReturnsAsync(1);
+        var result = await reportService.UpdateReportStatusAsync(It.IsAny<int>(), It.IsAny<Status>());
+        Assert.Equal(typeof(Report),result.GetType());
+
+
+    }
+    [Fact]
+    public async void UpdateReportStatusAsync_CantFindReport_ThrowNotFoundException(){
+        var report = new List<Report>(){
+            // new Report{
+            //     Description = "Test Description",
+            //     UserId = 1,
+            // },
+        
+        };
+        var reportmock = report.BuildMock();
+        
+        var reportRepositorymock = new Mock<IGenericRepo<Report>>();
+        _uow.Setup(x => x.ReportRepo)
+            .Returns(reportRepositorymock.Object);
+        reportRepositorymock.Setup(x=>x.AsQueryable()).Returns(reportmock);
+
+        // var result = await reportService.UpdateReportStatusAsync(It.IsAny<int>(), It.IsAny<Status>());
+        await Assert.ThrowsAsync<NotFoundException>(() => reportService.UpdateReportStatusAsync(It.IsAny<int>(), It.IsAny<Status>()));
+
+
+
     }
 }
