@@ -14,8 +14,8 @@ public class Report :IEntity
     public int UserId { get; set; }
     [ForeignKey(nameof(UserId))]
     public virtual User User { get; set; }
-    public int CommentId { get; set; }
+    public int CommentId{ get; set; }
     [ForeignKey(nameof(CommentId))]
-    public virtual ThreadComment ThreadComment { get; set; }
-    //TODO: create enum(install extension)
+public virtual ThreadComment ThreadComment { get; set; }
+    public Status Status { get; set; } = Status.PENDING;
 }

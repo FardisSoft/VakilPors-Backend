@@ -1,11 +1,15 @@
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VakilPors.Core.Contracts.Services;
 using VakilPors.Core.Domain.Dtos.Report;
+using VakilPors.Core.Domain.Entities;
 using VakilPors.Shared.Response;
 
 namespace VakilPors.Api.Controllers;
 
 [ApiController]
+[Authorize(Roles = RoleNames.Admin)]
 [Route("[controller]/[action]")]
 public class ReportController : MyControllerBase
 {
@@ -23,6 +27,7 @@ public class ReportController : MyControllerBase
         return Ok(new AppResponse<object>(result, "success"));
     }
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> PostReport([FromBody] PostReportDto postReportDto)
     {
         var result =await _reportservice.PostReport(postReportDto);
@@ -55,7 +60,12 @@ public class ReportController : MyControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
-
+    [HttpPatch("/Report/status/{id}")]
+    public async Task<IActionResult> UpdateStatus(int id, [FromBody]Status status)
+    {
+        var updatedReport = await _reportservice.UpdateReportStatusAsync(id, status);
+        return Ok(updatedReport);
+    }
     // [HttpDelete("{id}")]
     // public async Task<ActionResult> DeleteReport(int id)
     // {
