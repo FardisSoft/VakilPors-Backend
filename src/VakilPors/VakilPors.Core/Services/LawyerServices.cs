@@ -327,7 +327,7 @@ namespace VakilPors.Core.Services
         {
             var filteredLawyers = _appUnitOfWork.LawyerRepo.AsQueryableNoTracking()
             .Include(l => l.User)
-            .Where(l => string.IsNullOrEmpty(filterParams.Name) || Fuzz.PartialRatio(l.User.Name, filterParams.Name) > 75 );
+            .Where(l => string.IsNullOrEmpty(filterParams.Name) || l.User.Name.Contains(filterParams.Name));
 
             if (filterParams.Rating != null)
             {
